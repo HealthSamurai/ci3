@@ -58,10 +58,18 @@
 
 (def cfg {:apiVersion "ci3.io/v1" :ns "default"})
 
+
+(defn cleanup [s]
+  (-> s
+      (str/replace  #"\/" "-")
+      (str/replace  #"\_" "-")
+      (str/replace  #"\:" "-")))
+
 (defn create-build [payload]
   (let [repository (:repository payload)
         commit (last (:commits payload))
-        hashcommit (:id commit) ]
+        hashcommit (:id commit)
+        build-name (cleanup (str (:full_name repository) "-" hashcommit)) ]
     {:body (k8s/create cfg :builds
                        {:kind "Build"
                         :apiVersion "ci3.io/v1"
@@ -70,7 +78,7 @@
                                   :diff (:compare payload)
                                   :repository (select-keys repository
                                                            [:name :organization :full_name
-                                                            :html_url :git_url :ssh_url
+                                                            :url :html_url :git_url :ssh_url
                                                             ]
                                                            )
                                   :commit (select-keys commit
