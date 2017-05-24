@@ -1,0 +1,6 @@
+# APISERVER=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d " ")
+# TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
+# BUILD_ID=build-2
+# docker run --rm -e KUBE_URL=$APISERVER -e KUBE_TOKEN=$TOKEN -e BUILD_ID="build-2" -v /var/run/docker.sock:/var/run/docker.sock -t aidbox/ci3:0.0.1 agent
+
+env BUILD_ID=build-2 java -cp target/ci3.jar clojure.main -m ci3.agent 
