@@ -63,7 +63,8 @@
   (-> s
       (str/replace  #"\/" "-")
       (str/replace  #"\_" "-")
-      (str/replace  #"\:" "-")))
+      (str/replace  #"\:" "-")
+      (str/lower-case)))
 
 (defn create-build [payload]
   (let [repository (:repository payload)
