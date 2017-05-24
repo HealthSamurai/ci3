@@ -62,7 +62,7 @@
       res)))
 
 
-(def cfg {:apiVersion "zeroci.io/v1" :ns "default"})
+(def cfg {:apiVersion "ci3.io/v1" :ns "default"})
 
 (comment
   (list cfg :builds)
@@ -73,8 +73,8 @@
 
   (create cfg :builds
           {:kind "Build"
-           :apiVersion "zeroci.io/v1"
-           :metadata {:name "test-1"}})
+           :apiVersion "ci3.io/v1"
+           :metadata {:name "test-00"}})
   )
 
 #_(query {:apiVersion "zeroci.io/v1"

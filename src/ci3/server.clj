@@ -6,6 +6,7 @@
    [clojure.tools.logging :as log]
    [clojure.java.shell :as sh]
    [cheshire.core :as json]
+   [ci3.k8s :as k8s]
    [pandect.algo.sha1 :refer [sha1-hmac]]
    [route-map.core :as route-map]
    [ring.util.codec])
@@ -52,11 +53,24 @@
         payload (slurp body)
         hash (str "sha1=" (sha1-hmac payload "secret")) ]
     (if (= signature hash)
-      {:body payload}
+      (json/parse-string payload)
       {:status 401 })))
 
-(def webhook
-  (-> verify))
+
+(def cfg {:apiVersion "zeroci.io/v1" :ns "default"})
+(defn create-build [payload]
+  (let [build-name (str (get-in payload [:repository name ":" (:after payload)]))]
+    {:body (k8s/create cfg :build
+                       {:kind "Build"
+                        :apiVersion "zeroci.io/v1"
+                        :metadata {:name "test-1"}
+                        :payload payload })}))
+
+(defn webhook [req]
+  (-> req
+      verify
+      create-build
+      ))
 
 (defn welcome [_]
   {:body "Welocome to zeroci"})
