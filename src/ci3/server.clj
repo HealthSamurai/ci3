@@ -56,13 +56,35 @@
       {:status 401 })))
 
 
+(def cfg {:apiVersion "ci3.io/v1" :ns "default"})
+
+
+(defn cleanup [s]
+  (-> s
+      (str/replace  #"\/" "-")
+      (str/replace  #"\_" "-")
+      (str/replace  #"\:" "-")))
+
 (defn create-build [payload]
-  (let [build-name (str (get-in payload [:repository :name]) "-" (:after payload))]
-    {:body (k8s/create k8s/cfg :builds
+  (let [repository (:repository payload)
+        commit (last (:commits payload))
+        hashcommit (:id commit)
+        build-name (cleanup (str (:full_name repository) "-" hashcommit)) ]
+    {:body (k8s/create cfg :builds
                        {:kind "Build"
                         :apiVersion "ci3.io/v1"
-                        :metadata {:name build-name}
-                        :payload payload })}))
+                        :metadata {:name  hashcommit}
+                        :payload {:ref (:ref payload)
+                                  :diff (:compare payload)
+                                  :repository (select-keys repository
+                                                           [:name :organization :full_name
+                                                            :url :html_url :git_url :ssh_url
+                                                            ]
+                                                           )
+                                  :commit (select-keys commit
+                                                       [:id :message :timestamp
+                                                        :url :author ])
+                                 } })}))
 
 (defn webhook [req]
   (-> req
