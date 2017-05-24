@@ -1,4 +1,4 @@
-(ns ci3.webhook
+(ns ci3.server
   (:require
    [clojure.string :as str]
    [org.httpkit.server :as http-kit]
@@ -89,7 +89,6 @@
   (reset! server (http-kit/run-server #'app {:port 8888})))
 
 
-(defn -main [& args]
-  (restart))
+(defn -main [& args] (restart))
 
 (comment (restart))

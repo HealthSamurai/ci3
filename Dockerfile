@@ -11,7 +11,6 @@ RUN set -x && \
     chmod +x /usr/local/bin/kubectl && \
     kubectl version --client
 
-
 RUN apk add --no-cache git
 
 # Java Version and other ENV
@@ -84,8 +83,9 @@ RUN set -ex && \
     echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf
 # EOF
 
+ADD target/ci3.jar /ci3.jar
 
-ADD target/c3.jar /c3.jar
-ADD entrypoint /entrypoint
-RUN chmod u+x /entrypoint
-ENTRYPOINT "/entrypoint"
+COPY entrypoint /usr/local/bin/
+RUN chmod u+x /usr/local/bin/entrypoint
+
+ENTRYPOINT ["/usr/local/bin/entrypoint"]
