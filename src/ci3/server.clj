@@ -59,12 +59,24 @@
 (def cfg {:apiVersion "ci3.io/v1" :ns "default"})
 
 (defn create-build [payload]
-  (let [build-name (str (get-in payload [:repository :name]) "-" (:after payload))]
+  (let [repository (:repository payload)
+        commit (last (:commits payload))
+        hashcommit (:id commit) ]
     {:body (k8s/create cfg :builds
                        {:kind "Build"
                         :apiVersion "ci3.io/v1"
-                        :metadata {:name build-name}
-                        :payload payload })}))
+                        :metadata {:name  hashcommit}
+                        :payload {:ref (:ref payload)
+                                  :diff (:compare payload)
+                                  :repository (select-keys repository
+                                                           [:name :organization :full_name
+                                                            :html_url :git_url :ssh_url
+                                                            ]
+                                                           )
+                                  :commit (select-keys commit
+                                                       [:id :message :timestamp
+                                                        :url :author ])
+                                 } })}))
 
 (defn webhook [req]
   (-> req

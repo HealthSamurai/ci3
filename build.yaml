@@ -1,4 +1,6 @@
 apiVersion: "ci3.io/v1"
-kind: Build
+kind: ThirdPartyResource
 metadata:
-  name: sample build
+  name: builds.ci3.io
+versions:
+- name: v1
