@@ -2,15 +2,17 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ci3-run-1
+  name: ci3-run-10
   labels:
     system: dev
 spec:
   restartPolicy: Never
   containers:
   - name: agent
-    image: aidbox/ci3:0.0.1
+    image: aidbox/ci3:latest
     imagePullPolicy: Always
+    args:
+    - agent
     volumeMounts:
     - name: docker-sock
       mountPath: /var/run/docker.sock
@@ -18,7 +20,7 @@ spec:
     - name: BUILD_ID
       value: build-2
     - name: REPOSITORY
-      value: https://github.com/healthsamurai/ci3 \
+      value: https://github.com/healthsamurai/ci3
     - name: DOCKER_KEY
       valueFrom:
         secretKeyRef:

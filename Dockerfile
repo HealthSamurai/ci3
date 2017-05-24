@@ -96,4 +96,6 @@ ENV LEIN_ROOT 1
 COPY entrypoint /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint
 
+ENV DOCKER_API_VERSION 1.23
+
 ENTRYPOINT ["/usr/local/bin/entrypoint"]

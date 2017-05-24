@@ -21,7 +21,7 @@
 
 (defn query [cfg rt & [pth]]
   (let [res @(http-client/get
-              (url cfg (str "apis/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) "/" pth))
+              (url cfg (str (or (:prefix cfg) "apis") "/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) "/" pth))
               {:headers (merge default-headers {"Content-Type" "application/json"})
                :insecure? true})]
     (-> res
@@ -33,8 +33,8 @@
 
 (defn create [cfg rt res]
   (-> @(http-client/post
-        (url cfg (str "apis/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt)))
-        {:body (json/generate-string res)
+        (url cfg (str (or (:prefix cfg) "apis") "/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt)))
+        {:body (json/generate-string (walk/stringify-keys res))
          :insecure? true
          :headers (merge default-headers {"Content-Type" "application/json"})})
       :body
@@ -42,7 +42,7 @@
 
 (defn delete [cfg rt id]
   (-> @(http-client/delete
-        (url cfg (str "apis/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) "/" id))
+        (url cfg (str (or (:prefix cfg) "apis") "/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) "/" id))
         {:headers (merge default-headers {"Content-Type" "application/json"})
          :insecure? true})
       :body
@@ -54,7 +54,7 @@
       (let [diff (patch/diff res (merge res (walk/stringify-keys patch)))]
         (->
          @(http-client/patch
-           (url cfg (str "apis/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) "/" id))
+           (url cfg (str (or (:prefix cfg) "apis") "/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) "/" id))
            {:body (json/generate-string diff)
             :insecure? true
             :headers (merge default-headers {"Content-Type" "application/json-patch+json"})})
@@ -75,6 +75,12 @@
           {:kind "Build"
            :apiVersion "ci3.io/v1"
            :metadata {:name "test-00"}})
+  (-> @(http-client/get
+        (url cfg (str "api/v1/namespaces/default/pods"))
+        {:insecure? true
+         :headers (merge default-headers {"Content-Type" "application/json"})})
+      :body
+      (json/parse-string))
   )
 
 #_(query {:apiVersion "zeroci.io/v1"

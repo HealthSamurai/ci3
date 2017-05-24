@@ -56,11 +56,9 @@
       {:status 401 })))
 
 
-(def cfg {:apiVersion "ci3.io/v1" :ns "default"})
-
 (defn create-build [payload]
   (let [build-name (str (get-in payload [:repository :name]) "-" (:after payload))]
-    {:body (k8s/create cfg :builds
+    {:body (k8s/create k8s/cfg :builds
                        {:kind "Build"
                         :apiVersion "ci3.io/v1"
                         :metadata {:name build-name}
@@ -69,17 +67,13 @@
 (defn webhook [req]
   (-> req
       verify
-      create-build
-      ))
+      create-build))
 
 (defn welcome [_]
   {:body "Welocome to zeroci"})
 
 (defn builds [_]
-  (let [url "http://localhost:8001/api/v1/namespaces/default/pods?labelSelector=system=ci"
-        url "http://localhost:8001/apis/zeroci.io/v1/builds"
-        res (http-client/get url)]
-    {:body (:body @res)}))
+  {:body (k8s/list k8s/cfg :builds)})
 
 (def routes
   {:GET #'welcome
