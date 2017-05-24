@@ -1,0 +1,14 @@
+echo 'starting'
+
+ls -lR /var/run/secrets
+cat /var/run/secrets/kubernetes.io/serviceaccount/token
+if [ -f /var/run/secrets/kubernetes.io/serviceaccount/token ]; then
+  echo "export key"
+  export KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+fi
+
+if [ -n "$KUBERNETES_SERVICE_HOST" ]; then
+  export KUBE_URL="https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT"
+fi
+
+java -cp /ci3.jar clojure.main -m ci3.core
