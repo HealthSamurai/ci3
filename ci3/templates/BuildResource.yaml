@@ -1,0 +1,7 @@
+apiVersion: extensions/v1beta1
+kind: ThirdPartyResource
+metadata:
+  name: build.ci3.io
+description: "CI/CD resource"
+versions:
+- name: v1
