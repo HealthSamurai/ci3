@@ -39,20 +39,6 @@
                               :scheduledAt (str (java.util.Date.))
                               :status "scheduled"})))))))))
 
-;; (:items (walk/keywordize-keys (k8s/list k8s/cfg :builds)))
-
-(process (walk/keywordize-keys (k8s/list k8s/cfg :builds)))
-
-;; (map :pod (:items (walk/keywordize-keys (k8s/list k8s/cfg :builds))))
-
-;; (k8s/list {:prefix "api" :ns "default" :apiVersion "v1"} :pods)
-
-
-#_(k8s/create k8s/cfg :builds
-            {:kind "Build"
-             :apiVersion "ci3.io/v1"
-             :metadata {:name "ci3-build-6"}
-             :repository "https://github.com/healthsamurai/ci3"})
 
 (defn watch []
   (if @stop
@@ -64,5 +50,20 @@
 
   (reset! stop true)
   (reset! stop false)
+
+  ;; (:items (walk/keywordize-keys (k8s/list k8s/cfg :builds)))
+
+  ;; (process (walk/keywordize-keys (k8s/list k8s/cfg :builds)))
+
+  ;; (map :pod (:items (walk/keywordize-keys (k8s/list k8s/cfg :builds))))
+
+  ;; (k8s/list {:prefix "api" :ns "default" :apiVersion "v1"} :pods)
+
+
+  #_(k8s/create k8s/cfg :builds
+                {:kind "Build"
+                 :apiVersion "ci3.io/v1"
+                 :metadata {:name "ci3-build-6"}
+                 :repository "https://github.com/healthsamurai/ci3"})
 
   )

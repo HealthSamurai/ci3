@@ -66,7 +66,8 @@
 
 (comment
   (list cfg :builds)
-  (find cfg :builds "dfdfdf")
+  (find cfg :builds "ci3-build-6")
+
   (patch cfg :builds "test-1" {:status "changed"})
 
   (delete cfg :builds "test-1")

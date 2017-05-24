@@ -4,7 +4,7 @@ BUILD_ID=build-2
 docker run --rm \
   -e KUBE_URL=$APISERVER \
   -e KUBE_TOKEN=$TOKEN \
-  -e BUILD_ID="build-2" \
+  -e BUILD_ID="ci3-build-6" \
   -e REPOSITORY=https://github.com/healthsamurai/ci3 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /tmp/m2-cache:/root/.m2 \

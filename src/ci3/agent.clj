@@ -8,14 +8,10 @@
             [clojure.string :as str]
             [clojure.java.io :as io]))
 
-(def cfg {:apiVersion "zeroci.io/v1" :ns "default"})
-
 (defn build-id [] (System/getenv "BUILD_ID"))
 
-(defn get-build []
-  (let [cfg cfg 
-        bid (build-id)
-        bld (k8s/find cfg :builds bid)]
+(defn get-build [bid]
+  (let [bld (k8s/find k8s/cfg :builds (str/trim bid))]
     (when-not (or bld (= "Failure" (get bld "status")))
       (throw (Exception. (str "Could not find build: " bid " or " bld))))
     (println "Got build: " bld)
@@ -34,5 +30,6 @@
     (when-not (= 0 (:exit repo))
       (println repo)
       (throw (Exception. "Unable to clone repository"))))
-  (build/build (get-build) println)
+  (let [bld (get-build (build-id))]
+    (build/build (yaml/parse-string (slurp "/workspace/ci3.yaml") true) println))
   (System/exit 0))
