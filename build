@@ -3,5 +3,8 @@ set -e
 set -o xtrace
 
 lein uberjar
+
 docker build -t aidbox/ci3:0.0.3 .
 docker push aidbox/ci3:0.0.3
+docker tag aidbox/ci3:0.0.3 aidbox/ci3:latest
+docker push aidbox/ci3:latest

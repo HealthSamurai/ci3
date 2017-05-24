@@ -15,6 +15,7 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
+        args: {{ .Values.service.args }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         livenessProbe:
@@ -25,4 +26,3 @@ spec:
           httpGet:
             path: /
             port: {{ .Values.service.internalPort }}
-{{ toYaml .Values.resources | indent 10 }}

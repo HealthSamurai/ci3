@@ -1,15 +1,15 @@
 FROM docker
 
-RUN apk add --no-cache curl ca-certificates bash sudo
+RUN apk add --no-cache curl ca-certificates bash sudo openssl
 
 RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
 RUN curl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl > /usr/local/bin/kubectl
 
 ENV HOME=/config
 
-RUN set -x && \
-    chmod +x /usr/local/bin/kubectl && \
-    kubectl version --client
+RUN set +e && \
+    chmod +x /usr/local/bin/kubectl
+    #kubectl version --client
 
 RUN apk add --no-cache git
 
@@ -86,7 +86,7 @@ RUN set -ex && \
 RUN apk add --update curl
 RUN curl https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > /usr/bin/lein && chmod u+x /usr/bin/lein && lein
 
-ADD target/ci3.jar /ci3.jar
+ADD target/ci3.jar /var/ci3.jar
 
 RUN mkdir /workspace
 
