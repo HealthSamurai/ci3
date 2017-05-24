@@ -14,4 +14,4 @@ pipeline:
    command: ls -lah /
  - type: docker
    command: build
-   image: ci3
+   image: eu.gcr.io/aidbox-next/ci3

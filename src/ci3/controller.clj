@@ -7,7 +7,6 @@
 (defonce stop (atom nil))
 
 (defn process [builds]
-  (println ".")
   (when-let [items (:items builds)]
     (doseq [i items]
       (when-not (:pod i)

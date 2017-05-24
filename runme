@@ -1,17 +1,17 @@
-APISERVER=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d " ")
-TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
-BUILD_ID=build-2
-docker run --rm \
-  -e KUBE_URL=$APISERVER \
-  -e KUBE_TOKEN=$TOKEN \
-  -e BUILD_ID="ci3-build-6" \
-  -e REPOSITORY=https://github.com/healthsamurai/ci3 \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v /tmp/m2-cache:/root/.m2 \
-  -it aidbox/ci3:0.0.3 \
-  agent
+export APISERVER=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d " ")
+export TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
+export DOCKER_KEY="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
+export BUILD_ID=ci3-build-6
 
-  # --entrypoint="bash" \
-  #-v `pwd`:/workspace \
+# docker run --rm \
+#   -e KUBE_URL=$APISERVER \
+#   -e KUBE_TOKEN=$TOKEN \
+#   -e BUILD_ID=$BUILD_ID \
+#   -e REPOSITORY=https://github.com/healthsamurai/ci3 \
+#   -e DOCKER_KEY=$DOCKER_KEY \
+#   -v /var/run/docker.sock:/var/run/docker.sock \
+#   -v /tmp/m2-cache:/root/.m2 \
+#   -it aidbox/ci3:0.0.3 \
+#   agent
 
-# env BUILD_ID=build-2 java -cp target/ci3.jar clojure.main -m ci3.core $@
+java -cp target/ci3.jar clojure.main -m ci3.core run

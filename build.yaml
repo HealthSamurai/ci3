@@ -1,6 +1,0 @@
-apiVersion: "ci3.io/v1"
-kind: ThirdPartyResource
-metadata:
-  name: builds.ci3.io
-versions:
-- name: v1
