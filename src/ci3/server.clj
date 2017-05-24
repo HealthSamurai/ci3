@@ -7,6 +7,7 @@
    [clojure.java.shell :as sh]
    [cheshire.core :as json]
    [ci3.k8s :as k8s]
+   [ci3.controller :as ctrl]
    [pandect.algo.sha1 :refer [sha1-hmac]]
    [route-map.core :as route-map]
    [ring.util.codec]))
@@ -118,8 +119,8 @@
   (log/info "Starting server on " 8888)
   (reset! server (http-kit/run-server #'app {:port 8888})))
 
-
 (defn exec [& args]
+  (ctrl/watch)
   (restart))
 
 (comment

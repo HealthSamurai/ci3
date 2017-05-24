@@ -7,6 +7,7 @@
 (defonce stop (atom nil))
 
 (defn process [builds]
+  (println ".")
   (when-let [items (:items builds)]
     (doseq [i items]
       (when-not (:pod i)
@@ -29,7 +30,7 @@
                                      [{:name "docker-sock"
                                        :mountPath "/var/run/docker.sock"}]
                                      :env [{:name "BUILD_ID" :value id}
-                                           {:name "REPOSITORY" :value (:repository i)}
+                                           {:name "REPOSITORY" :value (get-in i [:payload :repository :url])}
                                            {:name "DOCKER_KEY" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}]}]}})]
             (println "Create pod" pod)
             (when-not (= "Failure" (get pod "status"))
@@ -43,7 +44,9 @@
 (defn watch []
   (if @stop
     (println "Stop watching")
-    (future (Thread/sleep 5000) (watch))))
+    (future (process (walk/keywordize-keys (k8s/list k8s/cfg :builds)))
+            (Thread/sleep 5000)
+            (watch))))
 
 (comment
   (watch)
