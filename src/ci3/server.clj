@@ -73,7 +73,7 @@
     {:body (k8s/create cfg :builds
                        {:kind "Build"
                         :apiVersion "ci3.io/v1"
-                        :metadata {:name  hashcommit}
+                        :metadata {:name  build-name}
                         :payload {:ref (:ref payload)
                                   :diff (:compare payload)
                                   :repository (select-keys repository
