@@ -4,8 +4,7 @@
             [clj-yaml.core :as yaml]
             [clojure.walk :as walk]
             [cheshire.core :as json]
-            [clojure.string :as str])
-  (:gen-class))
+            [clojure.string :as str]))
 
 (defmulti execute (fn [st] (when-let [tp (:type st)] (keyword tp))))
 

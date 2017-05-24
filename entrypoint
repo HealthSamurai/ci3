@@ -13,11 +13,4 @@ if [ -n "$KUBERNETES_SERVICE_HOST" ]; then
   export KUBE_URL="https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT"
 fi
 
-case $1 in
-  "agent" )
-    java -cp /ci3.jar clojure.main -m ci3.agent;;
-  "server" )
-    java -cp /ci3.jar clojure.main -m ci3.server;;
-  *)
-    echo "Please choose subcomands: agent, server";;
-esac
+java -cp /ci3.jar clojure.main -m ci3.core $@

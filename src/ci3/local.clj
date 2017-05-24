@@ -8,7 +8,11 @@
             [clojure.string :as str])
   (:gen-class))
 
-(defn exec [& args]
+(defn run [& args]
   (let [b (yaml/parse-string (slurp "ci3.yaml") true)]
     (println (sh/sh "pwd"))
     (build/build b println)))
+
+(defn exec [& args]
+  (apply run args)
+  (System/exit 0))

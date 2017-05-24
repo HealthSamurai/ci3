@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: zero-ci-agent-4
+  name: ci3-run-1
   labels:
     system: dev
 spec:
@@ -17,6 +17,8 @@ spec:
     env:
     - name: BUILD_ID
       value: build-2
+    - name: REPOSITORY
+      value: https://github.com/healthsamurai/ci3 \
     - name: DOCKER_KEY
       valueFrom:
         secretKeyRef:
