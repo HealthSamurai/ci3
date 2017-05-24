@@ -16,6 +16,7 @@
                  [ring/ring-defaults "0.3.0"]
                  [route-map "0.0.4"]
 
+                 [clj-yaml "0.4.0"]
                  ]
   :uberjar-name "ci3.jar"
   :profiles {:uberjar {:aot :all :omit-source true}})

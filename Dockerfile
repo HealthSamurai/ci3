@@ -85,6 +85,10 @@ RUN set -ex && \
 
 ADD target/ci3.jar /ci3.jar
 
+RUN mkdir /workspace
+
+WORKDIR /workspace 
+
 COPY entrypoint /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint
 

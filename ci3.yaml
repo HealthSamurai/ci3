@@ -1,0 +1,17 @@
+apiVersion: "zeroci.io/v1"
+kind: Build
+metadata:
+  name: build-2
+  label:
+    system: ci
+status: peinding
+pipeline:
+ - type: lein
+   command: test
+ - type: lein
+   command: uberjar
+ - image: busybox
+   command: ls -lah /
+ - type: docker
+   command: build
+   image: ci3

@@ -8,8 +8,7 @@
    [cheshire.core :as json]
    [pandect.algo.sha1 :refer [sha1-hmac]]
    [route-map.core :as route-map]
-   [ring.util.codec])
-  (:gen-class))
+   [ring.util.codec]))
 
 (defonce server (atom nil))
 
@@ -88,6 +87,9 @@
   (reset! server (http-kit/run-server #'app {:port 8888})))
 
 
-(defn -main [& args] (restart))
+(defn exec [& args]
+  (restart))
 
-(comment (restart))
+(comment
+  (restart)
+  )
