@@ -18,8 +18,9 @@ ingress:
 
 image:
   repository: aidbox/ci3
-  tag: 0.0.1
-  pullPolicy: IfNotPresent
+  #tag: 0.0.1
+  #pullPolicy: IfNotPresent
+  tag: :latest #  OR  pullPolicy: Always
 
 service:
   args: ["server"]

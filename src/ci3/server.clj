@@ -53,17 +53,18 @@
         payload (slurp body)
         hash (str "sha1=" (sha1-hmac payload "secret")) ]
     (if (= signature hash)
-      (json/parse-string payload)
+      (json/parse-string payload keyword)
       {:status 401 })))
 
 
-(def cfg {:apiVersion "zeroci.io/v1" :ns "default"})
+(def cfg {:apiVersion "ci3.io/v1" :ns "default"})
+
 (defn create-build [payload]
-  (let [build-name (str (get-in payload [:repository name ":" (:after payload)]))]
-    {:body (k8s/create cfg :build
+  (let [build-name (str (get-in payload [:repository :name]) "-" (:after payload))]
+    {:body (k8s/create cfg :builds
                        {:kind "Build"
-                        :apiVersion "zeroci.io/v1"
-                        :metadata {:name "test-1"}
+                        :apiVersion "ci3.io/v1"
+                        :metadata {:name build-name}
                         :payload payload })}))
 
 (defn webhook [req]

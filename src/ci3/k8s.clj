@@ -24,7 +24,7 @@
               (url cfg (str "apis/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) "/" pth))
               {:headers (merge default-headers {"Content-Type" "application/json"})
                :insecure? true})]
-    (-> res 
+    (-> res
      :body
      (json/parse-string))))
 
@@ -66,7 +66,7 @@
 
 (comment
   (list cfg :builds)
-  (find cfg :builds "test-1")
+  (find cfg :builds "dfdfdf")
   (patch cfg :builds "test-1" {:status "changed"})
 
   (delete cfg :builds "test-1")

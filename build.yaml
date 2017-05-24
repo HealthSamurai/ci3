@@ -1,4 +1,4 @@
 apiVersion: "ci3.io/v1"
 kind: Build
 metadata:
-  name: dddddddddd
+  name: sample build
