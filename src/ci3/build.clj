@@ -44,6 +44,7 @@
   (println "  archive .m2 dir")
   (archive-dir "/root/.m2" "/tmp/mvn.tar.gz")
   (println "lah" (sh/sh "ls" "-lah" "/tmp/mvn.tar.gz"))
+
   (println "cache" (sh/sh "cp" "/tmp/mvn.tar.gz" "/cache"))
   (let [tk (gcloud/get-access-token)]
     (println (sh/sh "bash" "-o" "xtrace"
@@ -51,7 +52,8 @@
                                " --data-binary @/tmp/mvn.tar.gz"
                                " -H 'Authorization: Bearer " tk "' "
                                "https://www.googleapis.com/upload/storage/v1/b/ci3-cache/o/?uploadType=media\\&name=mvn.tar.gz\\&key=mvn"
-                               ) :dir "/tmp"))))
+                               ) :dir "/tmp")))
+  {:exit 0})
 
 (defmethod maven-execute
   :restore-cache
