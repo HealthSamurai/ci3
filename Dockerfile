@@ -86,12 +86,12 @@ RUN set -ex && \
 RUN apk add --update curl
 RUN curl https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > /usr/bin/lein && chmod u+x /usr/bin/lein && lein
 
-ADD target/ci3.jar /var/ci3.jar
+ADD target/ci3.jar /ci3.jar
 
 RUN mkdir /workspace
 
-WORKDIR /workspace 
-ENV LEIN_ROOT 1 
+WORKDIR /workspace
+ENV LEIN_ROOT 1
 
 COPY entrypoint /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint

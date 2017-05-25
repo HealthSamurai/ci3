@@ -13,4 +13,4 @@ if [ -n "$KUBERNETES_SERVICE_HOST" ]; then
   export KUBE_URL="https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_PORT_443_TCP_PORT"
 fi
 
-java -cp /var/ci3.jar clojure.main -m ci3.core $@
+java -cp /ci3.jar clojure.main -m ci3.core $@
