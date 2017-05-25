@@ -22,7 +22,7 @@
                                      :hostPath {:path "/var/run/docker.sock"}}]
                                    :containers
                                    [{:name "agent"
-                                     :image "aidbox/ci3:latest"
+                                     :image "eu.gcr.io/aidbox-next/ci3:latest"
                                      :imagePullPolicy "Always"
                                      :args ["agent"]
                                      :volumeMounts
