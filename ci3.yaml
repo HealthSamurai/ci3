@@ -15,7 +15,7 @@ pipeline:
 - type: bash
   command: docker login --help
 - type: bash
-  command:  docker login help
+  command:  echo $DOCKER_KEY
 - type: bash
   command: "docker login -u _json_key -p $DOCKER_KEY https://eu.gcr.io"
 #- type: lein
