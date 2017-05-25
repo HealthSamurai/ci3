@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -e
+set -o xtrace
+
+# lein uberjar
+# docker build -t ci3 .
+
+export APISERVER=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d " ")
+export TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
+export DOCKER_KEY="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
+export BUILD_ID=ci3-build-6
+
+docker run --rm \
+  -e KUBE_URL=$APISERVER \
+  -e KUBE_TOKEN=$TOKEN \
+  -e BUILD_ID=$BUILD_ID \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v `pwd`:/workspace \
+  -v /tmp/cache:/cache \
+  -it ci3 \
+  agent
+
+# -e REPOSITORY=https://github.com/healthsamurai/ci3 \
+# -e DOCKER_KEY=$DOCKER_KEY \
+# -v /tmp/m2-cache:/root/.m2 \

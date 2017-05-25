@@ -14,4 +14,4 @@ export BUILD_ID=ci3-build-6
 #   -it aidbox/ci3:0.0.3 \
 #   agent
 
-java -cp target/ci3.jar clojure.main -m ci3.core run
+# java -cp target/ci3.jar clojure.main -m ci3.core run

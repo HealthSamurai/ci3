@@ -18,18 +18,15 @@
     (walk/keywordize-keys bld)))
 
 (defn checkout-project []
-  (if-let [repo (System/getenv "REPOSITORY")]
+  (when-let [repo (System/getenv "REPOSITORY")]
     (let [res (sh/sh "git" "clone" repo "/workspace")]
       (println res)
-      res)
-    (throw (Exception. "Provide $REPOSITORY"))))
+      res)))
 
 (defn exec [& args]
   ;; checkout project
   (let [repo (checkout-project)]
-    (when-not (= 0 (:exit repo))
-      (println repo)
-      (throw (Exception. "Unable to clone repository"))))
+    (println repo))
   (let [bld (get-build (build-id))]
     (build/build (yaml/parse-string (slurp "/workspace/ci3.yaml") true) println))
   (System/exit 0))

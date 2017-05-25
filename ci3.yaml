@@ -6,6 +6,8 @@ metadata:
     system: ci
 status: peinding
 pipeline:
+ - type: maven
+   command: restore-cache
  - type: lein
    command: test
  - type: lein
@@ -15,3 +17,7 @@ pipeline:
  - type: docker
    command: build
    image: eu.gcr.io/aidbox-next/ci3
+ - type: lein
+   command: deps
+ - type: maven
+   command: save-cache
