@@ -32,10 +32,8 @@
 (defn archive-dir [dir to]
   (println "archive: " (sh/sh "tar" "czvf" to dir)))
 
-;; (archive-dir "/Users/nicola/.m2" "mvn")
 
-(def tk "ya29.GlxVBN_9Ct8ddZZyKHXj4E5IcAnZo5_HLj4hzn5qWfnJci97Z2cXLYblRzLGrNQf8cC6fQv79coFOChBj6f3vMYnYstUUWI7bsOlgHIhowvULonddCn13fCBGjJUPw")
-
+(def tk (System/getenv "BUCKET_KEY"))
 
 (defmethod maven-execute
   :save-cache

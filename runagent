@@ -9,11 +9,13 @@ export APISERVER=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d 
 export TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
 export DOCKER_KEY="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
 export BUILD_ID=ci3-build-6
+export BUCKET_KEY="$(gcloud auth print-access-token)"
 
 docker run --rm \
   -e KUBE_URL=$APISERVER \
   -e KUBE_TOKEN=$TOKEN \
   -e BUILD_ID=$BUILD_ID \
+  -e BUCKET_KEY=$BUCKET_KEY \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v `pwd`:/workspace \
   -v /tmp/cache:/cache \
