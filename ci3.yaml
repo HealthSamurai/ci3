@@ -8,8 +8,8 @@ status: peinding
 environment:
   GIT_COMMIT: "$(git rev-parse --short HEAD)"
 pipeline:
-- type: maven
-  command: restore-cache
+#- type: maven
+  #command: restore-cache
 - type: lein
   command: test
 - type: lein
@@ -21,8 +21,8 @@ pipeline:
   image: eu.gcr.io/aidbox-next/ci3
 - type: lein
   command: deps
-- type: maven
-  command: save-cache
+#- type: maven
+  #command: save-cache
 - type: bash
   env:
     GIT_COMMIT: "$(git rev-parse --short HEAD)"
