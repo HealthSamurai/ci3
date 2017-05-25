@@ -16,3 +16,8 @@
 (defn exec [& args]
   (apply run args)
   (System/exit 0))
+
+(comment
+  (run)
+
+)
