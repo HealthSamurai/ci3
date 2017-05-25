@@ -17,6 +17,9 @@
                  [route-map "0.0.4"]
 
                  [clj-yaml "0.4.0"]
+
+                 [clj-jwt "0.1.1"]
+                 [clj-time "0.13.0"]
                  ]
   :uberjar-name "ci3.jar"
   :main ci3.core

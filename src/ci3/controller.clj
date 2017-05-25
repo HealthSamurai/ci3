@@ -30,7 +30,9 @@
                                        :mountPath "/var/run/docker.sock"}]
                                      :env [{:name "BUILD_ID" :value id}
                                            {:name "REPOSITORY" :value (get-in i [:payload :repository :url])}
-                                           {:name "DOCKER_KEY" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}]}]}})]
+                                           {:name "DOCKER_KEY" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}
+                                           {:name "SERVICE_ACCOUNT" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}]}
+                                    ]}})]
             (println "Create pod" pod)
             (when-not (= "Failure" (get pod "status"))
               (println "Update build:"
