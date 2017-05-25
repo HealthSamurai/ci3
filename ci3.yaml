@@ -19,7 +19,7 @@ pipeline:
 - type: bash
   env:
     GIT_COMMIT: "$(git rev-parse --short HEAD)"
-  command: echo :$GIT_COMMIT
+  command: echo $GIT_COMMIT
 - type: bash
   env:
     GIT_COMMIT: "$(git rev-parse --short HEAD)"
