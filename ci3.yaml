@@ -8,14 +8,14 @@ status: peinding
 environment:
   GIT_COMMIT: "$(git rev-parse --short HEAD)"
 pipeline:
-#- type: maven
-  #command: restore-cache
+- type: maven
+  command: restore-cache
 - type: lein
   command: test
 - type: lein
   command: uberjar
-#- type: maven
-  #command: save-cache
+- type: maven
+  command: save-cache
 - type: bash
   command: docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
 - type: bash
