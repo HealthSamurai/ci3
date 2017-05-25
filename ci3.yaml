@@ -10,19 +10,16 @@ environment:
 pipeline:
 #- type: maven
   #command: restore-cache
-- type: lein
-  command: test
+#- type: lein
+  #command: test
 - type: lein
   command: uberjar
-- image: busybox
-  command: ls -lah /
-- type: docker
-  command: build
-  image: eu.gcr.io/aidbox-next/ci3
-- type: lein
-  command: deps
 #- type: maven
   #command: save-cache
+- type: bash
+  env:
+    GIT_COMMIT: "$(git rev-parse --short HEAD)"
+  command: echo :$GIT_COMMIT
 - type: bash
   env:
     GIT_COMMIT: "$(git rev-parse --short HEAD)"
