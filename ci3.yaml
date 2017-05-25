@@ -11,13 +11,7 @@ pipeline:
 #- type: maven
   #command: restore-cache
 - type: bash
-  command: docker version
-- type: bash
-  command: docker login --help
-- type: bash
-  command:  echo $DOCKER_KEY
-- type: bash
-  command: "docker login -u _json_key -p '$(echo $DOCKER_KEY)' https://eu.gcr.io"
+  command: docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
 #- type: lein
   #command: test
 #- type: lein
