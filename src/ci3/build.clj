@@ -36,7 +36,8 @@
   (println "archive: " (sh/sh "tar" "czvf" to dir)))
 
 
-(def tk (System/getenv "BUCKET_KEY"))
+(def tk (or (System/getenv "BUCKET_KEY")
+            (System/getenv "KUBE_TOKEN")))
 
 (defmethod maven-execute
   :save-cache
