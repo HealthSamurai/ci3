@@ -30,3 +30,7 @@
   (let [bld (get-build (build-id))]
     (build/build (yaml/parse-string (slurp "/workspace/ci3.yaml") true) println))
   (System/exit 0))
+
+(comment 
+  (:pipeline (yaml/parse-string (slurp "/home/aitem/Work/HS/ci3/ci3.yaml") true) )
+  )
