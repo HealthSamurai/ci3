@@ -99,10 +99,16 @@
   (pprint/pprint (execute {:type "docker"
                            :command "build"
                            :image "eu.gcr.io/aidbox-next/ci32" }))
+
+  (pprint/pprint (execute {:type "bash"
+                           :command "docker login -u _json_key -p $DOCKER_KEY https://eu.gcr.io"
+                           }))
+
+
   (pprint/pprint (execute {:type "bash"
                            :env {:GIT_COMMIT "$(git rev-parse --short HEAD)"}
                            :command "helm upgrade --set image.tag=$GIT_COMMIT -i web-hook ci3" }))
-  
+
   (pprint/pprint (execute {:type "bash"
                            :env {:GIT_COMMIT "$(git rev-parse --short HEAD)"}
                            :command "docker build -t eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT ." }))
