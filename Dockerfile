@@ -86,7 +86,7 @@ RUN set -ex && \
 RUN apk add --update curl
 RUN curl https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > /usr/bin/lein && chmod u+x /usr/bin/lein && lein
 
-ADD target/ci3.jar /ci3.jar
+COPY target/ci3.jar /ci3.jar
 
 RUN mkdir /workspace
 
