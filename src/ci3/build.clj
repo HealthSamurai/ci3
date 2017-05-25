@@ -88,9 +88,9 @@
   [{cmd :command env :env }]
   (println "Execute" "bash" cmd)
   (let [env (->> (or env {})
-                (reduce-kv (fn [acc k v] (str acc (name k) "=" v " ")) "")
-                str/trim) ]
-   (sh/sh "bash" "-c" (str env " bash -c '" cmd "'") )))
+                 (reduce-kv (fn [acc k v] (str acc (name k) "=" v " ")) "")
+                 str/trim) ]
+    (sh/sh "bash" "-c" (str env " bash -c '" cmd "'") )))
 
 (comment
 

@@ -10,8 +10,8 @@ environment:
 pipeline:
 #- type: maven
   #command: restore-cache
-#- type: lein
-  #command: test
+- type: lein
+  command: test
 - type: lein
   command: uberjar
 #- type: maven
