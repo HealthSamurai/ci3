@@ -4,9 +4,11 @@
             [clj-yaml.core :as yaml]
             [clojure.walk :as walk]
             [cheshire.core :as json]
+            [clojure.pprint :as pprint]
             [clojure.string :as str]))
 
-(defmulti execute (fn [st] (when-let [tp (:type st)] (keyword tp))))
+(defmulti execute
+  (fn [st] (when-let [tp (:type st)] (keyword tp))))
 
 (defmethod execute
   :docker
@@ -19,6 +21,7 @@
   [{cmd :command}]
   (println "Execute" "lein" cmd)
   (sh/sh "bash" "-c" (str  "lein " cmd)))
+
 
 (defmethod execute
   :default
@@ -79,6 +82,27 @@
   :maven
   [args]
   (maven-execute args))
+
+(defmethod execute
+  :bash
+  [{cmd :command env :env }]
+  (println "Execute" "bash" cmd)
+  (let [env (->> (or env {})
+                (reduce-kv (fn [acc k v] (str acc k "=" v " ")) "")
+                str/trim) ]
+   (sh/sh "bash" "-c" (str env " bash -c '" cmd "'") )))
+
+(comment
+
+  (sh/sh "sh" "-c"  "FOO=$(git rev-parse --short HEAD) bash -c 'echo $FOO'" )
+
+  (pprint/pprint (execute {:type "docker"
+                           :command "build"
+                           :image "eu.gcr.io/aidbox-next/ci32" }))
+  (pprint/pprint (execute {:type "bash"
+                           :env {"GIT_COMMIT" "$(git rev-parse --short HEAD)"}
+                           :command "helm upgrade --set image.tag=$GIT_COMMIT -i web-hook ci3" }))
+  )
 
 (defn build [build cb]
   (loop [[st & sts] (:pipeline build)]
