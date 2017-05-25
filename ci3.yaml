@@ -26,6 +26,7 @@ pipeline:
   env:
     GIT_COMMIT: "$(git rev-parse --short HEAD)"
   command: docker tag eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT eu.gcr.io/aidbox-next/ci3:latest
+
 - type: bash
   env:
     GIT_COMMIT: "$(git rev-parse --short HEAD)"
