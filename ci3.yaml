@@ -25,7 +25,7 @@ pipeline:
     GIT_COMMIT: "$(git rev-parse --short HEAD)"
   command: docker build -t eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT .
 - type: bash
-  command: docker login -u _json_key -p $DOCKER_KEY https://eu.gcr.io"
+  command: docker login -u _json_key -p $DOCKER_KEY https://eu.gcr.io
 - type: bash
   env:
     GIT_COMMIT: "$(git rev-parse --short HEAD)"
