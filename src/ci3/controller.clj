@@ -17,7 +17,8 @@
                      :pods {:apiVersion "v1"
                             :kind "Pod"
                             :metadata {:name id :lables {:system "ci3"}}
-                            :spec {:volumes
+                            :spec {:restartPolicy "Never"
+                                   :volumes
                                    [{:name "docker-sock"
                                      :hostPath {:path "/var/run/docker.sock"}}]
                                    :containers
