@@ -10,29 +10,23 @@ environment:
 pipeline:
 #- type: maven
   #command: restore-cache
-- type: bash
-  command: docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
-#- type: lein
-  #command: test
-#- type: lein
-  #command: uberjar
+- type: lein
+  command: test
+- type: lein
+  command: uberjar
 #- type: maven
   #command: save-cache
-#- type: bash
-  #env:
-    #GIT_COMMIT: "$(git rev-parse --short HEAD)"
-  #command: echo $GIT_COMMIT
-#- type: bash
-  #env:
-    #GIT_COMMIT: "$(git rev-parse --short HEAD)"
-  #command: docker build -t eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT .
-#- type: bash
-  #command: docker login -u _json_key -p $DOCKER_KEY https://eu.gcr.io
-#- type: bash
-  #env:
-    #GIT_COMMIT: "$(git rev-parse --short HEAD)"
-  #command: docker push eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT
-#- type: bash
-  #env:
-    #GIT_COMMIT: "$(git rev-parse --short HEAD)"
-  #command: helm upgrade --set image.tag=$GIT_COMMIT,image.repository=eu.gcr.io/aidbox-next/ci3 -i web-hook ci3
+- type: bash
+  command: docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
+- type: bash
+  env:
+    GIT_COMMIT: "$(git rev-parse --short HEAD)"
+  command: docker build -t eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT .
+- type: bash
+  env:
+    GIT_COMMIT: "$(git rev-parse --short HEAD)"
+  command: docker push eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT
+- type: bash
+  env:
+    GIT_COMMIT: "$(git rev-parse --short HEAD)"
+  command: helm upgrade --set image.tag=$GIT_COMMIT,image.repository=eu.gcr.io/aidbox-next/ci3 -i web-hook ci3
