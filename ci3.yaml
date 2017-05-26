@@ -10,6 +10,10 @@ environment:
     command:
       git rev-parse --short HEAD
 pipeline:
+- type: env
+  DOCKER_REPO: eu.gcr.io/aidbox-next/ci3
+  GIT_COMMIT: 
+    command: "git rev-parse --short HEAD"
 - type: maven
   command: restore-cache
   key: ci3
@@ -22,16 +26,13 @@ pipeline:
   key: ci3
 - type: bash
   command: docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
-- type: env
-  GIT_COMMIT:
-    command: "git rev-parse --short HEAD"
 - type: bash
-  command: docker build -t eu.gcr.io/aidbox-next/ci3:v_$GIT_COMMIT .
+  command: docker build -t $DOCKER_REPO:v_$GIT_COMMIT .
 - type: bash
-  command: docker tag eu.gcr.io/aidbox-next/ci3:v_$GIT_COMMIT eu.gcr.io/aidbox-next/ci3:latest
+  command: docker tag $DOCKER_REPO:v_$GIT_COMMIT $DOCKER_REPO:latest
 - type: bash
-  command: docker push eu.gcr.io/aidbox-next/ci3:v_$GIT_COMMIT
+  command: docker push $DOCKER_REPO:v_$GIT_COMMIT
 - type: bash
-  command: docker push eu.gcr.io/aidbox-next/ci3:latest
+  command: docker push $DOCKER_REPO:latest
 - type: bash
-  command: helm upgrade --set image.tag=v_$GIT_COMMIT,image.repository=eu.gcr.io/aidbox-next/ci3 -i web-hook ci3
+  command: helm upgrade --set image.tag=v_$GIT_COMMIT,image.repository=$DOCKER_REPO -i web-hook ci3
