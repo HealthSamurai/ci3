@@ -1,0 +1,7 @@
+apiVersion: "ci3.io/v1"
+kind: Repository
+metadata:
+  name: ci3
+url: https://github.com/HealthSamurai/ci3
+full_name: HealthSamurai/ci3
+
