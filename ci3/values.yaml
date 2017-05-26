@@ -34,4 +34,4 @@ secrets:
 - name: ci3
   data:
     defaultSecret: "someDefaultsecret"
-    mySecret: "mySuperSecret"
+    mySecret: mySuperSecret
