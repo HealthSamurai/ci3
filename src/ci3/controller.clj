@@ -17,7 +17,9 @@
                      {:prefix "api" :ns "default" :apiVersion "v1"}
                      :pods {:apiVersion "v1"
                             :kind "Pod"
-                            :metadata {:name id :lables {:system "ci3"}}
+                            :metadata {:name id
+                                       :annotations {:system "ci3"}
+                                       :lables {:system "ci3"}}
                             :spec {:restartPolicy "Never"
                                    :volumes
                                    [{:name "docker-sock"
