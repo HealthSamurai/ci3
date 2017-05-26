@@ -66,7 +66,6 @@
 
   (watch-resource :repositories process-repository)
 
-  ("items")
   (doseq [b (get (k8s/list cfg :builds) "items")]
     (println
      (k8s/delete cfg :builds
