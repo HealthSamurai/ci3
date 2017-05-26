@@ -58,7 +58,7 @@
         hash (str "sha1=" (sha1-hmac payload "secret")) ]
     (if (= signature hash)
       (json/parse-string payload keyword)
-      {:status 401 })))
+      nil)))
 
 
 (def cfg {:apiVersion "ci3.io/v1" :ns "default"})
@@ -93,9 +93,9 @@
                                  } })}))
 
 (defn webhook [req]
-  (-> req
-      verify
-      create-build))
+  (if-let [payload (verify req)]
+    (create-build payload)
+    {:status 401 :body "401 Unauthorized"}))
 
 (defn layout [cnt]
   (page/html5
