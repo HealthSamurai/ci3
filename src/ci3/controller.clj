@@ -1,12 +1,13 @@
 (ns ci3.controller
   (:require [ci3.k8s :as k8s]
+            [ci3.github :as gh]
             [clojure.walk :as walk]))
 
 (def cfg {:apiVersion "ci3.io/v1" :ns "default"})
 
 (defonce stop (atom nil))
 
-(defn process [builds]
+(defn process-build [builds]
   (when-let [items (:items builds)]
     (doseq [i items]
       (when-not (:pod i)
@@ -38,23 +39,43 @@
             (when-not (= "Failure" (get pod "status"))
               (println "Update build:"
                        (k8s/patch k8s/cfg :builds
-                          id {:pod pod 
+                          id {:pod pod
                               :scheduledAt (str (java.util.Date.))
-                              :status "scheduled"})))))))))
+                              :status "sche"})))))))))
 
-
-(defn watch []
+(defn watch-resource [rt process]
   (if @stop
-    (println "Stop watching")
-    (future (process (walk/keywordize-keys (k8s/list k8s/cfg :builds)))
-            (Thread/sleep 5000)
-            (watch))))
+    (println "Stop watching " (name rt))
+    (future (process (walk/keywordize-keys (k8s/list k8s/cfg rt)))
+            (Thread/sleep 10000)
+            (watch-resource rt process))))
+
+(defn process-repository [repositories]
+  (when-let  [repos (:items repositories)]
+    (doseq [r repos]
+      (when-not (:staus r)
+        (println "Add webhook " (:url r))
+        (spit "/tmp/repl" (str "add web hook" "\n\n\n") )
+        )
+      )
+    ))
+
+(defn restart []
+  (do
+    (reset! stop true)
+    (reset! stop false)
+    (watch-resource :repositories process-repository)))
+
 
 (comment
-  (watch)
 
+  (watch-resource :build process-build)
+  (watch-resource :repositories process-repository)
+
+  (k8s/list k8s/cfg :repositories)
   (reset! stop true)
   (reset! stop false)
+
 
   ;; (:items (walk/keywordize-keys (k8s/list k8s/cfg :builds)))
 

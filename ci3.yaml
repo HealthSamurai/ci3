@@ -1,4 +1,4 @@
-apiVersion: "zeroci.io/v1"
+apiVersion: "ci3.io/v1"
 kind: Build
 metadata:
   name: build-2

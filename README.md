@@ -3,6 +3,7 @@
 A minimaliztic ci for k8s
 
 
+
 ## Motivataion
 
 k8s provides us with nice platform to run isolated payloads.
@@ -13,6 +14,8 @@ ability to run and debug tests localy using agent mode
 ## Getting started
 
 Install local test runner ci3 brew, download jar etc
+
+## Secretes
 
 
 ## License
