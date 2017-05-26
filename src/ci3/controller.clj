@@ -8,8 +8,7 @@
 (defonce stop (atom nil))
 
 (defn process-build [builds]
-  (println builds)
-  #_(when-let [items (:items builds)]
+  (when-let [items (:items builds)]
     (doseq [i items]
       (when-not (:pod i)
         (let [id (get-in i [:metadata :name])]
