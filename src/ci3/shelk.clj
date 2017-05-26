@@ -6,11 +6,11 @@
 
 (defn pprint [res]
   (println "$" (:command res)
-           "\n in " (humanize/duration (/ (:time res) 1000) {:number-format str})
+           "\n in " (humanize/duration (/ (:time res) 1000000) {:number-format str})
            "with status:" (:exit res))
   (when-not  (str/blank? (:out res)) (println "==STDOUT==\n" (:out res)))
   (when-not (str/blank? (:err res)) (println "==STDERR==\n" (:err res)))
-  (println "---------")
+  (println "------------------------------\n")
   res)
 
 (defn bash [cmd & opts]

@@ -7,6 +7,7 @@
             [cheshire.core :as json]
             [clojure.pprint :as pprint]
             [clojure.string :as str]
+            [clojure.contrib.humanize :as humanize]
             [ci3.shelk :as shelk]))
 
 (defmulti execute
@@ -19,8 +20,10 @@
 
 (defmethod execute
   :lein
-  [{cmd :command}]
-  (shelk/bash ["lein " cmd]))
+  [{cmd :command dir :dir}]
+  (if dir
+    (shelk/bash ["lein " cmd] :dir (str "/workspace/" dir))
+    (shelk/bash ["lein " cmd])))
 
 
 (defmethod execute
@@ -91,10 +94,22 @@
                  str/trim) ]
     (shelk/bash (str env " bash -c '" cmd "'"))))
 
+(defn do-step [{dir :dir :as step}]
+  (println "\n==============================")
+  (println "STEP:" (:type step) (pr-str step))
+  (println "\n------------------------------")
+  (let [start (System/nanoTime)
+        result (execute step)]
+    (println "\n------------------------------")
+    (println "DONE in " (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
+    (println "\n------------------------------")
+
+    result))
+
 (defn build [build]
   (loop [[st & sts] (:pipeline build)]
     (if st
-      (let [res (execute st)]
+      (let [res (do-step st)]
         (if-not (= 0 (:exit res))
           (println "ERROR!") 
           (recur sts)))
