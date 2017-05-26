@@ -26,14 +26,12 @@ pipeline:
   GIT_COMMIT:
     command: "git rev-parse --short HEAD"
 - type: bash
-  command: docker build -t eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT .
+  command: docker build -t eu.gcr.io/aidbox-next/ci3:v_$GIT_COMMIT .
 - type: bash
-  command: docker tag eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT eu.gcr.io/aidbox-next/ci3:latest
+  command: docker tag eu.gcr.io/aidbox-next/ci3:v_$GIT_COMMIT eu.gcr.io/aidbox-next/ci3:latest
 - type: bash
-  command: docker push eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT
+  command: docker push eu.gcr.io/aidbox-next/ci3:v_$GIT_COMMIT
 - type: bash
   command: docker push eu.gcr.io/aidbox-next/ci3:latest
 - type: bash
-  command: echo "$GIT_COMMIT"
-- type: bash
-  command: helm upgrade --set image.tag=$GIT_COMMIT,image.repository=eu.gcr.io/aidbox-next/ci3 -i web-hook ./ci3
+  command: helm upgrade --set image.tag=v_$GIT_COMMIT,image.repository=eu.gcr.io/aidbox-next/ci3 -i web-hook ci3

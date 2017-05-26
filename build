@@ -3,7 +3,7 @@ set -e
 set -o xtrace
 
 export DOCKER_KEY="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
-export GIT_COMMIT="$(git rev-parse --short HEAD)"
+export GIT_COMMIT="v_$(git rev-parse --short HEAD)"
 
 lein uberjar
 
@@ -13,4 +13,3 @@ docker tag eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT eu.gcr.io/aidbox-next/ci3:lates
 docker push eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT
 docker push eu.gcr.io/aidbox-next/ci3:latest
 helm upgrade --set image.tag=$GIT_COMMIT,image.repository=eu.gcr.io/aidbox-next/ci3 -i web-hook ci3
-
