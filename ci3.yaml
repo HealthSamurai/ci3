@@ -10,7 +10,6 @@ environment:
     command:
       git rev-parse --short HEAD
 pipeline:
-
 - type: maven
   command: restore-cache
   key: ci3
