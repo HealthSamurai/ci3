@@ -33,5 +33,5 @@ service:
 secrets:
 - name: ci3
   data:
-    defaultSecret: "some-secret"
-    mySecret: "mysecret"
+    defaultSecret: "someDefaultsecret"
+    mySecret: "mySuperSecret"
