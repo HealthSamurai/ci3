@@ -66,6 +66,8 @@
     (reset! stop false)
     (watch-resource :repositories process-repository)))
 
+(defn watch []
+  (watch-resource :build process-build))
 
 (comment
 
