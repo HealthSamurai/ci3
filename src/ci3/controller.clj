@@ -47,7 +47,7 @@
   (if @stop
     (println "Stop watching " (name rt))
     (future (process (walk/keywordize-keys (k8s/list k8s/cfg rt)))
-            (Thread/sleep 10000)
+            (Thread/sleep 5000)
             (watch-resource rt process))))
 
 (defn process-repository [repositories]
@@ -55,10 +55,7 @@
     (doseq [r repos]
       (when-not (:staus r)
         (println "Add webhook " (:url r))
-        (spit "/tmp/repl" (str "add web hook" "\n\n\n") )
-        )
-      )
-    ))
+        (spit "/tmp/repl" (str "add web hook" "\n\n\n"))))))
 
 (defn restart []
   (do
