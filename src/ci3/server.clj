@@ -18,6 +18,7 @@
 
 (defonce server (atom nil))
 
+(def cfg {:apiVersion "ci3.io/v1" :ns "default"})
 (defn exec [& args]
   (log/info "Execute: " args)
   (let [res (apply sh/sh args)]
@@ -52,17 +53,17 @@
       {:body (str "Could not get config for " rk) :status 500})))
 
 (defn verify
-  [{headers :headers body :body :as req}]
+  [{ {id :id} :route-params headers :headers body :body :as req}]
   (let [signature (get headers "x-hub-signature")
         payload (slurp body)
-        hash (str "sha1=" (sha1-hmac payload "secret")) ]
-    (if (= signature hash)
+        repo (k8s/find cfg :repositories id)
+        secret (k8s/secret "ci3" (keyword (or (get repo "secret") "defaultSecret")))
+        hash (str "sha1=" (sha1-hmac payload secret)) ]
+    (if (and
+          (not (= (get repo "code") 404))
+          (= signature hash))
       (json/parse-string payload keyword)
       nil)))
-
-
-(def cfg {:apiVersion "ci3.io/v1" :ns "default"})
-
 
 (defn cleanup [s]
   (-> s
@@ -138,9 +139,8 @@
 (def routes
   {:GET #'welcome
    "builds" {:GET #'builds
-             [:id] {:GET #'logs}}
-   "webhook"  {:POST #'webhook}})
-
+             [:id] {:GET #'logs} }
+   "webhook" { [:id] {:POST #'webhook}}})
 
 (defn app [{meth :request-method uri :uri :as req}]
   (if-let [res (route-map/match [meth uri] routes)]
