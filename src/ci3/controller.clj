@@ -39,16 +39,17 @@
             (when-not (= "Failure" (get pod "status"))
               (println "Update build:"
                        (k8s/patch k8s/cfg :builds
-                          id {:pod pod
-                              :scheduledAt (str (java.util.Date.))
-                              :status "sche"})))))))))
+                                  id {:pod pod
+                                      :scheduledAt (str (java.util.Date.))
+                                      :status "sche"})))))))))
 
 (defn watch-resource [cfg rt process]
   (if @stop
     (println "Stop watching " (name rt))
-    (future (process (walk/keywordize-keys (k8s/list cfg rt)))
-            (Thread/sleep 5000)
-            (watch-resource rt process))))
+    (future
+      (process (walk/keywordize-keys (k8s/list cfg rt)))
+      (Thread/sleep 5000)
+      (watch-resource cfg rt process))))
 
 (defn process-repository [repositories]
   (when-let  [repos (:items repositories)]
