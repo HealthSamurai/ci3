@@ -27,12 +27,17 @@
 (defn print-step [build step & _]
   (println "### " (:name step) (:type step)))
 
-(defn exec [& args]
-  ;; checkout project
+(defn run [& args]
   (let [repo (checkout-project)] (println repo))
   (let [bld (get-build (build-id))]
-    (build/build (yaml/parse-string (slurp "/workspace/ci3.yaml") true)))
+    (build/build
+     (yaml/parse-string (slurp "ci3.yaml") true))))
+
+(defn exec [& args]
+  (run)
   (System/exit 0))
 
-(comment 
-  (:pipeline (yaml/parse-string (slurp "/home/aitem/Work/HS/ci3/ci3.yaml") true) ))
+(comment
+  (run)
+
+  )

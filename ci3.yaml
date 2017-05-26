@@ -20,23 +20,16 @@ pipeline:
   key: ci3
 - type: bash
   command: docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
+- type: env
+  GIT_COMMIT:
+    command: "git rev-parse --short HEAD"
 - type: bash
-  env:
-    GIT_COMMIT: "$(git rev-parse --short HEAD)"
   command: docker build -t eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT .
 - type: bash
-  env:
-    GIT_COMMIT: "$(git rev-parse --short HEAD)"
   command: docker tag eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT eu.gcr.io/aidbox-next/ci3:latest
 - type: bash
-  env:
-    GIT_COMMIT: "$(git rev-parse --short HEAD)"
   command: docker push eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT
 - type: bash
-  env:
-    GIT_COMMIT: "$(git rev-parse --short HEAD)"
   command: docker push eu.gcr.io/aidbox-next/ci3:latest
 - type: bash
-  env:
-    GIT_COMMIT: "$(git rev-parse --short HEAD)"
   command: helm upgrade --set image.tag=$GIT_COMMIT,image.repository=eu.gcr.io/aidbox-next/ci3 -i web-hook ci3

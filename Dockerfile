@@ -84,7 +84,8 @@ RUN set -ex && \
 # EOF
 
 RUN apk add --update curl
-RUN curl https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > /usr/bin/lein && chmod u+x /usr/bin/lein && lein
+
+RUN curl https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > /usr/bin/lein && chmod u+x /usr/bin/lein && lein && echo 'ok'
 
 COPY target/ci3.jar /var/ci3.jar
 

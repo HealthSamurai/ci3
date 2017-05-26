@@ -8,105 +8,89 @@
             [clojure.pprint :as pprint]
             [clojure.string :as str]
             [clojure.contrib.humanize :as humanize]
+            [ci3.cache :as cache]
             [ci3.shelk :as shelk]))
 
 (defmulti execute
-  (fn [st] (when-let [tp (:type st)] (keyword tp))))
+  (fn [st env] (when-let [tp (:type st)] (keyword tp))))
 
 (defmethod execute
   :docker
-  [{cmd :command img :image}]
-  (shelk/bash ["docker" "build" "-t" img "."]))
+  [{cmd :command img :image} env]
+  (merge env (shelk/bash ["docker" "build" "-t" img "."])))
 
 (defmethod execute
   :lein
-  [{cmd :command}]
-  (shelk/bash ["lein " cmd]))
+  [{cmd :command} env]
+  (merge env (shelk/bash ["lein " cmd])))
 
 (defmethod execute
   :default
-  [{img :image cmd :command}]
-  (shelk/bash ["docker" "run" "--rm" "-t" img (str/split cmd #"\s+")]))
+  [{img :image cmd :command} env]
+  (merge env (shelk/bash ["docker" "run" "--rm" "-t" img (str/split cmd #"\s+")])))
 
-(defmulti maven-execute (fn [{cmd :command}] (keyword cmd)))
-
-(defn archive-dir [dir to]
-  (shelk/bash ["tar" "czvf" to dir ">/dev/null 2>&1"]))
-
-(defn bucket []
-  (or (System/getenv "CACHE_BUCKET") "ci3-cache"))
-
-(defn upload-bucket-object-url [k]
-  (str "https://www.googleapis.com/upload/storage/v1/b/"
-       (bucket)
-       "/o/?uploadType=media\\&name=" k ".tar.gz\\&" k "=mvn"))
-
-(defn upload-to-bucket [access-token file-path k]
-  (shelk/bash
-   (str  "curl -X POST "
-         " --data-binary @" file-path " "
-         " -H 'Authorization: Bearer " access-token "' "
-         (upload-bucket-object-url k))))
-
-(defn download-bucket-object-url [k]
-  (str "https://www.googleapis.com/download/storage/v1/b/"
-       (bucket)
-       "/o/" k ".tar.gz?alt=media"))
-
-(defn download-from-bucket [access-token file-path k]
-  (shelk/bash
-   (str  "curl "
-         "-H 'Authorization: Bearer " access-token "' "
-         (download-bucket-object-url k)
-         " -o " file-path)))
+(defmulti maven-execute (fn [{cmd :command} env] (keyword cmd)))
 
 (defmethod maven-execute
   :save-cache
-  [{k :key}]
+  [{k :key} env]
   (let [tmp-file (str "/tmp/" k  ".tar.gz")]
-    (archive-dir "/root/.m2" tmp-file)
+    (cache/archive-dir "/root/.m2" tmp-file)
     (shelk/bash ["ls -lah" tmp-file])
-    (upload-to-bucket (gcloud/get-access-token) tmp-file k))
-  {:exit 0})
+    (cache/upload-to-bucket (gcloud/get-access-token) tmp-file k)
+    (assoc env :exit 0)))
 
 (defmethod maven-execute
   :restore-cache
-  [{k :key}]
+  [{k :key} env]
   (let [tmp-file (str "/tmp/" k  ".tar.gz")]
-    (download-from-bucket (gcloud/get-access-token) tmp-file k)
-    (shelk/bash ["tar" "xzvf" tmp-file ">/dev/null 2>&1"] :dir "/"))
-  {:exit 0})
+    (cache/download-from-bucket (gcloud/get-access-token) tmp-file k)
+    (shelk/bash ["tar" "xzvf" tmp-file ">/dev/null 2>&1"] :dir "/")
+    (assoc env :exit 0)))
 
 (defmethod execute
   :maven
-  [args]
-  (maven-execute args))
+  [args env]
+  (maven-execute args env))
 
 (defmethod execute
   :bash
-  [{cmd :command env :env }]
-  (println "Execute" "bash" cmd)
-  (let [env (->> (or env {})
-                 (reduce-kv (fn [acc k v] (str acc (name k) "=" v " ")) "")
-                 str/trim) ]
-    (shelk/bash (str env " bash -c '" cmd "'"))))
+  [{cmd :command} env]
+  (merge env (shelk/bash cmd)))
 
-(defn do-step [{dir :dir :as step}]
+(defmethod execute
+  :env
+  [step env]
+  (reduce (fn [acc [k v]]
+            (cond
+              (map? v) (let [res (:out (shelk/bash (:command v)))]
+                         (assoc-in acc [:env k] res))
+              :else (assoc-in acc [:env k] v)))
+          (assoc env :exit 0) (dissoc step :type)))
+
+(defn do-step [{dir :dir :as step} env]
   (println "==============================")
   (println "STEP:" (:type step) (pr-str step))
   (println "------------------------------")
   (let [start (System/nanoTime)
-        result (execute step)]
+        result (sh/with-sh-env (or (:env env) env)
+                 (if dir
+                   (sh/with-sh-dir dir
+                     (execute step env))
+                   (execute step env)))]
     (println "------------------------------")
     (println "step done in " (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
 
     result))
 
 (defn build [build]
-  (loop [[st & sts] (:pipeline build)]
-    (if st
-      (let [res (do-step st)]
-        (if-not (= 0 (:exit res))
-          (println "ERROR!") 
-          (recur sts)))
-      (println "DONE!"))))
+  (let [start (System/nanoTime)]
+    (loop [env {:build build}
+           [st & sts] (:pipeline build)]
+      (if st
+        (let [res (do-step st env)]
+          (if-not (= 0 (:exit res))
+            (println "ERROR!") 
+            (recur res sts)))
+        (println "==========================================\nDONE in "
+                 (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))))))
