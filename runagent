@@ -5,6 +5,8 @@ set -e
 lein uberjar
 docker build -t ci3 .
 
+lein clean
+
 export KUBE_URL=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d " ")
 export KUBE_TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
 export DOCKER_KEY="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
@@ -16,14 +18,15 @@ docker run --rm \
   -e KUBE_URL=$KUBE_URL \
   -e KUBE_TOKEN=$KUBE_TOKEN \
   -e BUILD_ID=$BUILD_ID \
+  -e DOCKER_KEY="$DOCKER_KEY" \
   -e SERVICE_ACCOUNT="$SERVICE_ACCOUNT" \
   -e CACHE_BUCKET="$CACHE_BUCKET" \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v `pwd`:/workspace \
   -v /tmp/cache:/cache \
+  -v /Users/nicola/.kube:/root/.kube \
   -it ci3 \
   agent
 
-# -e REPOSITORY=https://github.com/healthsamurai/ci3 \
 # -e DOCKER_KEY=$DOCKER_KEY \
 # -v /tmp/m2-cache:/root/.m2 \

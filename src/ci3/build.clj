@@ -22,7 +22,7 @@
 (defmethod execute
   :lein
   [{cmd :command} env]
-  (merge env (shelk/bash ["lein " cmd])))
+  (merge env (shelk/bash ["/usr/bin/lein " cmd])))
 
 (defmethod execute
   :default
@@ -72,8 +72,9 @@
   (println "==============================")
   (println "STEP:" (:type step) (pr-str step))
   (println "------------------------------")
+  (println (pr-str (:env env)))
   (let [start (System/nanoTime)
-        result (sh/with-sh-env (or (:env env) env)
+        result (sh/with-sh-env (or (:env env) {})
                  (if dir
                    (sh/with-sh-dir dir
                      (execute step env))
@@ -83,9 +84,14 @@
 
     result))
 
+(defn get-envs []
+  (reduce (fn [acc [k v]]
+            (assoc acc (keyword k) v)
+            ) {} (System/getenv)))
+
 (defn build [build]
   (let [start (System/nanoTime)]
-    (loop [env {:build build}
+    (loop [env {:build build :env (get-envs)}
            [st & sts] (:pipeline build)]
       (if st
         (let [res (do-step st env)]
@@ -94,3 +100,5 @@
             (recur res sts)))
         (println "==========================================\nDONE in "
                  (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))))))
+
+
