@@ -36,4 +36,4 @@ pipeline:
 - type: bash
   command: echo "$GIT_COMMIT"
 - type: bash
-  command: helm upgrade --set image.tag=$GIT_COMMIT,image.repository=eu.gcr.io/aidbox-next/ci3 -i web-hook ci3
+  command: helm upgrade --set image.tag=$GIT_COMMIT,image.repository=eu.gcr.io/aidbox-next/ci3 -i web-hook ./ci3

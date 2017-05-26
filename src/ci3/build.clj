@@ -63,7 +63,7 @@
   [step env]
   (reduce (fn [acc [k v]]
             (cond
-              (map? v) (let [res (:out (shelk/bash (:command v)))]
+              (map? v) (let [res (str/trim (:out (shelk/bash (:command v))))]
                          (assoc-in acc [:env k] res))
               :else (assoc-in acc [:env k] v)))
           (assoc env :exit 0) (dissoc step :type)))
