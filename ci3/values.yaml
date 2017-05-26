@@ -33,4 +33,5 @@ service:
 secrets:
 - name: ci3
   data:
-    hook-secret: "some-secret"
+    defaultSecret: "some-secret"
+    mySecret: "mysecret"

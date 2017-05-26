@@ -3,10 +3,10 @@ set -e
 # set -o xtrace
 
 export APISERVER=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d " ")
-export TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
+export TOKEN="$(kubectl get secret secrets -o json | jq -r .data.github_token | base64 --decode)"
 export DOCKER_KEY="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
 export SERVICE_ACCOUNT="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
 export CACHE_BUCKET="ci3-cache"
 
-lein uberjar
-java -cp target/ci3.jar clojure.main -m ci3.core agent
+#lein uberjar
+#java -cp target/ci3.jar clojure.main -m ci3.core agent

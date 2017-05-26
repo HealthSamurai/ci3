@@ -60,8 +60,20 @@
 
 (def cfg {:apiVersion "ci3.io/v1" :ns "default"})
 
+(defn secret [name key]
+  (let [cfg {:apiVersion "v1" :ns "deftest"}]
+    (->
+      @(http-client/get
+         (str kube-url  "/api/v1/namespaces/default/secrets/" )
+         {:insecure? true
+          :headers (merge default-headers {"Content-Type" "application/json-patch+json"})})
+      :body
+      ))
+  )
+
 (comment
   (list cfg :builds)
+  (secret "ci3" :mysecret)
   (find cfg :builds "ci3-build-6")
 
   (patch cfg :builds "test-1" {:status "changed"})
