@@ -2,10 +2,12 @@
 set -e
 set -o xtrace
 
-export $GIT_COMMIT="$(git rev-parse --short HEAD)"
+export DOCKER_KEY="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
+export GIT_COMMIT="$(git rev-parse --short HEAD)"
 
 lein uberjar
 
+docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
 docker build -t eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT .
 docker tag eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT eu.gcr.io/aidbox-next/ci3:latest
 docker push eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT
