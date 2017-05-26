@@ -72,7 +72,6 @@
   (println "==============================")
   (println "STEP:" (:type step) (pr-str step))
   (println "------------------------------")
-  (println (pr-str (:env env)))
   (let [start (System/nanoTime)
         result (sh/with-sh-env (or (:env env) {})
                  (if dir
