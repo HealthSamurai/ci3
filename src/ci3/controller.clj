@@ -8,7 +8,8 @@
 (defonce stop (atom nil))
 
 (defn process-build [builds]
-  (when-let [items (:items builds)]
+  (println builds)
+  #_(when-let [items (:items builds)]
     (doseq [i items]
       (when-not (:pod i)
         (let [id (get-in i [:metadata :name])]
@@ -43,10 +44,10 @@
                               :scheduledAt (str (java.util.Date.))
                               :status "sche"})))))))))
 
-(defn watch-resource [rt process]
+(defn watch-resource [cfg rt process]
   (if @stop
     (println "Stop watching " (name rt))
-    (future (process (walk/keywordize-keys (k8s/list k8s/cfg rt)))
+    (future (process (walk/keywordize-keys (k8s/list cfg rt)))
             (Thread/sleep 5000)
             (watch-resource rt process))))
 
@@ -57,21 +58,22 @@
         (println "Add webhook " (:url r))
         (spit "/tmp/repl" (str "add web hook" "\n\n\n"))))))
 
-(defn restart []
-  (do
-    (reset! stop true)
-    (reset! stop false)
-    (watch-resource :repositories process-repository)))
-
 (defn watch []
-  (watch-resource :build process-build))
+  (watch-resource cfg :builds process-build))
 
 (comment
 
-  (watch-resource :build process-build)
+  (watch-resource cfg :builds process-build)
+
   (watch-resource :repositories process-repository)
 
-  (k8s/list k8s/cfg :repositories)
+  ("items")
+  (doseq [b (get (k8s/list cfg :builds) "items")]
+    (println
+     (k8s/delete cfg :builds
+                 (get-in b ["metadata" "name"]))))
+
+
   (reset! stop true)
   (reset! stop false)
 
