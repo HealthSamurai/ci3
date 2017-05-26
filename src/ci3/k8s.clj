@@ -1,4 +1,5 @@
 (ns ci3.k8s
+  (:import java.util.Base64)
   (:require
    [org.httpkit.client :as http-client]
    [clj-json-patch.core :as patch]
@@ -64,16 +65,17 @@
   (let [cfg {:apiVersion "v1" :ns "deftest"}]
     (->
       @(http-client/get
-         (str kube-url  "/api/v1/namespaces/default/secrets/" )
+         (str kube-url  "/api/v1/namespaces/default/secrets/" name)
          {:insecure? true
           :headers (merge default-headers {"Content-Type" "application/json-patch+json"})})
-      :body
-      ))
-  )
+      :body (json/parse-string keyword)
+      :data key
+      (#(String. (.decode (Base64/getDecoder) %))))))
 
 (comment
   (list cfg :builds)
-  (secret "ci3" :mysecret)
+  (secret "ci3" :mySecret)
+  (secret "ci3" :defaultSecret)
   (find cfg :builds "ci3-build-6")
 
   (patch cfg :builds "test-1" {:status "changed"})
