@@ -16,6 +16,12 @@
 (defn url [cfg pth]
   (str kube-url "/" pth))
 
+(defn curl [cfg pth]
+  (let [res @(http-client/get
+              (url cfg pth)
+              {:headers default-headers :insecure? true})]
+    (-> res :body)))
+
 (defn query [cfg rt & [pth]]
   (let [res @(http-client/get
               (url cfg (str (or (:prefix cfg) "apis") "/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) "/" pth))
@@ -86,6 +92,14 @@
   (patch cfg :builds "test-1" {:status "changed"})
 
   (delete cfg :builds "test-1")
+
+  (query {:prefix "api"
+          :ns "default"
+          :apiVersion "v1"}
+         :pods
+         "aitem-hook-test-d40a2375646990b2dec75e80cf97ce5a8a77a199/log")
+
+  (curl {} "api/v1/namespaces/default/pods/aitem-hook-test-d40a2375646990b2dec75e80cf97ce5a8a77a199/log")
 
   (create cfg :builds
           {:kind "Build"

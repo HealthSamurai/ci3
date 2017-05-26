@@ -10,7 +10,11 @@
    [ci3.controller :as ctrl]
    [pandect.algo.sha1 :refer [sha1-hmac]]
    [route-map.core :as route-map]
-   [ring.util.codec]))
+   [ring.util.codec]
+   [hiccup.core :as hiccup]
+   [hiccup.page :as page]
+   [garden.core :as css]
+   [clojure.walk :as walk]))
 
 (defonce server (atom nil))
 
@@ -93,21 +97,54 @@
       verify
       create-build))
 
+(defn layout [cnt]
+  (page/html5
+   [:head
+    [:meta {:charset "utf-8"}]
+    [:link {:rel "stylesheet" :href "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"}]
+    [:link {:rel "stylesheet" :href     "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"}]]
+   [:body
+    [:style (css/css [:body {:padding "0 20px"} [:.top {:padding "5px 10px" :background-color "#eee" :margin-bottom "10px"}]])]
+    [:div.container-fluid.top "ci3"]
+    cnt]))
+
 (defn welcome [_]
-  {:body "Welocome to zeroci"})
+  {:body (layout [:h3 "Welocome to minimalistic ci on k8s - ci3"])
+   :headers {"Content-Type" "text/html"}})
 
 (defn builds [_]
-  {:body (k8s/list k8s/cfg :builds)})
+  (let [bs (walk/keywordize-keys (k8s/list k8s/cfg :builds))]
+    {:body (layout
+            [:div.container
+             (for [b (reverse (sort-by (fn [x] (get-in x [:payload :commit :timestamp])) (:items bs)))]
+               [:div {:key (get-in b [:metadata :name])}
+                [:a {   :href (str "/builds/" (get-in b [:metadata :name]))}
+                 [:b (get-in b [:payload :commit :timestamp])]
+                 " by "
+                 [:span (get-in b [:payload :commit :author :name])]
+                 " - "
+                 [:span (get-in b [:payload :commit :message])]]
+                [:div "pod:"   (get-in b [:pod :metadata :name])]
+                [:hr]])])
+     :headers {"Content-Type" "text/html"}}))
+
+(defn logs [{{id :id} :route-params}]
+  (let [logs (k8s/curl {} (str  "api/v1/namespaces/default/pods/" id "/log"))]
+    {:body (layout
+            [:div.container-fluid
+             [:pre logs]])
+     :headers {"Content-Type" "text/html"}}))
 
 (def routes
   {:GET #'welcome
-   "builds" {:GET #'builds}
+   "builds" {:GET #'builds
+             [:id] {:GET #'logs}}
    "webhook"  {:POST #'webhook}})
 
 
 (defn app [{meth :request-method uri :uri :as req}]
   (if-let [res (route-map/match [meth uri] routes)]
-    ((:match res)  (assoc req :route-params req))
+    ((:match res)  (assoc req :route-params (:params res)))
     {:status 404 :body (str meth " " uri " Not found")}))
 
 (defn restart []

@@ -21,6 +21,9 @@
                  [clj-jwt "0.1.1"]
                  [clj-time "0.13.0"]
                  [clojure-humanize "0.2.2"]
+
+                 [hiccup "1.0.5"]
+                 [garden "1.3.2"]
                  ]
   :uberjar-name "ci3.jar"
   :main ci3.core
