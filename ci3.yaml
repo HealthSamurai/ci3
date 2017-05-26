@@ -34,4 +34,6 @@ pipeline:
 - type: bash
   command: docker push eu.gcr.io/aidbox-next/ci3:latest
 - type: bash
+  command: echo "$GIT_COMMIT"
+- type: bash
   command: helm upgrade --set image.tag=$GIT_COMMIT,image.repository=eu.gcr.io/aidbox-next/ci3 -i web-hook ci3
