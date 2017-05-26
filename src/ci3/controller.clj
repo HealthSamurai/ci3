@@ -55,19 +55,22 @@
 
 (defn process-repository [repositories]
   (when-let  [repos (:items repositories)]
-    (doseq [r repos]
-      (when-not (:staus r)
-        (println "Add webhook " (:url r))
-        (spit "/tmp/repl" (str "add web hook" "\n\n\n"))))))
+    (doseq [repo repos]
+      (when-not (:hook repo)
+        (let [id (get-in repo [:metadata :name])
+              hook (gh/create-webhook repo)]
+          (k8s/patch k8s/cfg :repositories id
+                     {:hook hook}))))))
 
 (defn watch []
-  (watch-resource cfg :builds process-build))
+  (watch-resource cfg :builds process-build)
+  (watch-resource cfg :repositories process-repository))
 
 (comment
 
   (watch-resource cfg :builds process-build)
 
-  (watch-resource :repositories process-repository)
+  (watch-resource cfg :repositories process-repository)
 
   (doseq [b (get (k8s/list cfg :builds) "items")]
     (println

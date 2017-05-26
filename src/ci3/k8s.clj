@@ -70,12 +70,7 @@
           :headers (merge default-headers {"Content-Type" "application/json-patch+json"})})
       :body (json/parse-string keyword)
       :data key
-      (#(String. (.decode (Base64/getDecoder) %)))
-
-      )))
-
-(subs "1234" 1 (- (count "1234") 1))
-
+      (#(String. (.decode (Base64/getDecoder) %))))))
 
 (comment
   (list cfg :builds)

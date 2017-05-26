@@ -24,5 +24,5 @@
         (json/parse-string))))
 
 (comment
-  (create-webhook {:fullName "HealthSamurai/ci3" :secret "mySecret"})
+(create-webhook {:fullName "HealthSamurai/ci3" :secret "mySecret"})
   )
