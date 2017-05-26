@@ -10,11 +10,7 @@
     {"Authorization" (str "Bearer " token)}
     {}))
 
-
 (def kube-url (or (System/getenv "KUBE_URL") "http://localhost:8001"))
-
-(println "url:" kube-url)
-(println "headers:" default-headers)
 
 (defn url [cfg pth]
   (str kube-url "/" pth))

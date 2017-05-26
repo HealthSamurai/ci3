@@ -16,6 +16,9 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
         args: {{ .Values.service.args }}
+        env:
+        - name: CACHE_BUCKET
+          value: "{{ .Values.cacheBucket }}"
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         livenessProbe:

@@ -21,6 +21,8 @@ image:
   tag: 0.0.5
   pullPolicy: Always
 
+cacheBucket: ci3-cache
+
 service:
   args: ["server"]
   name: nginx

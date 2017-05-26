@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-set -o xtrace
+# set -o xtrace
 
 lein uberjar
 docker build -t ci3 .
@@ -10,12 +10,14 @@ export TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cu
 export DOCKER_KEY="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
 export BUILD_ID=ci3-build-6
 export SERVICE_ACCOUNT="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
+export CACHE_BUCKET="ci3-cache"
 
 docker run --rm \
   -e KUBE_URL=$APISERVER \
   -e KUBE_TOKEN=$TOKEN \
   -e BUILD_ID=$BUILD_ID \
   -e SERVICE_ACCOUNT="$SERVICE_ACCOUNT" \
+  -e CACHE_BUCKET="$CACHE_BUCKET" \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v `pwd`:/workspace \
   -v /tmp/cache:/cache \

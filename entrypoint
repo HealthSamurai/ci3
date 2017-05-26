@@ -2,8 +2,6 @@
 
 set -e
 
-echo 'starting'
-
 if [ -f /var/run/secrets/kubernetes.io/serviceaccount/token ]; then
   echo "export key"
   export KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)

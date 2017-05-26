@@ -23,12 +23,14 @@
       (println res)
       res)))
 
+(defn print-step [build step & _]
+  (println "### " (:name step) (:type step)))
+
 (defn exec [& args]
   ;; checkout project
-  (let [repo (checkout-project)]
-    (println repo))
+  (let [repo (checkout-project)] (println repo))
   (let [bld (get-build (build-id))]
-    (build/build (yaml/parse-string (slurp "/workspace/ci3.yaml") true) println))
+    (build/build (yaml/parse-string (slurp "/workspace/ci3.yaml") true)))
   (System/exit 0))
 
 (comment 

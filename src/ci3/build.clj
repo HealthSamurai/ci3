@@ -6,7 +6,8 @@
             [clojure.walk :as walk]
             [cheshire.core :as json]
             [clojure.pprint :as pprint]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [ci3.shelk :as shelk]))
 
 (defmulti execute
   (fn [st] (when-let [tp (:type st)] (keyword tp))))
@@ -14,68 +15,66 @@
 (defmethod execute
   :docker
   [{cmd :command img :image}]
-  (println "Execute" "docker build -t" img)
-  (sh/sh "docker" "build" "-t" img "."))
+  (shelk/bash ["docker" "build" "-t" img "."]))
 
 (defmethod execute
   :lein
   [{cmd :command}]
-  (println "Execute" "lein" cmd)
-  (sh/sh "bash" "-c" (str  "lein " cmd)))
+  (shelk/bash ["lein " cmd]))
 
 
 (defmethod execute
   :default
   [{img :image cmd :command}]
-  (println "Execute: docker" "run" "-rm" "-t" img cmd)
-  (apply sh/sh "docker" "run" "--rm" "-t" img (str/split cmd #"\s+")))
+  (shelk/bash ["docker" "run" "--rm" "-t" img (str/split cmd #"\s+")]))
 
 (defmulti maven-execute (fn [{cmd :command}] (keyword cmd)))
 
 (defn archive-dir [dir to]
-  (println "archive: " (sh/sh "tar" "czvf" to dir)))
+  (shelk/bash ["tar" "czvf" to dir ">/dev/null 2>&1"]))
 
+(defn bucket []
+  (or (System/getenv "CACHE_BUCKET") "ci3-cache"))
+
+(defn upload-bucket-object-url [k]
+  (str "https://www.googleapis.com/upload/storage/v1/b/"
+       (bucket)
+       "/o/?uploadType=media\\&name=" k ".tar.gz\\&" k "=mvn"))
+
+(defn upload-to-bucket [access-token file-path k]
+  (shelk/bash
+   (str  "curl -X POST "
+         " --data-binary @" file-path " "
+         " -H 'Authorization: Bearer " access-token "' "
+         (upload-bucket-object-url k))))
+
+(defn download-bucket-object-url [k]
+  (str "https://www.googleapis.com/download/storage/v1/b/"
+       (bucket)
+       "/o/" k ".tar.gz?alt=media"))
+
+(defn download-from-bucket [access-token file-path k]
+  (shelk/bash
+   (str  "curl "
+         "-H 'Authorization: Bearer " access-token "' "
+         (download-bucket-object-url k)
+         " -o " file-path)))
 
 (defmethod maven-execute
   :save-cache
-  [arg]
-  (println "Execute: save maven cache")
-  ;;(apply sh/sh "docker" "run" "--rm" "-t" img (str/split cmd #"\s+"))
-  (println "  archive .m2 dir")
-  (archive-dir "/root/.m2" "/tmp/mvn.tar.gz")
-  (println "lah" (sh/sh "ls" "-lah" "/tmp/mvn.tar.gz"))
-
-  (println "cache" (sh/sh "cp" "/tmp/mvn.tar.gz" "/cache"))
-  (let [tk (gcloud/get-access-token)]
-    (println (sh/sh "bash" "-o" "xtrace"
-                    "-c" (str  "curl -X POST "
-                               " --data-binary @/tmp/mvn.tar.gz"
-                               " -H 'Authorization: Bearer " tk "' "
-                               "https://www.googleapis.com/upload/storage/v1/b/ci3-cache/o/?uploadType=media\\&name=mvn.tar.gz\\&key=mvn"
-                               ) :dir "/tmp")))
+  [{k :key}]
+  (let [tmp-file (str "/tmp/" k  ".tar.gz")]
+    (archive-dir "/root/.m2" tmp-file)
+    (shelk/bash ["ls -lah" tmp-file])
+    (upload-to-bucket (gcloud/get-access-token) tmp-file k))
   {:exit 0})
 
 (defmethod maven-execute
   :restore-cache
-  [arg]
-  (println "Execute: save maven cache")
-  ;;(apply sh/sh "docker" "run" "--rm" "-t" img (str/split cmd #"\s+"))
-  (println "  restore .m2 dir")
-  (println (sh/sh "ls" "-lah" "/cache"))
-  ;; (println "restore" (sh/sh "cp" "/cache/mvn.tar.gz" "/tmp"))
-
-  (let [tk (gcloud/get-access-token)]
-    (println
-     (sh/sh "bash"
-            "-o" "xtrace"
-            "-c" (str  "curl "
-                       "-H 'Authorization: Bearer " tk "' "
-                       "https://www.googleapis.com/download/storage/v1/b/ci3-cache/o/mvn.tar.gz?alt=media"
-                       " -o /tmp/mvn.tar.gz"))))
-
-  (println (sh/sh "ls" "-lah" "/tmp/mvn.tar.gz"))
-  (println (sh/sh "tar" "xzvf" "/tmp/mvn.tar.gz" :dir "/"))
-  (println (sh/sh "ls" "-lah" "/root/.m2"))
+  [{k :key}]
+  (let [tmp-file (str "/tmp/" k  ".tar.gz")]
+    (download-from-bucket (gcloud/get-access-token) tmp-file k)
+    (shelk/bash ["tar" "xzvf" tmp-file ">/dev/null 2>&1"] :dir "/"))
   {:exit 0})
 
 (defmethod execute
@@ -90,38 +89,13 @@
   (let [env (->> (or env {})
                  (reduce-kv (fn [acc k v] (str acc (name k) "=" v " ")) "")
                  str/trim) ]
-    (sh/sh "bash" "-c" (str env " bash -c '" cmd "'") )))
+    (shelk/bash (str env " bash -c '" cmd "'"))))
 
-(comment
-
-  (sh/sh "sh" "-c"  "FOO=$(git rev-parse --short HEAD) bash -c 'echo $FOO'" )
-
-  (pprint/pprint (execute {:type "docker"
-                           :command "build"
-                           :image "eu.gcr.io/aidbox-next/ci32" }))
-
-  (pprint/pprint (execute {:type "bash"
-                           :command "docker login -u _json_key -p $DOCKER_KEY https://eu.gcr.io"
-                           }))
-
-
-  (pprint/pprint (execute {:type "bash"
-                           :env {:GIT_COMMIT "$(git rev-parse --short HEAD)"}
-                           :command "helm upgrade --set image.tag=$GIT_COMMIT -i web-hook ci3" }))
-
-  (pprint/pprint (execute {:type "bash"
-                           :env {:GIT_COMMIT "$(git rev-parse --short HEAD)"}
-                           :command "docker build -t eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT ." }))
-  )
-
-(defn build [build cb]
+(defn build [build]
   (loop [[st & sts] (:pipeline build)]
-    (when st
-      (cb :step build st)
+    (if st
       (let [res (execute st)]
-        (println res)
         (if-not (= 0 (:exit res))
-          (println (:err res))
-          (recur sts)))))
-  (cb :finish build)
-  (println "Done"))
+          (println "ERROR!") 
+          (recur sts)))
+      (println "DONE!"))))

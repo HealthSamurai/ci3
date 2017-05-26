@@ -11,7 +11,7 @@
 (defn run [& args]
   (let [b (yaml/parse-string (slurp "ci3.yaml") true)]
     (println (sh/sh "pwd"))
-    (build/build b println)))
+    (build/build b)))
 
 (defn exec [& args]
   (apply run args)
