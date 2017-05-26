@@ -5,16 +5,16 @@ set -e
 lein uberjar
 docker build -t ci3 .
 
-export APISERVER=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d " ")
-export TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
+export KUBE_URL=$(kubectl config view | grep server | cut -f 2- -d ":" | tr -d " ")
+export KUBE_TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t')
 export DOCKER_KEY="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
 export BUILD_ID=ci3-build-6
 export SERVICE_ACCOUNT="$(kubectl get secrets docker-registry -o json | jq -r '.data.key' | base64 --decode)"
 export CACHE_BUCKET="ci3-cache"
 
 docker run --rm \
-  -e KUBE_URL=$APISERVER \
-  -e KUBE_TOKEN=$TOKEN \
+  -e KUBE_URL=$KUBE_URL \
+  -e KUBE_TOKEN=$KUBE_TOKEN \
   -e BUILD_ID=$BUILD_ID \
   -e SERVICE_ACCOUNT="$SERVICE_ACCOUNT" \
   -e CACHE_BUCKET="$CACHE_BUCKET" \

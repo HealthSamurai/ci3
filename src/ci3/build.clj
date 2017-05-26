@@ -20,11 +20,8 @@
 
 (defmethod execute
   :lein
-  [{cmd :command dir :dir}]
-  (if dir
-    (shelk/bash ["lein " cmd] :dir (str "/workspace/" dir))
-    (shelk/bash ["lein " cmd])))
-
+  [{cmd :command}]
+  (shelk/bash ["lein " cmd]))
 
 (defmethod execute
   :default
@@ -95,14 +92,13 @@
     (shelk/bash (str env " bash -c '" cmd "'"))))
 
 (defn do-step [{dir :dir :as step}]
-  (println "\n==============================")
+  (println "==============================")
   (println "STEP:" (:type step) (pr-str step))
-  (println "\n------------------------------")
+  (println "------------------------------")
   (let [start (System/nanoTime)
         result (execute step)]
-    (println "\n------------------------------")
-    (println "DONE in " (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
-    (println "\n------------------------------")
+    (println "------------------------------")
+    (println "step done in " (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
 
     result))
 

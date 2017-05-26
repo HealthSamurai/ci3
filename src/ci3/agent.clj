@@ -11,11 +11,12 @@
 (defn build-id [] (System/getenv "BUILD_ID"))
 
 (defn get-build [bid]
-  (let [bld (k8s/find k8s/cfg :builds (str/trim bid))]
-    (when-not (or bld (= "Failure" (get bld "status")))
-      (throw (Exception. (str "Could not find build: " bid " or " bld))))
-    (println "Got build: " bld)
-    (walk/keywordize-keys bld)))
+  (when bid
+    (when-let [bld (k8s/find k8s/cfg :builds (str/trim bid))]
+      (when-not (or bld (= "Failure" (get bld "status")))
+        (throw (Exception. (str "Could not find build: " bid " or " bld))))
+      (println "Got build: " bld)
+      (walk/keywordize-keys bld))))
 
 (defn checkout-project []
   (when-let [repo (System/getenv "REPOSITORY")]
@@ -34,5 +35,4 @@
   (System/exit 0))
 
 (comment 
-  (:pipeline (yaml/parse-string (slurp "/home/aitem/Work/HS/ci3/ci3.yaml") true) )
-  )
+  (:pipeline (yaml/parse-string (slurp "/home/aitem/Work/HS/ci3/ci3.yaml") true) ))
