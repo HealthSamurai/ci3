@@ -92,7 +92,7 @@
 (defn update-status [build]
   (let [gh-status  (gh/set-status build)
         id (get-in build [:metadata :name])]
-    (k8s/patch k8s/cfg :build id
+    (k8s/patch k8s/cfg :builds id
                {:gh-status gh-status})) )
 
 (defn build [build]
