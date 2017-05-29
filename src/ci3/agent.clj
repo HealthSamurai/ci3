@@ -19,8 +19,11 @@
       (walk/keywordize-keys bld))))
 
 (defn checkout-project []
-  (when-let [repo (System/getenv "REPOSITORY")]
-    (let [res (sh/sh "git" "clone" repo "/workspace")]
+  (when-let [full_name (System/getenv "REPOSITORY")]
+    (let [token (k8s/secret "secrets" :github_token)
+          repo (str "https://" token "@github.com/" full_name ".git")
+          res (sh/sh "git" "clone" repo "/workspace")]
+      (println "-------" repo)
       (println res)
       res)))
 
