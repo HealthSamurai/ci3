@@ -28,17 +28,17 @@
   (let [sha (get-in build [:payload :commit :id])
         full_name (get-in build [:payload :repository :full_name])
         target_url (str "https://ci.health-samurai.io/builds/" (get-in build [:metadata :name]))
-        ]
-    (-> @(http-client/post
-           (str "https://api.github.com/repos/" full_name "/statuses/" sha)
-           {:body (json/generate-string{:context "continuous-integration/ci3"
-                                        :description "success"
-                                        :target_url target_url
-                                        :state "success" })
-            :headers  { "Authorization" (str "token " gh-token) }})
-        :body
-        (json/parse-string)))
-  )
+        status (-> @(http-client/post
+                      (str "https://api.github.com/repos/" full_name "/statuses/" sha)
+                      {:body (json/generate-string{:context "continuous-integration/ci3"
+                                                   :description "success"
+                                                   :target_url target_url
+                                                   :state "success" })
+                       :headers  { "Authorization" (str "token " gh-token) }})
+                   :body
+                   (json/parse-string))]
+    (println status)
+    status))
 
 (comment
   (create-webhook {:fullName "HealthSamurai/ci3" :secret "mySecret" :metadata {:name "ci3"}})

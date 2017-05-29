@@ -89,6 +89,11 @@
             (assoc acc (keyword k) v)
             ) {} (System/getenv)))
 
+(defn update-status [build]
+  (let [gh-status  (gh/set-status build)
+        id (get-in build [:metadata :name])]
+    (k8s/patch k8s/cfg :build id
+               {:gh-status gh-status})) )
 
 (defn build [build]
   (let [start (System/nanoTime)]
@@ -102,7 +107,7 @@
 
         (println "==========================================\nDONE in "
                  (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))))
-    (gh/set-status build)
+    (update-status build)
     ))
 
 
