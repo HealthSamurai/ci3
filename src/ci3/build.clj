@@ -1,7 +1,7 @@
 (ns ci3.build
   (:require [clojure.java.shell :as sh]
             [ci3.k8s :as k8s]
-            [ci3.github :as gs]
+            [ci3.github :as gh]
             [ci3.gcloud :as gcloud]
             [clj-yaml.core :as yaml]
             [clojure.walk :as walk]
@@ -101,6 +101,8 @@
             (recur res sts)))
 
         (println "==========================================\nDONE in "
-                 (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))))))
+                 (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))))
+    (gh/set-status build)
+    ))
 
 
