@@ -37,6 +37,8 @@
                        :headers  { "Authorization" (str "token " gh-token) }})
                    :body
                    (json/parse-string))]
+    (println sha full_name target_url)
+    (println (str "https://api.github.com/repos/" full_name "/statuses/" sha))
     (println status)
     status))
 
