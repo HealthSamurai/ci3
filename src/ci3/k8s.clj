@@ -67,6 +67,11 @@
 
 (def cfg {:apiVersion "ci3.io/v1" :ns "default"})
 
+(defn base64-decode [s]
+  (if s
+    (String. (.decode (Base64/getDecoder) s))
+    nil))
+
 (defn secret [name key]
   (let [cfg {:apiVersion "v1" :ns "deftest"}]
     (->
@@ -76,12 +81,14 @@
           :headers (merge default-headers {"Content-Type" "application/json-patch+json"})})
       :body (json/parse-string keyword)
       :data key
-      (#(String. (.decode (Base64/getDecoder) %))))))
+      base64-decode)))
 
 (comment
   (list cfg :builds)
   (secret "ci3" :mySecret)
-  (secret "ci3" :defaultSecret)
+  (secret "secrets" :github_token)
+  (gh/create-webhook )
+
   (find cfg :builds "ci3-build-6")
 
   (patch cfg :builds "test-1" {:status "changed"})
