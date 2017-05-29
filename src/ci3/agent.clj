@@ -15,7 +15,7 @@
     (when-let [bld (k8s/find k8s/cfg :builds (str/trim bid))]
       (when-not (or bld (= "Failure" (get bld "status")))
         (throw (Exception. (str "Could not find build: " bid " or " bld))))
-      (println "Got build: " bld)
+      (println "Got build: " (get bld "metadata"))
       (walk/keywordize-keys bld))))
 
 (defn checkout-project []
@@ -23,7 +23,6 @@
     (let [token (k8s/secret "secrets" :github_token)
           repo (str "https://" token "@github.com/" full_name ".git")
           res (sh/sh "git" "clone" repo "/workspace")]
-      (println "-------" repo)
       (println res)
       res)))
 
@@ -32,10 +31,13 @@
 
 (defn run [& args]
   (let [repo (checkout-project)] (println repo))
-  (let [build (get-build (build-id))
+  (let [id (build-id)
+        build (get-build id )
         build (merge
                 (yaml/parse-string (slurp "ci3.yaml") true)
-                build) ]
+                build)]
+    (k8s/patch k8s/cfg :builds id
+               (select-keys  build [:pipeline :environment]))
     (build/build build)))
 
 (defn exec [& args]
