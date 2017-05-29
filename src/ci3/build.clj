@@ -93,7 +93,15 @@
   (let [gh-status  (gh/set-status build)
         id (get-in build [:metadata :name])]
     (k8s/patch k8s/cfg :builds id
-               {:gh-status gh-status})) )
+               {:gh-status gh-status
+                :status (:status build) })) )
+
+(defn error [build]
+  (println "ERROR!")
+  (update-status (assoc build :status "error")))
+
+(defn success [build]
+  (update-status (assoc build :status "success")))
 
 (defn build [build]
   (let [start (System/nanoTime)]
@@ -102,12 +110,11 @@
       (if st
         (let [res (do-step st env)]
           (if-not (= 0 (:exit res))
-            (println "ERROR!")
+            (error build)
             (recur res sts)))
-
-        (println "==========================================\nDONE in "
-                 (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))))
-    (update-status build)
-    ))
+        (do
+          (println "==========================================\nDONE in "
+           (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
+         (success build))))))
 
 

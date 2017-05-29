@@ -33,7 +33,7 @@
                       {:body (json/generate-string{:context "continuous-integration/ci3"
                                                    :description "success"
                                                    :target_url target_url
-                                                   :state "success" })
+                                                   :state (:status build) })
                        :headers  { "Authorization" (str "token " gh-token) }})
                    :body
                    (json/parse-string))]
@@ -43,6 +43,7 @@
   (create-webhook {:fullName "HealthSamurai/ci3" :secret "mySecret" :metadata {:name "ci3"}})
 
   (set-status {:kind "Build"
+               :status "error"
                :metadata {:name "healthsamurai-ci3-4aa99cc52848f9cbc67286bb876c7287b27c717d"}
                :payload {:commit {:id "fc45e0b88a00d3de6a040db107b2a5b6c0c2bc03"}
                          :repository {:full_name "HealthSamurai/ci3"} }} )
