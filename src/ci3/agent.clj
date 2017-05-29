@@ -29,15 +29,15 @@
 
 (defn run [& args]
   (let [repo (checkout-project)] (println repo))
-  (let [bld (get-build (build-id))]
-    (build/build
-     (yaml/parse-string (slurp "ci3.yaml") true))))
+  (let [build (get-build (build-id))
+        build (merge
+                (yaml/parse-string (slurp "ci3.yaml") true)
+                build) ]
+    (build/build build)))
 
 (defn exec [& args]
   (run)
   (System/exit 0))
 
 (comment
-  (run)
-
-  )
+  (run))
