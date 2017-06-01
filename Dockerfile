@@ -87,12 +87,30 @@ RUN apk add --update curl
 
 RUN curl https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > /usr/bin/lein && chmod u+x /usr/bin/lein && lein && echo 'ok'
 
+RUN apk add --update \
+    python \
+    py-pip \
+    py-cffi \
+    py-cryptography \
+  && pip install --upgrade pip \
+  && apk add --virtual build-deps \
+    gcc \
+    libffi-dev \
+    python-dev \
+    linux-headers \
+    musl-dev \
+    openssl-dev \
+  && pip install gsutil \
+  && apk del build-deps \
+  && rm -rf /var/cache/apk/*
+
 COPY target/ci3.jar /var/ci3.jar
 
 RUN mkdir /workspace
 
 WORKDIR /workspace
 ENV LEIN_ROOT 1
+ENV BOTO_CONFIG=/root/.boto
 
 COPY entrypoint /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint
