@@ -26,7 +26,7 @@
                                      :hostPath {:path "/var/run/docker.sock"}}
                                     {:name "gsutil"
                                      :secret {:secretName "storage"
-                                              :items {:key "boto" :path ".boto"}}}]
+                                              :items [{:key "boto" :path ".boto"}]}}]
                                    :containers
                                    [{:name "agent"
                                      :image "eu.gcr.io/aidbox-next/ci3:latest"
