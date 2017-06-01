@@ -23,7 +23,10 @@
                             :spec {:restartPolicy "Never"
                                    :volumes
                                    [{:name "docker-sock"
-                                     :hostPath {:path "/var/run/docker.sock"}}]
+                                     :hostPath {:path "/var/run/docker.sock"}}
+                                    {:name "gsutil"
+                                     :secret {:secretName "storage"
+                                              :items {:key "boto" :path ".boto"}}}]
                                    :containers
                                    [{:name "agent"
                                      :image "eu.gcr.io/aidbox-next/ci3:latest"
@@ -31,12 +34,15 @@
                                      :args ["agent"]
                                      :volumeMounts
                                      [{:name "docker-sock"
-                                       :mountPath "/var/run/docker.sock"}]
+                                       :mountPath "/var/run/docker.sock"}
+                                      {:name "gsutil"
+                                       :mountPath "/gsutil"
+                                       :readOnly true}]
                                      :env [{:name "BUILD_ID" :value id}
+                                           {:name "BOTO_CONFIG" :value "/gsutil/.boto"}
                                            {:name "REPOSITORY" :value (get-in i [:payload :repository :full_name])}
                                            {:name "DOCKER_KEY" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}
-                                           {:name "SERVICE_ACCOUNT" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}]}
-                                    ]}})]
+                                           {:name "SERVICE_ACCOUNT" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}]}]}})]
             (println "Create pod" pod)
             (when-not (= "Failure" (get pod "status"))
               (println "Update build:"
