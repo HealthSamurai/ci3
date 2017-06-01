@@ -1,6 +1,7 @@
 (ns ci3.build
   (:require [clojure.java.shell :as sh]
             [ci3.k8s :as k8s]
+            [ci3.github :as gh]
             [ci3.gcloud :as gcloud]
             [clj-yaml.core :as yaml]
             [clojure.walk :as walk]
@@ -88,6 +89,20 @@
             (assoc acc (keyword k) v)
             ) {} (System/getenv)))
 
+(defn update-status [build]
+  (let [gh-status  (gh/set-status build)
+        id (get-in build [:metadata :name])]
+    (k8s/patch k8s/cfg :builds id
+               {:gh-status gh-status
+                :status (:status build) })) )
+
+(defn error [build]
+  (println "ERROR!")
+  (update-status (assoc build :status "error")))
+
+(defn success [build]
+  (update-status (assoc build :status "success")))
+
 (defn build [build]
   (let [start (System/nanoTime)]
     (loop [env {:build build :env (get-envs)}
@@ -95,9 +110,11 @@
       (if st
         (let [res (do-step st env)]
           (if-not (= 0 (:exit res))
-            (println "ERROR!") 
+            (error build)
             (recur res sts)))
-        (println "==========================================\nDONE in "
-                 (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))))))
+        (do
+          (println "==========================================\nDONE in "
+           (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
+         (success build))))))
 
 

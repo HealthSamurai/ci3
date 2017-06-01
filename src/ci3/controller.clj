@@ -33,7 +33,7 @@
                                      [{:name "docker-sock"
                                        :mountPath "/var/run/docker.sock"}]
                                      :env [{:name "BUILD_ID" :value id}
-                                           {:name "REPOSITORY" :value (get-in i [:payload :repository :url])}
+                                           {:name "REPOSITORY" :value (get-in i [:payload :repository :full_name])}
                                            {:name "DOCKER_KEY" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}
                                            {:name "SERVICE_ACCOUNT" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}]}
                                     ]}})]
