@@ -35,4 +35,4 @@ pipeline:
 - type: bash
   command: docker push $DOCKER_REPO:latest
 - type: bash
-  command: helm upgrade --set image.tag=v_$GIT_COMMIT,image.repository=$DOCKER_REPO -i web-hook ci3
+  command: helm upgrade --set image.tag=v_$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci ci3
