@@ -12,7 +12,7 @@ ingress:
   tls:
   - hosts:
     - ci.health-samurai.io
-    secretName: tls
+    secretName: health-samurai-tls
   hosts:
   - ci.health-samurai.io
 
@@ -31,7 +31,5 @@ service:
   internalPort: 8888
 
 secrets:
-- name: ci3
-  data:
-    defaultSecret: "someDefaultsecret"
-    mySecret: mySuperSecret
+  defaultSecret: "someDefaultsecret"
+  mySecret: mySuperSecret
