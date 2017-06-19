@@ -24,8 +24,11 @@
                                    :volumes
                                    [{:name "docker-sock"
                                      :hostPath {:path "/var/run/docker.sock"}}
+                                    {:name "account"
+                                     :secret {:secretName "boto"
+                                              :items [{:key "account" :path "account.json"}]} }
                                     {:name "gsutil"
-                                     :secret {:secretName "storage"
+                                     :secret {:secretName "boto"
                                               :items [{:key "boto" :path ".boto"}]}}]
                                    :containers
                                    [{:name "agent"
@@ -35,6 +38,8 @@
                                      :volumeMounts
                                      [{:name "docker-sock"
                                        :mountPath "/var/run/docker.sock"}
+                                      {:name "account"
+                                       :mountPath "/tmp"}
                                       {:name "gsutil"
                                        :mountPath "/gsutil"
                                        :readOnly true}]

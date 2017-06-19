@@ -7,7 +7,7 @@ export GIT_COMMIT="v_$(git rev-parse --short HEAD)"
 
 lein uberjar
 
-docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
+#docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
 docker build -t eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT .
 docker tag eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT eu.gcr.io/aidbox-next/ci3:latest
 docker push eu.gcr.io/aidbox-next/ci3:$GIT_COMMIT
