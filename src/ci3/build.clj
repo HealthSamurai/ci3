@@ -97,14 +97,15 @@
                {:gh-status gh-status
                 :status (:status build) })) )
 
+(def base-url "https://ci.health-samurai.io/")
 (defn error [build]
   (println "ERROR!")
   (update-status (assoc build :status "error"))
-  (telegram/notify (str "Error build " (get-in build [:metadata :name]))))
+  (telegram/notify (str "Error build " base-url "builds/" (get-in build [:metadata :name]))))
 
 (defn success [build]
   (update-status (assoc build :status "success"))
-  (telegram/notify (str "Success build " (get-in build [:metadata :name]))))
+  (telegram/notify (str "Success build " base-url "builds/" (get-in build [:metadata :name]))))
 
 (defn build [build]
   (let [start (System/nanoTime)]
