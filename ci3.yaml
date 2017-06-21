@@ -12,7 +12,7 @@ environment:
 pipeline:
 - type: env
   DOCKER_REPO: eu.gcr.io/aidbox-next/ci3
-  GIT_COMMIT: 
+  GIT_COMMIT:
     command: "git rev-parse --short HEAD"
 - type: maven
   command: restore-cache

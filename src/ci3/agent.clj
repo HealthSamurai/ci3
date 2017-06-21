@@ -45,4 +45,5 @@
   (System/exit 0))
 
 (comment
+  (yaml/parse-string (slurp "ci3.yaml") true)
   (run))

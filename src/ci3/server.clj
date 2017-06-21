@@ -7,6 +7,7 @@
    [clojure.java.shell :as sh]
    [cheshire.core :as json]
    [ci3.k8s :as k8s]
+   [ci3.telegram :as telegram]
    [ci3.controller :as ctrl]
    [pandect.algo.sha1 :refer [sha1-hmac]]
    [route-map.core :as route-map]
@@ -158,8 +159,8 @@
 
 (defn exec [& args]
   (ctrl/watch)
+  (telegram/start)
   (restart))
 
 (comment
-  (restart)
-  )
+  (restart))

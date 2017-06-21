@@ -1,6 +1,7 @@
 (ns ci3.build
   (:require [clojure.java.shell :as sh]
             [ci3.k8s :as k8s]
+            [ci3.telegram :as telegram]
             [ci3.github :as gh]
             [ci3.gcloud :as gcloud]
             [clj-yaml.core :as yaml]
@@ -98,10 +99,12 @@
 
 (defn error [build]
   (println "ERROR!")
-  (update-status (assoc build :status "error")))
+  (update-status (assoc build :status "error"))
+  (telegram/notify (str "Error build " (get-in build [:metadata :name]))))
 
 (defn success [build]
-  (update-status (assoc build :status "success")))
+  (update-status (assoc build :status "success"))
+  (telegram/notify (str "Success build " (get-in build [:metadata :name]))))
 
 (defn build [build]
   (let [start (System/nanoTime)]
