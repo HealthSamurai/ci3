@@ -3,7 +3,7 @@
 
 A minimaliztic ci for k8s
 
-
+test telegram notification
 
 
 ## Motivataion
