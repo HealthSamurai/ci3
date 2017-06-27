@@ -83,7 +83,7 @@
         commit (last (:commits payload))
         hashcommit (:id commit)
         build-name (cleanup (str (:full_name repository) "-" hashcommit))
-        build-name (if (> 63 (count build-name)) (subs build-name 0 63) build-name)]
+        build-name (if (> (count build-name) 63) (subs build-name 0 63) build-name)]
     {:body (k8s/create cfg :builds
                        {:kind "Build"
                         :apiVersion "ci3.io/v1"
