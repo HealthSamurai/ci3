@@ -73,11 +73,17 @@
       (str/replace  #"\:" "-")
       (str/lower-case)))
 
+
+(def longstring "healthsamurai-yourwaitsapp-d6b1fa98d56db635825fc2d4a4c1ea72801931e6")
+(count longstring)
+(subs longstring  0 63)
+
 (defn create-build [payload]
   (let [repository (:repository payload)
         commit (last (:commits payload))
         hashcommit (:id commit)
-        build-name (cleanup (str (:full_name repository) "-" hashcommit)) ]
+        build-name (cleanup (str (:full_name repository) "-" hashcommit))
+        build-name (if (> 63 (count build-name)) (subs build-name 0 63) build-name)]
     {:body (k8s/create cfg :builds
                        {:kind "Build"
                         :apiVersion "ci3.io/v1"
