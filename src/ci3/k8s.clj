@@ -43,8 +43,8 @@
 
 (defn resolve-secrets [res]
   (walk/postwalk (fn [x]
-                   (if (and (map? x) (contains? x "valueFrom"))
-                     (if-let [{nm "name" k "key"} (get-in x ["valueFrom" "secretKeyRef"])]
+                   (if (and (map? x) (contains? x :valueFrom))
+                     (if-let [{nm :name k :key} (get-in x [:valueFrom :secretKeyRef])]
                        (if-let [res (secret nm (keyword k))]
                          res
                          (do (log/warn "Could not resolve secret " k " from " nm) x))
@@ -58,7 +58,7 @@
                :insecure? true})]
     (-> res
      :body
-     (json/parse-string)
+     (json/parse-string keyword)
      (resolve-secrets))))
 
 (defn list [cfg rt] (query cfg rt))
@@ -95,20 +95,24 @@
       res)))
 
 (comment
-  (list cfg :repositories)
+  (map :name (map :metadata (:items (list cfg :repositories))))
+
+  (map :metadata )
+
+  (find cfg :repositories "ci3")
+
+  (patch cfg :repositories "ci3-chart" {:webhook nil})
 
   (secret "ci3" :mySecret)
   (secret "secrets" :github_token)
 
   (secret "bitbucket" :oauthConsumerSecret)
 
-  (gh/create-webhook )
-
   (find cfg :builds "ci3-build-6")
 
   (patch cfg :builds "test-1" {:status "changed"})
 
-  (delete cfg :builds "test-1")
+  (delete cfg :repositories "ci3")
 
   (query {:prefix "api"
           :ns "default"

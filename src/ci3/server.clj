@@ -94,7 +94,8 @@
                                                         :url :author ])} })}))
 
 (defn webhook [req]
-  (if-let [payload (verify req)]
+  (log/info "WEB HOOK" req)
+  #_(if-let [payload (verify req)]
     (create-build payload)
     {:status 401 :body "401 Unauthorized"}))
 

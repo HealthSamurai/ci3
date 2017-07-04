@@ -5,12 +5,33 @@
             [org.httpkit.client :as http]
             [ci3.env :as env]
             [unifn.core :as u]
+            [ci3.fx]
             [clojure.string :as str]
-            [clojure.spec.alpha :as s]))
+            [clojure.spec.alpha :as s]
+            [ci3.k8s :as k8s]))
 
 ;; https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html#OAuthonBitbucketCloud-Step4.RequestanAccessToken
 
 (def auth-endpoint "https://bitbucket.org/site/oauth2/access_token")
+
+
+(defmethod u/*fn
+  :bitbucket/slug
+  [{{url :url} :repository}]
+  {:repository {:slug (->> (str/split url #"bitbucket.org/") second)}})
+
+(defmethod u/*fn
+  :bitbucket/hook-url
+  [{{hooks-url :hooks-url} :env {{nm :name} :metadata} :repository}]
+  {:hook-url (str hooks-url "/" nm)})
+
+(defmethod u/*fn
+  :bitbucket/not-initialized?
+  [{{{status :status} :webhook} :repository}]
+  (when (= "installed" status)
+    (println "Already installed")
+    {::u/status :stop
+     ::u/message "already installed"}))
 
 (s/def :bitbucket/key string?)
 (s/def :bitbucket/secret string?)
@@ -23,114 +44,100 @@
 (s/def :bitbucket/access-token-request
   (s/keys :req-un [:bitbucket/repository]))
 
-(defmethod u/*fn
-  :http
-  [args]
-  (println args)
-  (let [res @(http/request args)]
-    (if (< (:status res) 400)
-      (update res :body (fn [x] (when x (json/parse-string x keyword))))
-      {::u/status :error
-       ::u/errors res
-       ::u/message (str "Request failed with")})))
-
 
 (defmethod u/*fn
   :bitbucket/access-token-request
   [{{{k :key s :secret} :oauthConsumer} :repository}]
   {:fx {:http {:method :post
                :url auth-endpoint
-               :fx/result [:bitbucket/access-token-response]
+               :fx/result [:tokens]
                :form-params {:grant_type "client_credentials"}
                :format :json
                :basic-auth  (str k ":" s)}}})
 
 
+(s/def ::access_token string?)
+(s/def ::tokens (s/keys :req-un [::access_token]))
+(s/def  :bitbucket/get-hooks (s/keys :req-un [::tokens]))
+
 (defmethod u/*fn
   :bitbucket/get-hooks
-  [{access-token :access-token {slug :slug} :repository}]
+  [{{access-token :access_token} :tokens {slug :slug} :repository}]
   {:fx {:http {:method :get
                :url (str "https://api.bitbucket.org/2.0/repositories/" slug "/hooks")
-               :result [:bitbucket/get-hooks]
+               :fx/result [:hooks]
                :format :json
                :oauth-token access-token}}})
 
 (defmethod u/*fn
+  :bitbucket/hook-not-present
+  [{hook-url :hook-url {hooks :values} :hooks}]
+  (when (some #(= hook-url (get % :url)) hooks)
+    {::u/status :stop
+     ::u/message "Hook already present"}))
+
+(defmethod u/*fn
   :bitbucket/add-hook
-  [{{hooks-url :hooks-url} :env access-token :access-token {slug :slug} :repository}]
-  {:fx {:http
-        {:oauth-token access-token
-         :url (str "https://api.bitbucket.org/2.0/repositories/" slug "/hooks")
-         :format :json
-         :result [:bitbucket/hook]
-         :body {:description "ci3 webhook"
-                :url hooks-url
-                :active true
-                :events ["repo:push"]}}}})
+  [{hook-url :hook-url
+    {access-token :access_token} :tokens
+    {slug :slug} :repository}]
+  {:fx {:http {:oauth-token access-token
+               :url (str "https://api.bitbucket.org/2.0/repositories/" slug "/hooks")
+               :method :post
+               :format :json
+               :fx/result [:hook]
+               :body {:description "ci3 webhook"
+                      :url hook-url
+                      :active true
+                      :events ["repo:push"]}}}})
 
+(defmethod u/*fn
+  :bitbucket/update-repo
+  [{hook :hook {{nm :name v :resourceVersion } :metadata} :repository}]
+  {:fx {:k8s/patch {:resource :repositories
+                    :config {:apiVersion "ci3.io/v1" :ns "default"}
+                    :id nm
+                    :data {:webhook {:status "installed"
+                                     :hook (:body hook)
+                                     :version v
+                                     :ts (java.util.Date.)}}}}})
 
-
-(defn get-access-token [api-key api-secret]
-  (let [code-req @(http/post auth-endpoint
-                             {:basic-auth (str api-key ":" api-secret)
-                              :form-params {:grant_type "client_credentials"}})]
-    (log/info "Code request " (:status code-req))
-    (-> code-req
-        :body
-        (json/parse-string keyword)
-        :access_token)))
-
-
-(defn get-hooks [env repo-slug access-token]
-  (-> @(http/get (str "https://api.bitbucket.org/2.0/repositories/" repo-slug "/hooks")
-                 {:oauth-token access-token})
-      :body
-      (json/parse-string keyword)
-      :values))
-
-(defn add-hook [env repo-slug access-token]
-  (let [resp @(http/post (str "https://api.bitbucket.org/2.0/repositories/" repo-slug "/hooks")
-                         {:oauth-token access-token
-                          :body (json/generate-string
-                                 {:description "ci3 webhook"
-                                  :url  (:hooks-url env)
-                                  :active true
-                                  :events ["repo:push"]})})]
-    (log/info "Add hook:" resp)
-    resp))
-
-(defn ensure-hook [env repo-slug access-token]
-  (let [hooks (get-hooks env repo-slug access-token)
-        hooks-url (:hooks-url env)]
-    (if-not (some #(= hooks-url (get % :url)) hooks)
-      (add-hook env repo-slug access-token)
-      (log/info repo-slug " already has ci3 hook"))))
+(defmethod u/*fn
+  :bitbucket/ensure-hook
+  [arg]
+  (u/*apply
+   [:bitbucket/not-initialized?
+    :bitbucket/slug
+    :bitbucket/hook-url
+    :bitbucket/access-token-request
+    :bitbucket/get-hooks
+    :bitbucket/hook-not-present
+    :bitbucket/add-hook]
+   arg))
 
 (defmethod interf/init
   :bitbucket
   [env repo]
-  (log/info "INIT bitbucket repo" repo)
-  (let [{k "key" s "secret"} (get repo "oauthConsumer")
-        access-token (get-access-token (str/trim k) (str/trim s))
-        repo-slug (->> (str/split (get repo "url") #"bitbucket.org/") second)]
-    (log/info "GET token "  access-token " by " k " and " s)
-    (ensure-hook env repo-slug access-token)))
+  (u/*apply [:bitbucket/ensure-hook
+             :bitbucket/update-repo]
+            {:env env :repository repo}))
 
 (comment
 
-  (def env {:hooks-url "http://cleo-ci.health-samurai.io/webhook"})
+  (u/*apply
+   :bitbucket/ensure-hook
+   {:env (env/environment)
+    :repository  {:metadata {:name "ci3"}
+                  :url "https://bitbucket.org/healthsamurai/ci3"
+                  :oauthConsumer {:key (env/env :BITBUCKET_KEY)
+                                  :secret (env/env :BITBUCKET_SECRET)}}})
 
-  (def tokens 
-    (get-access-token (env/env :BITBUCKET_KEY)
-                      (env/env :BITBUCKET_SECRET)))
+  (k8s/find k8s/cfg :repositories "ci3")
+  (k8s/find k8s/cfg :repositories "ci3")
 
-  tokens
-
-  (mapv :url (get-hooks {} "cleoemr/ema-itegration" tokens))
-
-  (-> @(http/get "https://api.bitbucket.org/2.0/repositories/cleoemr/ema-itegration/hooks" {:oauth-token tokens})
-      :body
-      (json/parse-string keyword))
-
+  (u/*apply [:bitbucket/ensure-hook
+             :bitbucket/update-repo]
+            {:env  (env/environment)
+             :repository (k8s/find k8s/cfg :repositories "ci3")})
 
   )

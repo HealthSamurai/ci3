@@ -2,7 +2,8 @@
   (:require [clojure.string :as str]))
 
 (defn env [k]
-  (str/trim (System/getenv (name k))))
+  (when-let [x (System/getenv (name k))]
+    (str/trim x)))
 
 (defn environment []
   (let [hostname (env :HOSTNAME)
