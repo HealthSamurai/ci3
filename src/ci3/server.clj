@@ -46,6 +46,9 @@
       (h (assoc req :repositories rs))
       {:body (str "Could not get repositories configmap") :status 500})))
 
+(defn repositories [req]
+  {:body (json/generate-string (k8s/list k8s/cfg :repositories))})
+
 (defn get-config [h]
   (fn [{rk :repo-key rs :repositories :as req}]
     (if-let [cfg (get rs (keyword rk))]
@@ -85,13 +88,10 @@
                                   :diff (:compare payload)
                                   :repository (select-keys repository
                                                            [:name :organization :full_name
-                                                            :url :html_url :git_url :ssh_url
-                                                            ]
-                                                           )
+                                                            :url :html_url :git_url :ssh_url])
                                   :commit (select-keys commit
                                                        [:id :message :timestamp
-                                                        :url :author ])
-                                 } })}))
+                                                        :url :author ])} })}))
 
 (defn webhook [req]
   (if-let [payload (verify req)]
@@ -140,6 +140,7 @@
   {:GET #'welcome
    "builds" {:GET #'builds
              [:id] {:GET #'logs} }
+   "repositories" {:GET #'repositories}
    "webhook" { [:id] {:POST #'webhook}}})
 
 (defn app [{meth :request-method uri :uri :as req}]

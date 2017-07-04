@@ -4,7 +4,6 @@
     [clj-json-patch.core :as patch]
     [clojure.walk :as walk]
     [ci3.k8s :as k8s]
-    [cheshire.core :as json]
     [cheshire.core :as json]))
 
 (def gh-token (k8s/secret "secrets" :github_token))
@@ -18,8 +17,8 @@
                                         :events ["push"]
                                         :config {:url (str "https://ci.health-samurai.io/webhook/" (get-in repo [:metadata :name]))
                                                  :content_type "json"
-                                                 :secret secret }})
-            :headers  { "Authorization" (str "token " gh-token) }})
+                                                 :secret secret}})
+            :headers  { "Authorization" (str "token " gh-token)}})
         :body
         (json/parse-string))))
 

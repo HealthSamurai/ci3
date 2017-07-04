@@ -4,8 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [
-
-                 [org.clojure/clojure "1.9.0-alpha15"]
+                 [org.clojure/clojure "1.9.0-alpha16"]
                  ;; [ch.qos.logback/logback-classic "1.2.2"]
                  [cheshire "5.7.1"]
                  [clj-json-patch "0.1.4"]
@@ -24,7 +23,8 @@
 
                  [hiccup "1.0.5"]
                  [garden "1.3.2"]
-                 ]
+
+                 [matcho "0.1.0-RC5"]]
   :uberjar-name "ci3.jar"
   :main ci3.core
   :profiles {:uberjar {:aot :all :omit-source true}})

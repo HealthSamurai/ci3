@@ -1,6 +1,7 @@
 (ns ci3.controller
   (:require [ci3.k8s :as k8s]
-            [ci3.github :as gh]
+            ;; [ci3.github :as gh]
+            [ci3.repo.core :as repo]
             [clojure.walk :as walk]))
 
 (def cfg {:apiVersion "ci3.io/v1" :ns "default"})
@@ -59,24 +60,16 @@
       (Thread/sleep 5000)
       (watch-resource cfg rt process))))
 
-(defn process-repository [repositories]
-  (when-let  [repos (:items repositories)]
-    (doseq [repo repos]
-      (when-not (:hook repo)
-        (let [id (get-in repo [:metadata :name])
-              hook (gh/create-webhook repo)]
-          (k8s/patch k8s/cfg :repositories id
-                     {:hook hook}))))))
 
 (defn watch []
   (watch-resource cfg :builds process-build)
-  (watch-resource cfg :repositories process-repository))
+  (watch-resource cfg :repositories repo/watch))
 
 (comment
 
   (watch-resource cfg :builds process-build)
 
-  (watch-resource cfg :repositories process-repository)
+  (watch-resource cfg :repositories repo/watch)
 
   (doseq [b (get (k8s/list cfg :builds) "items")]
     (println

@@ -33,9 +33,7 @@
   (let [repo (checkout-project)] (println repo))
   (let [id (build-id)
         build (get-build id )
-        build (merge
-                (yaml/parse-string (slurp "ci3.yaml") true)
-                build)]
+        build (merge (yaml/parse-string (slurp "ci3.yaml") true) build)]
     (k8s/patch k8s/cfg :builds id
                (select-keys  build [:pipeline :environment]))
     (build/build build)))
