@@ -1,7 +1,7 @@
 (ns ci3.gcp.storage
   (:require [clojure.java.shell :as sh]
             [ci3.k8s :as k8s]
-            [ci3.gcloud :as gcloud]
+            [ci3.gcp.gcloud :as gcloud]
             [clj-yaml.core :as yaml]
             [clojure.walk :as walk]
             [cheshire.core :as json]

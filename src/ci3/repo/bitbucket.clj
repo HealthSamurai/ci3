@@ -3,7 +3,6 @@
             [ci3.repo.interface :as interf]
             [clojure.tools.logging :as log]
             [org.httpkit.client :as http]
-            [ci3.env :as env]
             [unifn.core :as u]
             [ci3.fx]
             [clojure.string :as str]

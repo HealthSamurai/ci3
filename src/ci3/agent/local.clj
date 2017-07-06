@@ -1,7 +1,6 @@
-(ns ci3.local
+(ns ci3.agent.local
   (:require [clojure.java.shell :as sh]
             [ci3.k8s :as k8s]
-            [ci3.build :as build]
             [clj-yaml.core :as yaml]
             [clojure.walk :as walk]
             [cheshire.core :as json]
@@ -11,7 +10,7 @@
 (defn run [& args]
   (let [b (yaml/parse-string (slurp "ci3.yaml") true)]
     (println (sh/sh "pwd"))
-    (build/build b)))
+    (println "TODO")))
 
 (defn exec [& args]
   (apply run args)
@@ -19,5 +18,4 @@
 
 (comment
   (run)
-
-)
+  )

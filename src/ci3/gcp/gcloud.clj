@@ -1,4 +1,4 @@
-(ns ci3.gcloud
+(ns ci3.gcp.gcloud
   (:require [cheshire.core :as json]
             [clj-jwt.core :as jwt]
             [clj-jwt.key :as key]

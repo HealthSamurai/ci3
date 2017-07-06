@@ -3,16 +3,13 @@
             [ci3.repo.interface :as interf]
             [ci3.repo.bitbucket]
             [ci3.repo.github]
-            [ci3.env :as env]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [unifn.core :as u]))
 
-(defn watch []
-  (let [e (env/environment)
-        repos (k8s/list k8s/cfg :repositories)]
-    (doseq [repo (get repos "items")]
-      (interf/init e repo))))
-
-;; (remove-all-methods interf/init)
+(defmethod
+  u/*fn :ci3.watch/repository
+  [{env :env res :resource :as arg}]
+  (println "Register webhook"))
 
 (comment
 

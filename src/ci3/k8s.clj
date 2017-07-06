@@ -95,7 +95,7 @@
       res)))
 
 (comment
-  (map :name (map :metadata (:items (list cfg :repositories))))
+  (map :resourceVersion (map :metadata (:items (list cfg :repositories))))
 
   (map :metadata )
 

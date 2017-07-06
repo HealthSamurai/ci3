@@ -1,4 +1,4 @@
-(ns ci3.shelk
+(ns ci3.agent.shelk
   (:require [clojure.java.shell :as sh]
             [clojure.contrib.humanize :as humanize]
             [clojure.string :as str]))

@@ -1,5 +1,5 @@
-(ns ci3.cache
-  (:require [ci3.shelk :as shelk]))
+(ns ci3.agent.cache
+  (:require [ci3.agent.shelk :as shelk]))
 
 (defn archive-dir [dir to]
   (shelk/bash ["tar" "czvf" to dir ">/dev/null 2>&1"]))
