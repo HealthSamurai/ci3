@@ -25,5 +25,7 @@
 
 (comment
   (bash "ls" :dir "/")
+
   (str/trim (str/trim (:out (bash ["ls -lah"]))))
+
   )
