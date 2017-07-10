@@ -6,3 +6,8 @@
   :ci3/webhook
   [{req :request}]
   {:response {:status 200 :body "Ok!"}})
+
+(defmethod u/*fn
+  :ci3/webhook-verify
+  [{req :request}]
+  {:response {:status 200 :body "Ok!"}})

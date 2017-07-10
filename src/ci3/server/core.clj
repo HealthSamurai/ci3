@@ -20,7 +20,8 @@
   {:GET ::routes
    "repositories" {:GET ::repositories}
    "watches" {:GET :ci3.rest/watches}
-   "webhook" { [:id] {:POST ::webhook}}
+   "webhook" { [:id] {:POST ::webhook
+                      :GET ::webhook-verify}}
    "builds" {:GET ::builds
              [:id] {:GET ::logs} }})
 
