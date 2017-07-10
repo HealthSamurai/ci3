@@ -9,7 +9,7 @@
 (defmethod
   u/*fn :ci3.watch/repository
   [{env :env res :resource :as arg}]
-  (println "Register webhook"))
+  (println "Register webhook" res))
 
 (comment
 

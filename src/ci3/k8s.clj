@@ -31,7 +31,7 @@
     nil))
 
 (defn secret [name key]
-  (let [cfg {:apiVersion "v1" :ns "deftest"}]
+  (let [cfg {:apiVersion "v1" :ns "default"}]
     (->
      @(http-client/get
        (str kube-url  "/api/v1/namespaces/default/secrets/" name)
