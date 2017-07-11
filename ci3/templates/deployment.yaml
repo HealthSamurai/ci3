@@ -19,6 +19,8 @@ spec:
         env:
         - name: CACHE_BUCKET
           value: "{{ .Values.cacheBucket }}"
+        - name: HOSTNAME
+          value: "{{ .Values.hostName }}"
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         livenessProbe:
