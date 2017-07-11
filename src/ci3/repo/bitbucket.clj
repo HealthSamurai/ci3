@@ -26,7 +26,7 @@
 (defmethod u/*fn
   ::hook-url
   [{{host :hostname} :env {{nm :name} :metadata} :repository}] (println host)
-  {:hook-url (str host "/" (name nm))})
+  {:hook-url (str host "/webhook/" (name nm))})
 
 (defmethod u/*fn
   ::not-initialized?
@@ -137,10 +137,5 @@
 
   (k8s/find k8s/cfg :repositories "ci3")
   (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3"))
-
-  (u/*apply
-   [::ensure-hook]
-   {:env {:hostname "http://cleo-ci.health-samurai.io"}
-    :repository  (k8s/find k8s/cfg :repositories "ci3")})
 
   )
