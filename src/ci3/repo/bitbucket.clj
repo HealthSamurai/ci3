@@ -105,7 +105,8 @@
   ::ensure-hook
   [arg]
   (u/*apply
-   [::not-initialized?
+   [::k8s/resolve-secrets
+    ::not-initialized?
     ::slug
     ::hook-url
     ::access-token-request

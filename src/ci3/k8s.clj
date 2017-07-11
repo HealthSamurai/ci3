@@ -4,6 +4,7 @@
    [org.httpkit.client :as http-client]
    [clj-json-patch.core :as patch]
    [clojure.walk :as walk]
+   [unifn.core :as u]
    [cheshire.core :as json]
    [clojure.tools.logging :as log]))
 
@@ -52,6 +53,10 @@
          x)
        x)) res))
 
+(defmethod u/*fn
+  ::resolve-secrets
+  [res]
+  (resolve-secrets res))
 
 (defn query [cfg rt & [pth]]
   (let [res @(http-client/get
