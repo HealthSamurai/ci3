@@ -139,7 +139,7 @@
                       (#'do-watch env client (dissoc opts :request))))))
         (Thread/sleep 10000)))
     (println "Stopping supervisor")
-    (swap! state :stop false)))
+    (swap! state assoc :stop false)))
 
 (defmethod u/*fn :k8s/watch
   [{env :env watch :watch :as arg}]
@@ -150,8 +150,8 @@
 
 (comment
   (:version (:repositories (:requests @state)))
-  (swap! state :stop true)
-  (swap! state :stop false)
+  (swap! state assoc :stop true)
+  (swap! state assoc :stop false)
   state
 
   (supervisor {:kube-url "http://localhost:8001"})

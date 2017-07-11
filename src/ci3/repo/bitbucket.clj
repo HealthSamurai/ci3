@@ -119,8 +119,7 @@
   :bitbucket
   [env repo]
   (u/*apply
-   [::e/env
-    ::ensure-hook
+   [::ensure-hook
     ::update-repo]
    {:env env :repository repo}))
 
