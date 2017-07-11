@@ -8,5 +8,10 @@
   [_ repo]
   (log/info "No handler for repo " repo))
 
+(defmulti webhook
+  (fn [req]
+    ;; some rule
+    :bitbucket))
+
 (comment
   (ns-unmap *ns* 'init))

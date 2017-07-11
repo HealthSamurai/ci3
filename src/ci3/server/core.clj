@@ -29,7 +29,7 @@
                                     :apiVersion "ci3.io/v1"
                                     :resource :repositories
                                     :ns "default"}
-                                   {:handler :ci3.watch/build
+                                   {:handler ::repo/build
                                     :apiVersion "ci3.io/v1"
                                     :resource :builds
                                     :ns "default"}]}

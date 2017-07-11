@@ -11,7 +11,7 @@
               :items [{:key "boto" :path ".boto"}]}}]
    :containers
    [{:name "agent"
-     :image "eu.gcr.io/aidbox-next/ci3:latest"
+     :image "eu.gcr.io/vivid-kite-171620/ci3:latest"
      :imagePullPolicy "Always"
      :args ["agent"]
      :volumeMounts

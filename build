@@ -9,5 +9,7 @@ lein uberjar
 
 #docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
 docker build -t eu.gcr.io/vivid-kite-171620/ci3:$GIT_COMMIT .
+docker tag eu.gcr.io/vivid-kite-171620/ci3:$GIT_COMMIT eu.gcr.io/vivid-kite-171620/ci3:latest
 gcloud docker -- push eu.gcr.io/vivid-kite-171620/ci3:$GIT_COMMIT
+gcloud docker -- push eu.gcr.io/vivid-kite-171620/ci3:latest
 helm upgrade --set image.tag=$GIT_COMMIT,image.repository=eu.gcr.io/vivid-kite-171620/ci3 -i ci3 ci3

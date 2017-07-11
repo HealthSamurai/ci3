@@ -123,6 +123,50 @@
     ::update-repo]
    {:env env :repository repo}))
 
+
+
+(defn cleanup [s]
+  (-> s
+      (str/replace  #"\/" "_")
+      (str/replace  #"\_" "-")
+      (str/replace  #"\:" "-")
+      (str/lower-case)))
+
+(defn create-build [payload]
+  (let [repository (:repository payload)
+        commit (last (:commits payload))
+        hashcommit (get-in payload [:push :changes 0 :commits 0 :hash])
+        build-name (cleanup (str (:full_name repository) "-" hashcommit))
+        build-name (if (> (count build-name) 63) (subs build-name 0 63) build-name)]
+    (println hashcommit)
+    {:body (k8s/create k8s/cfg :builds
+                       {:kind "Build"
+                        :apiVersion "ci3.io/v1"
+                        :metadata {:name  build-name}
+                        :payload {:ref (:ref payload)
+                                  :diff (:compare payload)
+                                  :repository (select-keys repository
+                                                           [:name :organization :full_name
+                                                            :url :html_url :git_url :ssh_url])
+                                  :commit (select-keys commit
+                                                       [:id :message :timestamp
+                                                        :url :author ])} })}))
+
+(defmethod u/*fn
+  ::mk-build
+  [{{payload :body} :request :as arg}]
+  {:response {:status 200
+              :body (create-build (json/parse-string payload keyword)) }})
+
+(defmethod interf/webhook
+  :bitbucket
+  [arg]
+  (u/*apply
+   [::mk-build]
+   arg))
+
+
+
 (comment
   (u/*apply
    [::get-hooks]
