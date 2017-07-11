@@ -25,8 +25,7 @@
 
 (defmethod u/*fn
   ::hook-url
-  [{{host :hostname} :env {{nm :name} :metadata} :repository}]
-  (println host)
+  [{{host :hostname} :env {{nm :name} :metadata} :repository}] (println host)
   {:hook-url (str host "/" (name nm))})
 
 (defmethod u/*fn
@@ -62,7 +61,7 @@
 (defmethod u/*fn
   ::get-hooks
   [{{access-token :access_token} :tokens {slug :slug} :repository}]
-  {:fx {:http {:method :get
+  {:fx {:http {:methoed :get
                :url (str bb-api slug "/hooks")
                :fx/result [:hooks]
                :format :json
@@ -80,6 +79,7 @@
   [{hook-url :hook-url
    {access-token :access_token} :tokens
    {slug :slug {name :name} :metadata} :repository}]
+  (println "Add hook")
   {:fx {:http {:oauth-token access-token
                :url (str bb-api slug "/hooks")
                :method :post
@@ -116,10 +116,11 @@
    arg))
 
 (defmethod interf/init
-  ::bitbucket
+  :bitbucket
   [env repo]
   (u/*apply
-   [::ensure-hook
+   [::e/env
+    ::ensure-hook
     ::update-repo]
    {:env env :repository repo}))
 
@@ -140,7 +141,7 @@
 
   (u/*apply
    [::ensure-hook]
-   {:env {:_hostname "http://cleo-ci.health-samurai.io"}
-    :repository  (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3"))})
+   {:env {:hostname "http://cleo-ci.health-samurai.io"}
+    :repository  (k8s/find k8s/cfg :repositories "ci3")})
 
   )

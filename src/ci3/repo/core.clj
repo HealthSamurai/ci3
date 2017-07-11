@@ -8,9 +8,10 @@
 
 (defmethod u/*fn
   ::repository
-  [{env :env res :resource :as arg}]
-  (println "Register webhook" res)
-  (interf/init env res))
+  [{env :env {repo :object :as res} :resource  :as arg}]
+  (when (= "ADDED" (:type res))
+    (println "Register webhook")
+    (interf/init env repo)))
 
 (comment
   (watch)

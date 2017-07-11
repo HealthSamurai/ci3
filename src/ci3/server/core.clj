@@ -11,7 +11,6 @@
 
 (defmethod u/*fn ::routes
   [{{routes :routes} :cache}]
-  (println routes)
   {:response {:body (var-get routes)}})
 
 (def routes

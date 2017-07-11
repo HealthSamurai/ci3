@@ -77,7 +77,7 @@
     (set-request-data rt :message rest-of-msg)
     resources))
 
-(defn mk-on-change [opts retry]
+(defn mk-on-change [env opts retry]
   (fn [st body]
     (doseq [res (parse-json-stream (:resource opts) body)]
       (update-version (:resource opts) (get-in res [:object :metadata :resourceVersion]))
@@ -88,7 +88,7 @@
             (retry))
         (do (println opts " for v:" (get-in res [:object :metadata :resourceVersion]))
             (println "->" (:handler opts))
-            (u/*apply (:handler opts) {:resource (k8s/resolve-secrets res)}))))
+            (u/*apply (:handler opts) {:env env :resource (k8s/resolve-secrets res)}))))
     [body :continue]))
 
 (defn build-watch-query
@@ -101,7 +101,7 @@
   (let [v (get-version (:resource opts)) 
         q (build-watch-query env opts)
         q (if v (assoc-in q [:query :resourceVersion] v) q)
-        on-change (mk-on-change opts #(do-watch env client opts))]
+        on-change (mk-on-change env opts #(do-watch env client opts))]
     (println "Watch " opts " from " v)
     (->> (http/request-stream client :get (:url q) on-change
                               :headers {"Authorization" (str "Bearer " (:kube-token env))}
