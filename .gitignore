@@ -11,3 +11,4 @@ pom.xml.asc
 .hg/
 private.yaml
 .env.secret
+secrets.yaml

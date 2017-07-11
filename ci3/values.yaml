@@ -2,26 +2,18 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 replicaCount: 1
-hostName: ci.health-samurai.io
+hostName: cleo-ci.health-samurai.io
 ingress:
   enabled: true
-  annotations:
-    kubernetes.io/ingress.allow-http: "false"
-    kubernetes.io/tls-acme: "true"
-    kubernetes.io/ingress.class: "gce"
-  tls:
-  - hosts:
-    - ci.health-samurai.io
-    secretName: tls
   hosts:
-  - ci.health-samurai.io
+  - cleo-ci.health-samurai.io
 
 image:
-  repository: aidbox/ci3
+  repository: eu.gcr.io/vivid-kite-171620/ci3
   tag: 0.0.5
   pullPolicy: Always
 
-cacheBucket: ci3-cache
+cacheBucket: cleo-ci-cache
 
 service:
   args: ["server"]
@@ -29,9 +21,3 @@ service:
   type: NodePort
   externalPort: 80
   internalPort: 8888
-
-secrets:
-- name: ci3
-  data:
-    defaultSecret: "someDefaultsecret"
-    mySecret: mySuperSecret

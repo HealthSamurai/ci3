@@ -7,11 +7,9 @@
             [unifn.env :as e]
             [environ.core :as env]
             [ci3.fx]
-            [clojure.string :as str]
+            [ci3.k8s :as k8s]
             [clojure.spec.alpha :as s]
-            [ci3.k8s :as k8s]))
-
-;; https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html#OAuthonBitbucketCloud-Step4.RequestanAccessToken
+            [clojure.string :as str]))
 
 (def auth-endpoint "https://bitbucket.org/site/oauth2/access_token")
 
@@ -23,10 +21,10 @@
 (defmethod u/*fn
   :bitbucket/hook-url
   [{{hooks-url :hooks-url} :env {{nm :name} :metadata} :repository}]
-  {:hook-url (str hooks-url "/" nm)})
+  {:hook-url (str "http://ci-cleo.healt-samurai.io/webhook/" nm)})
 
 (defmethod u/*fn
-  :bitbucket/not-initialized?
+  :bitbucket/not-initi alized?
   [{{{status :status} :webhook} :repository}]
   (when (= "installed" status)
     (println "Already installed")
@@ -57,7 +55,7 @@
 
 (s/def ::access_token string?)
 (s/def ::tokens (s/keys :req-un [::access_token]))
-(s/def  :bitbucket/get-hooks (s/keys :req-un [::tokens]))
+(s/def :bitbucket/get-hooks (s/keys :req-un [::tokens]))
 
 (defmethod u/*fn
   :bitbucket/get-hooks
@@ -78,18 +76,17 @@
 (defmethod u/*fn
   :bitbucket/add-hook
   [{hook-url :hook-url
-    {access-token :access_token} :tokens
-    {slug :slug {name :name} :metadata} :repository}]
-  (let [hook-url (or hook-url (str "http://ci.healt-samurai.io/webhook/" name))]
-      {:fx {:http {:oauth-token access-token
-                :url (str "https://api.bitbucket.org/2.0/repositories/" slug "/hooks")
-                :method :post
-                :format :json
-                :fx/result [:hook]
-                :body {:description "ci3 webhook"
-                       :url hook-url
-                       :active true
-                       :events ["repo:push"]}}}}))
+   {access-token :access_token} :tokens
+   {slug :slug {name :name} :metadata} :repository}]
+  {:fx {:http {:oauth-token access-token
+               :url (str "https://api.bitbucket.org/2.0/repositories/" slug "/hooks")
+               :method :post
+               :format :json
+               :fx/result [:hook]
+               :body {:description "ci3 webhook"
+                      :url hook-url
+                      :active true
+                      :events ["repo:push"]}}}})
 
 (defmethod u/*fn
   :bitbucket/update-repo
@@ -113,8 +110,7 @@
     :bitbucket/get-hooks
     :bitbucket/hook-not-present
     :bitbucket/add-hook]
-   arg))
-
+   arg)) 
 (defmethod interf/init
   :bitbucket
   [env repo]
@@ -133,18 +129,17 @@
   (u/*apply
    [::e/env
     :bitbucket/ensure-hook]
-   {:repository  {:metadata {:name "ci3"}
-                  :url "https://bitbucket.org/healthsamurai/ci3"
-                  :hook-url "https://ci.health-samurai.io/"
-                  :oauthConsumer {:key (env/env :bitbucket-key)
-                                  :secret (env/env :bitbucket-secret)}}})
+   {:repository  (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3"))})
 
   (k8s/find k8s/cfg :repositories "ci3")
   (k8s/find k8s/cfg :repositories "ci3")
 
-  (u/*apply [::e/env
-             :bitbucket/ensure-hook
-             :bitbucket/update-repo]
-            {:repository (k8s/find k8s/cfg :repositories "ci3")})
+  (u/*apply
+   [::e/env
+    :bitbucket/ensure-hook
+    :bitbucket/update-repo]
+   {:repository  (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3"))})
+
+  (k8s/find k8s/cfg :repositories "ci3")
 
   )

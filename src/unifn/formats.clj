@@ -25,6 +25,7 @@
 (defn generate-stream
   ([data] (generate-stream data nil))
   ([data options]
+
    (ring.util.io/piped-input-stream
     (fn [out] (json/generate-stream
                data (-> out (OutputStreamWriter.) (BufferedWriter.)) options)))))

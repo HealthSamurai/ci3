@@ -165,12 +165,6 @@
                         {:handler :ci3.watch/build
                          :apiVersion "ci3.io/v1"
                          :resource :builds
-                         :ns "default"}]}})
-
-  
-
-
-
-  )
+                         :ns "default"}]}}))
 
 

@@ -1,6 +1,6 @@
 (ns ci3.server.core
   (:require
-   [ci3.server.webhook]
+   [ci3.server.webhook :as webhook]
    [unifn.rest :as rest]
    [ci3.server.watch]
    [ci3.server.api]
@@ -10,6 +10,7 @@
 
 (defmethod u/*fn ::routes
   [{{routes :routes} :cache}]
+  (println routes)
   {:response {:body (var-get routes)}})
 
 (defmethod u/*fn ::hook-url
@@ -20,8 +21,8 @@
   {:GET ::routes
    "repositories" {:GET ::repositories}
    "watches" {:GET :ci3.rest/watches}
-   "webhook" { [:id] {:POST ::webhook
-                      :GET ::webhook-verify}}
+   "webhook" { [:id] {:POST ::webhook/webhook
+                      :GET  ::webhook/webhook-verify}}
    "builds" {:GET ::builds
              [:id] {:GET ::logs} }})
 
@@ -48,9 +49,5 @@
   (u/*apply [:unifn.env/env :k8s/watch] metadata)
   )
 
-
-
 (comment
-  (rest/restart metadata)
-
-  )
+  (rest/restart metadata))

@@ -9,13 +9,12 @@
 (defmethod
   u/*fn :ci3.watch/repository
   [{env :env res :resource :as arg}]
-  (println "Register webhook" res))
+  (println "Register webhook" res)
+  (u/*apply
+   [:bitbucket/ensure-hook]
+   arg)
+  )
 
 (comment
-
   (watch)
-
-  (get-in (k8s/list k8s/cfg :repositories) ["items" 1 "oauthConsumer"])
-
-
-  )
+  (get-in (k8s/list k8s/cfg :repositories) ["items" 1 "oauthConsumer"]))

@@ -3,11 +3,11 @@
 
 
 (defmethod u/*fn
-  :ci3/webhook
+  ::webhook
   [{req :request}]
-  {:response {:status 200 :body "Ok!"}})
+  {:response {:status 200 :body "Ok! Do build"}})
 
 (defmethod u/*fn
-  :ci3/webhook-verify
+  ::webhook-verify
   [{req :request}]
-  {:response {:status 200 :body "Ok!"}})
+  {:response {:status 200 :body "Ok! Wait for hook"}})

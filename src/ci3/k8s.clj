@@ -51,6 +51,7 @@
                        x)
                      x)) res))
 
+
 (defn query [cfg rt & [pth]]
   (let [res @(http-client/get
               (url cfg (str (or (:prefix cfg) "apis") "/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) "/" pth))
@@ -100,6 +101,9 @@
   (map :metadata )
 
   (find cfg :repositories "ci3")
+
+  (resolve-secrets {:tar{:foo {:valueFrom {:secretKeyRef {:name "ci3" :key "bbKey"}}}}})
+  (resolve-secrets (find cfg :repositories "ci3"))
 
   (patch cfg :repositories "ci3-chart" {:webhook nil})
 

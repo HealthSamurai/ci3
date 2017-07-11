@@ -2,8 +2,20 @@ apiVersion: "ci3.io/v1"
 kind: Repository
 metadata:
   name: ci3
-url: https://github.com/HealthSamurai/ci3
+url: https://bitbucket.org/healthsamurai/ci3
 fullName: HealthSamurai/ci3
-# from cluster secrets (or default secret)
-secret: mySecret
+oauthConsumer:
+  key:
+    valueFrom:
+      secretKeyRef:
+        name: bitbucket
+        key: key
+  secret:
+    valueFrom:
+      secretKeyRef:
+        name: bitbucket
+        key: secret
+
+
+
 
