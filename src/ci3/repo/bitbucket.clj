@@ -12,38 +12,45 @@
             [clojure.string :as str]))
 
 (def auth-endpoint "https://bitbucket.org/site/oauth2/access_token")
+(def bb-api "https://api.bitbucket.org/2.0/repositories/")
 
 (defmethod u/*fn
-  :bitbucket/slug
+  ::slug
   [{{url :url} :repository}]
   {:repository {:slug (->> (str/split url #"bitbucket.org/") second)}})
 
-(defmethod u/*fn
-  :bitbucket/hook-url
-  [{{hooks-url :hooks-url} :env {{nm :name} :metadata} :repository}]
-  {:hook-url (str "http://ci-cleo.healt-samurai.io/webhook/" nm)})
+(s/def ::hook-url (s/keys :req-un [::env]))
+(s/def ::env      (s/keys :req-un [::hostname]))
+(s/def ::hostname string?)
 
 (defmethod u/*fn
-  :bitbucket/not-initi alized?
+  ::hook-url
+  [{{host :hostname} :env {{nm :name} :metadata} :repository}]
+  (println host)
+  {:hook-url (str host "/" (name nm))})
+
+(defmethod u/*fn
+  ::not-initialized?
   [{{{status :status} :webhook} :repository}]
   (when (= "installed" status)
     (println "Already installed")
     {::u/status :stop
      ::u/message "already installed"}))
 
-(s/def :bitbucket/key string?)
-(s/def :bitbucket/secret string?)
-(s/def :bitbucket/oauthConsumer
-  (s/keys :req-un [:bitbucket/key :bitbucket/secret]))
+(s/def ::key string?)
+(s/def ::secret string?)
+(s/def ::oauthConsumer
+  (s/keys :req-un [::key ::secret]))
+(s/def ::repository
+  (s/keys :req-un [::oauthConsumer]))
+(s/def ::access-token-request
+  (s/keys :req-un [::repository]))
 
-(s/def :bitbucket/repository
-  (s/keys :req-un [:bitbucket/oauthConsumer]))
+(s/def ::tokens (s/keys :req-un [::access_token]))
+(s/def ::get-hooks (s/keys :req-un [::tokens]))
 
-(s/def :bitbucket/access-token-request
-  (s/keys :req-un [:bitbucket/repository]))
-
-
-(defmethod u/*fn :bitbucket/access-token-request
+(defmethod u/*fn
+  ::access-token-request
   [{{{k :key s :secret} :oauthConsumer} :repository}]
   {:fx {:http {:method :post
                :url auth-endpoint
@@ -52,34 +59,29 @@
                :format :json
                :basic-auth  (str k ":" s)}}})
 
-
-(s/def ::access_token string?)
-(s/def ::tokens (s/keys :req-un [::access_token]))
-(s/def :bitbucket/get-hooks (s/keys :req-un [::tokens]))
-
 (defmethod u/*fn
-  :bitbucket/get-hooks
+  ::get-hooks
   [{{access-token :access_token} :tokens {slug :slug} :repository}]
   {:fx {:http {:method :get
-               :url (str "https://api.bitbucket.org/2.0/repositories/" slug "/hooks")
+               :url (str bb-api slug "/hooks")
                :fx/result [:hooks]
                :format :json
                :oauth-token access-token}}})
 
 (defmethod u/*fn
-  :bitbucket/hook-not-present
+  ::hook-not-present
   [{hook-url :hook-url {hooks :values} :hooks}]
   (when (some #(= hook-url (get % :url)) hooks)
     {::u/status :stop
      ::u/message "Hook already present"}))
 
 (defmethod u/*fn
-  :bitbucket/add-hook
+  ::add-hook
   [{hook-url :hook-url
    {access-token :access_token} :tokens
    {slug :slug {name :name} :metadata} :repository}]
   {:fx {:http {:oauth-token access-token
-               :url (str "https://api.bitbucket.org/2.0/repositories/" slug "/hooks")
+               :url (str bb-api slug "/hooks")
                :method :post
                :format :json
                :fx/result [:hook]
@@ -89,7 +91,7 @@
                       :events ["repo:push"]}}}})
 
 (defmethod u/*fn
-  :bitbucket/update-repo
+  ::update-repo
   [{hook :hook {{nm :name v :resourceVersion } :metadata} :repository}]
   {:fx {:k8s/patch {:resource :repositories
                     :config {:apiVersion "ci3.io/v1" :ns "default"}
@@ -100,46 +102,44 @@
                                      :ts (java.util.Date.)}}}}})
 
 (defmethod u/*fn
-  :bitbucket/ensure-hook
+  ::ensure-hook
   [arg]
   (u/*apply
-   [:bitbucket/not-initialized?
-    :bitbucket/slug
-    :bitbucket/hook-url
-    :bitbucket/access-token-request
-    :bitbucket/get-hooks
-    :bitbucket/hook-not-present
-    :bitbucket/add-hook]
-   arg)) 
+   [::not-initialized?
+    ::slug
+    ::hook-url
+    ::access-token-request
+    ::get-hooks
+    ::hook-not-present
+    ::add-hook]
+   arg))
+
 (defmethod interf/init
-  :bitbucket
+  ::bitbucket
   [env repo]
-  (u/*apply [:bitbucket/ensure-hook
-             :bitbucket/update-repo]
-            {:env env :repository repo}))
+  (u/*apply
+   [::ensure-hook
+    ::update-repo]
+   {:env env :repository repo}))
 
 (comment
   (u/*apply
-   [::e/env
-    :bitbucket/get-hooks]
+   [::get-hooks]
    {:repository  {:metadata {:name "ci3"}
                   :url "https://bitbucket.org/healthsamurai/ci3"
                   :oauthConsumer {:key (env/env :bitbucket-key)
                                   :secret (env/env :bitbucket-secret)}}})
   (u/*apply
    [::e/env
-    :bitbucket/ensure-hook]
+    ::ensure-hook]
    {:repository  (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3"))})
 
   (k8s/find k8s/cfg :repositories "ci3")
-  (k8s/find k8s/cfg :repositories "ci3")
+  (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3"))
 
   (u/*apply
-   [::e/env
-    :bitbucket/ensure-hook
-    :bitbucket/update-repo]
-   {:repository  (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3"))})
-
-  (k8s/find k8s/cfg :repositories "ci3")
+   [::ensure-hook]
+   {:env {:_hostname "http://cleo-ci.health-samurai.io"}
+    :repository  (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3"))})
 
   )

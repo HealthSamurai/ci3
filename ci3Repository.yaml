@@ -3,6 +3,7 @@ kind: Repository
 metadata:
   name: ci3
 url: https://bitbucket.org/healthsamurai/ci3
+type: bitbucket
 fullName: HealthSamurai/ci3
 oauthConsumer:
   key:

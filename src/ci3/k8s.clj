@@ -42,14 +42,15 @@
      base64-decode)))
 
 (defn resolve-secrets [res]
-  (walk/postwalk (fn [x]
-                   (if (and (map? x) (contains? x :valueFrom))
-                     (if-let [{nm :name k :key} (get-in x [:valueFrom :secretKeyRef])]
-                       (if-let [res (secret nm (keyword k))]
-                         res
-                         (do (log/warn "Could not resolve secret " k " from " nm) x))
-                       x)
-                     x)) res))
+  (walk/postwalk
+   (fn [x]
+     (if (and (map? x) (contains? x :valueFrom))
+       (if-let [{nm :name k :key} (get-in x [:valueFrom :secretKeyRef])]
+         (if-let [res (secret nm (keyword k))]
+           res
+           (do (log/warn "Could not resolve secret " k " from " nm) x))
+         x)
+       x)) res))
 
 
 (defn query [cfg rt & [pth]]
@@ -97,8 +98,7 @@
 
 (comment
   (map :resourceVersion (map :metadata (:items (list cfg :repositories))))
-
-  (map :metadata )
+  (map :metadata)
 
   (find cfg :repositories "ci3")
 

@@ -4,6 +4,7 @@
    [unifn.rest :as rest]
    [ci3.server.watch]
    [ci3.server.api]
+   [ci3.repo.core :as rep]
    [unifn.env]
    [unifn.formats]
    [unifn.core :as u]))
@@ -12,10 +13,6 @@
   [{{routes :routes} :cache}]
   (println routes)
   {:response {:body (var-get routes)}})
-
-(defmethod u/*fn ::hook-url
-  [{{host :hostname} :env}]
-  {:hook-url (str host "/webhook")})
 
 (def routes
   {:GET ::routes
@@ -29,7 +26,7 @@
 
 (def metadata {:cache {:routes #'routes}
                :watch {:timeout 5000
-                       :resources [{:handler :ci3.watch/repository
+                       :resources [{:handler ::repo/repository
                                     :apiVersion "ci3.io/v1"
                                     :resource :repositories
                                     :ns "default"}
@@ -39,15 +36,13 @@
                                     :ns "default"}]}
                :web [:unifn.routing/dispatch
                      :unifn.formats/response]
-               :bootstrap [:unifn.env/env
-                           ::hook-url]
+               :bootstrap [:unifn.env/env]
                :config {:web {:port 8888}}})
 
 
 (defn exec [& args]
   (rest/restart metadata)
-  (u/*apply [:unifn.env/env :k8s/watch] metadata)
-  )
+  (u/*apply [:unifn.env/env :k8s/watch] metadata))
 
 (comment
   (rest/restart metadata))

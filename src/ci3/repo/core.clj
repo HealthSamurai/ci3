@@ -1,19 +1,16 @@
 (ns ci3.repo.core
   (:require [ci3.k8s :as k8s]
             [ci3.repo.interface :as interf]
-            [ci3.repo.bitbucket]
+            [ci3.repo.bitbucket :as bitbucket]
             [ci3.repo.github]
             [clojure.tools.logging :as log]
             [unifn.core :as u]))
 
-(defmethod
-  u/*fn :ci3.watch/repository
+(defmethod u/*fn
+  ::repository
   [{env :env res :resource :as arg}]
   (println "Register webhook" res)
-  (u/*apply
-   [:bitbucket/ensure-hook]
-   arg)
-  )
+  (interf/init env res))
 
 (comment
   (watch)
