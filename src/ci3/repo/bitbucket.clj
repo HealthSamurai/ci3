@@ -124,7 +124,6 @@
    {:env env :repository repo}))
 
 
-
 (defn cleanup [s]
   (-> s
       (str/replace  #"\/" "_")
@@ -158,11 +157,17 @@
   {:response {:status 200
               :body (create-build (json/parse-string payload keyword)) }})
 
+(defmethod u/*fn
+  ::verify
+  [{{ip :remote-addr} :request}]
+  {:response {:status 200
+              :body ip}})
+
 (defmethod interf/webhook
   :bitbucket
   [arg]
   (u/*apply
-   [::mk-build]
+   [::verify]
    arg))
 
 
