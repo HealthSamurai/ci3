@@ -4,7 +4,6 @@
    [ci3.build.core :as build]
    [unifn.rest :as rest]
    [ci3.server.watch]
-   [ci3.server.api]
    [ci3.repo.core :as repo]
    [unifn.env]
    [unifn.formats]
