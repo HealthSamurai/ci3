@@ -19,9 +19,6 @@
 
 (defonce state (atom {}))
 
-;; zero ssl context
-
-
 (defrecord BlindTrustManager
     []
   X509TrustManager
@@ -37,8 +34,6 @@
     (.init ctx nil trust-managers nil)
     ctx))
 
-
-
 (defn update-version [rt v]
   (when v
     (let [v (cond (string? v) (Integer/parseInt v)
@@ -51,7 +46,6 @@
 
 (defn get-version [rt]
   (get-in @state [:requests rt :version]))
-
 
 (defn set-request-data [rt k v]
   (assoc-in @state [:requests rt k] v))
@@ -94,11 +88,11 @@
 (defn build-watch-query
   [{kube-url :kube-url}
    {res :resource n :ns api :apiVersion}]
-  {:url (str kube-url "/apis/" api "/namespaces/" n "/" (name res)) 
+  {:url (str kube-url "/apis/" api "/namespaces/" n "/" (name res))
    :query  {:watch true}})
 
 (defn do-watch [env client opts]
-  (let [v (get-version (:resource opts)) 
+  (let [v (get-version (:resource opts))
         q (build-watch-query env opts)
         q (if v (assoc-in q [:query :resourceVersion] v) q)
         on-change (mk-on-change env opts #(do-watch env client opts))]
@@ -152,7 +146,6 @@
   (:version (:repositories (:requests @state)))
   (swap! state assoc :stop true)
   (swap! state assoc :stop false)
-  state
 
   (supervisor {:kube-url "http://localhost:8001"})
   (start
@@ -166,5 +159,3 @@
                          :apiVersion "ci3.io/v1"
                          :resource :builds
                          :ns "default"}]}}))
-
-

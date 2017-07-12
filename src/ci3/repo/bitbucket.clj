@@ -123,7 +123,7 @@
     ::update-repo]
    {:env env :repository repo}))
 
-(defn mk-build-resource [{{payload :body :as req} :request build-name ::build-name}]
+(defn build-resource [{{payload :body :as req} :request build-name ::build-name}]
   (let [payload (json/parse-string payload keyword)
         repo-id  (get-in req [:route-params :id])
         repository (:repository payload)
@@ -149,7 +149,7 @@
 (defmethod u/*fn
   ::mk-build-resource
   [arg]
-  {::build (mk-build-resource arg)})
+  {::build (build-resource arg)})
 (defmethod u/*fn
   ::create-build
   [{build ::build}]
@@ -165,7 +165,7 @@
   ;; 104.192.143.0/24 34.198.203.127 34.198.178.64 34.198.32.85
   )
 
-(defmethod interf/webhook
+(defmethod interf/mk-build
   :bitbucket
   [arg]
   (u/*apply
@@ -176,16 +176,6 @@
     ::hook-resp]
    arg))
 
-(defmethod interf/webhook
-  :bitbucket
-  [arg]
-  (u/*apply
-   [::verify
-    ::mk-build-name
-    ::mk-build-resource
-    ::create-build
-    ::hook-resp]
-   arg))
 
 (comment
   (u/*apply

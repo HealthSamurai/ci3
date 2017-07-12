@@ -104,7 +104,7 @@
 
 (defn run-build [build]
   (let [start (System/nanoTime)]
-    (loop [env {:build build :env (get-envs)}
+    (loop [env {:build build }
            [st & sts] (:pipeline build)]
       (if st
         (let [res (do-step st env)]
@@ -182,7 +182,7 @@
 
 (defn local [& args])
 
-(defn $run [& args]
+#_(defn $run [& args]
   (let [repo (checkout-project)] (println repo))
   (let [id (build-id)
         build (merge (yaml/parse-string (slurp "ci3.yaml") true) build)]
