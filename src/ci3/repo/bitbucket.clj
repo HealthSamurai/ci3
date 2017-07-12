@@ -182,6 +182,17 @@
     ::hook-resp]
    arg))
 
+(defmethod interf/webhook
+  :bitbucket
+  [arg]
+  (u/*apply
+   [::verify
+    ::mk-build-name
+    ::mk-build-resource
+    ::create-build
+    ::hook-resp]
+   arg))
+
 (comment
   (u/*apply
    [::get-hooks]

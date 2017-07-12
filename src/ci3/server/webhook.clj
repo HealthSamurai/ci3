@@ -2,7 +2,6 @@
   (:require [unifn.core :as u]
             [ci3.repo.interface :as interf]))
 
-
 (defmethod u/*fn
   ::webhook
   [{req :request :as arg}]

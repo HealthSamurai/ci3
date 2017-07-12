@@ -1,14 +1,17 @@
 (ns ci3.build.core
-  (:require [unifn.core :as u]))
+  (:require [unifn.core :as u]
+            [clojure.string :as str]
+            [ci3.k8s :as k8s]))
 
 (defn pod-spec [res]
   {:restartPolicy "Never"
    :volumes
    [{:name "docker-sock"
      :hostPath {:path "/var/run/docker.sock"}}
-    {:name "gsutil"
-     :secret {:secretName "storage"
-              :items [{:key "boto" :path ".boto"}]}}]
+    {:name "boto"
+     :secret {:secretName "gsutil"
+              :items [{:key "boto" :path ".boto"}
+                      {:key "account" :path "account.json"}]}}]
    :containers
    [{:name "agent"
      :image "eu.gcr.io/vivid-kite-171620/ci3:latest"
@@ -27,20 +30,16 @@
            {:name "SERVICE_ACCOUNT" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}]}]})
 
 (defmethod u/*fn
-  :ci3.watch/build
-  [{env :env {{nm :name} :metadata :as res} :resource}]
-  (println "Start building " res)
-  {:fx {:k8s/create  {:resource :pods
-                      :apiVersion "api/v1"
-                      :ns "default"
-                      :data {:apiVersion "v1"
-                             :kind "Pod"
-                             :metadata {:name name
-                                        :annotations {:system "ci3"}
-                                        :lables {:system "ci3"}}
-                             :spec (pod-spec res)}}}})
-#_(k8s/patch k8s/cfg :builds
-           id {:pod pod
-               :scheduledAt (str (java.util.Date.))
-               :status "sche"})
+  ::build
+  [{env :env {{{nm :name} :metadata :as build}  :object tp :type } :resource}]
+  (when (= tp "ADDED")
+    (println "Start building #" nm)
+    (let [cfg {:prefix "api" :apiVersion "v1" :ns "default"}]
+      {::pod (k8s/create cfg :pods
+                         {:apiVersion "v1"
+                          :kind "Pod"
+                          :metadata {:name (str "build-" nm)
+                                     :annotations {:system "ci3"}
+                                     :lables {:system "ci3"}}
+                          :spec (pod-spec build)})})))
 

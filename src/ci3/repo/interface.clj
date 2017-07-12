@@ -3,6 +3,7 @@
             [unifn.core :as u]))
 
 (defmulti init (fn [_ repo] (keyword (or (:type repo) "github"))))
+
 (defmethod init
   :default
   [_ repo]

@@ -17,5 +17,4 @@
   (System/exit 0))
 
 (comment
-  (run)
-  )
+  (run))

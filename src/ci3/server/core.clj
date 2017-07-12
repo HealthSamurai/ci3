@@ -1,6 +1,7 @@
 (ns ci3.server.core
   (:require
    [ci3.server.webhook :as webhook]
+   [ci3.build.core :as build]
    [unifn.rest :as rest]
    [ci3.server.watch]
    [ci3.server.api]
@@ -25,11 +26,11 @@
 
 (def metadata {:cache {:routes #'routes}
                :watch {:timeout 5000
-                       :resources [{:handler ::repo/repository
+                       :resources [{:handler ::repo/init
                                     :apiVersion "ci3.io/v1"
                                     :resource :repositories
                                     :ns "default"}
-                                   {:handler ::repo/build
+                                   {:handler ::build/build
                                     :apiVersion "ci3.io/v1"
                                     :resource :builds
                                     :ns "default"}]}
