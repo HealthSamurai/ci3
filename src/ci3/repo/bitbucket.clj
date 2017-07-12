@@ -123,16 +123,9 @@
     ::update-repo]
    {:env env :repository repo}))
 
-
-(defn cleanup [s]
-  (-> s
-      (str/replace  #"\/" "_")
-      (str/replace  #"\_" "-")
-      (str/replace  #"\:" "-")
-      (str/lower-case)))
-
-(defn mk-build-resource [{{payload :body} :request build-name ::build-name}]
+(defn mk-build-resource [{{payload :body :as req} :request build-name ::build-name}]
   (let [payload (json/parse-string payload keyword)
+        repo-id  (get-in req [:route-params :id])
         repository (:repository payload)
         commit (last (:commits payload))
         hashcommit (get-in payload [:push :changes 0 :commits 0 :hash])
@@ -141,6 +134,7 @@
      :apiVersion "ci3.io/v1"
      :metadata {:name  build-name}
      :payload {:diff diff
+               :repository-id repo-id
                :repository (select-keys repository
                                         [:name :organization :full_name
                                          :url :html_url :git_url :ssh_url])

@@ -2,6 +2,8 @@
 /classes
 /checkouts
 pom.xml
+secret
+secrets.yaml
 pom.xml.asc
 *.jar
 *.class

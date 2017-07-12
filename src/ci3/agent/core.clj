@@ -4,12 +4,16 @@
             [ci3.gcp.gcloud :as gcloud]
             [clj-yaml.core :as yaml]
             [clojure.walk :as walk]
+            [unifn.core :as u]
+            [unifn.env :as e]
             [cheshire.core :as json]
             [clojure.pprint :as pprint]
             [clojure.string :as str]
             [clojure.contrib.humanize :as humanize]
             [ci3.agent.cache :as cache]
-            [ci3.agent.shelk :as shelk]))
+            [ci3.agent.shelk :as shelk]
+            [unifn.env :as e]
+            [ci3.build.core :as build]))
 
 (defmulti execute
   (fn [st env] (when-let [tp (:type st)] (keyword tp))))
@@ -83,11 +87,6 @@
 
     result))
 
-(defn get-envs []
-  (reduce (fn [acc [k v]]
-            (assoc acc (keyword k) v)
-            ) {} (System/getenv)))
-
 (defn update-status [build]
   (println "TODO")
   #_(let [gh-status  (gh/set-status build)
@@ -117,17 +116,8 @@
            (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
          (success build))))))
 
-(defn build-id [] (System/getenv "BUILD_ID"))
 
-(defn get-build [bid]
-  (when bid
-    (when-let [bld (k8s/find k8s/cfg :builds (str/trim bid))]
-      (when-not (or bld (= "Failure" (get bld "status")))
-        (throw (Exception. (str "Could not find build: " bid " or " bld))))
-      (println "Got build: " (get bld "metadata"))
-      (walk/keywordize-keys bld))))
-
-(defn checkout-project []
+(defn checkout-project-github []
   (when-let [full_name (System/getenv "REPOSITORY")]
     (let [token (k8s/secret "secrets" :github_token)
           repo (str "https://" token "@github.com/" full_name ".git")
@@ -135,24 +125,67 @@
       (println res)
       res)))
 
-;; (defn print-step [build step & _]
-;;   (println "### " (:name step) (:type step)))
+(defn checkout-project [build]
+  (when-let [full_name (System/getenv "REPOSITORY")]
+    (let [token (k8s/secret "secrets" :github_token)
+          repo (str "https://" token "@github.com/" full_name ".git")
+          res (sh/sh "git" "clone" repo "/workspace")]
+      (println res)
+      res)))
 
- (defn run [& args]
-   (let [repo (checkout-project)] (println repo))
-   (let [id (build-id)
-         build (get-build id )
-         build (merge (yaml/parse-string (slurp "ci3.yaml") true) build)]
-     (k8s/patch k8s/cfg :builds id
-                (select-keys  build [:pipeline :environment]))
-     (run-build build)))
 
-(defn exec [& args]
+(defmethod u/*fn
+ ::checkout-project
+ [{env :env build :build repo :repository}]
+ {}
+ )
+
+(defmethod u/*fn
+  ::get-build
+  [{{bid :build-id} :env}]
+  (when bid
+    (when-let [bld (k8s/find k8s/cfg :builds (str/trim bid))]
+      (when-not (or bld (= "Failure" (get bld :status)))
+        (throw (Exception. (str "Could not find build: " bid " or " bld))))
+      (println "Got build: " (get-in bld [:metadata :name]))
+      {::build (walk/keywordize-keys bld)})))
+
+(defmethod u/*fn
+  ::get-repository
+  [{build ::build}]
+   (when-let [rid (get-in build [:payload :repository-id])]
+    (when-let [bld (k8s/find k8s/cfg :repositories (str/trim rid))]
+      (when-not (or bld (= "Failure" (get bld :status)))
+        (throw (Exception. (str "Could not find repo: " rid " or " bld))))
+      (println "Got repo: " (get-in bld [:metadata :name]))
+      {::repository (walk/keywordize-keys bld)})))
+
+(defn run [& [arg]]
+  (u/*apply
+   [::e/env
+    ::get-build
+    ::get-repository
+    ;;::checkout-project
+    ;;::run-build
+    ]
+   arg))
+
+(comment
+  (-> (run {:env {:build-id "5"}})
+      ::repository ))
+
+(defn exec  [& args]
   (run)
   (System/exit 0))
 
-(comment
-  (run))
 
-;;(defn exec [])
+
 (defn local [& args])
+
+(defn $run [& args]
+  (let [repo (checkout-project)] (println repo))
+  (let [id (build-id)
+        build (merge (yaml/parse-string (slurp "ci3.yaml") true) build)]
+    (k8s/patch k8s/cfg :builds id
+               (select-keys  build [:pipeline :environment]))
+    (run-build build)))
