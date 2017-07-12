@@ -131,46 +131,56 @@
       (str/replace  #"\:" "-")
       (str/lower-case)))
 
-(defn create-build [payload]
-  (let [repository (:repository payload)
+(defn mk-build-resource [{{payload :body} :request build-name ::build-name}]
+  (let [payload (json/parse-string payload keyword)
+        repository (:repository payload)
         commit (last (:commits payload))
         hashcommit (get-in payload [:push :changes 0 :commits 0 :hash])
-        build-name (cleanup (str (:full_name repository) "-" hashcommit))
-        build-name (if (> (count build-name) 63) (subs build-name 0 63) build-name)]
-    (println hashcommit)
-    {:body (k8s/create k8s/cfg :builds
-                       {:kind "Build"
-                        :apiVersion "ci3.io/v1"
-                        :metadata {:name  build-name}
-                        :payload {:ref (:ref payload)
-                                  :diff (:compare payload)
-                                  :repository (select-keys repository
-                                                           [:name :organization :full_name
-                                                            :url :html_url :git_url :ssh_url])
-                                  :commit (select-keys commit
-                                                       [:id :message :timestamp
-                                                        :url :author ])} })}))
+        diff (get-in payload [:push :changes 0 :links :html :href])]
+    {:kind "Build"
+     :apiVersion "ci3.io/v1"
+     :metadata {:name  build-name}
+     :payload {:diff diff
+               :repository (select-keys repository
+                                        [:name :organization :full_name
+                                         :url :html_url :git_url :ssh_url])
+               :commit (select-keys commit
+                                    [:id :message :timestamp
+                                     :url :author ])} }))
 
 (defmethod u/*fn
-  ::mk-build
-  [{{payload :body} :request :as arg}]
-  {:response {:status 200
-              :body (create-build (json/parse-string payload keyword)) }})
-
+  ::mk-build-name
+  [arg]
+  {::build-name (-> (k8s/list k8s/cfg :builds) :items count inc str)})
+(defmethod u/*fn
+  ::mk-build-resource
+  [arg]
+  {::build (mk-build-resource arg)})
+(defmethod u/*fn
+  ::create-build
+  [{build ::build}]
+  {::build (k8s/create k8s/cfg :builds build)})
+(defmethod u/*fn
+  ::hook-resp
+  [{build ::build}]
+  {:response {:status 200 :body build}})
 (defmethod u/*fn
   ::verify
-  [{{ip :remote-addr} :request}]
-  {:response {:status 200
-              :body ip}})
+  [{{ip :remote-addr :as req} :request}]
+  ;; verify ip should be one of
+  ;; 104.192.143.0/24 34.198.203.127 34.198.178.64 34.198.32.85
+  )
 
 (defmethod interf/webhook
   :bitbucket
   [arg]
   (u/*apply
-   [::verify]
+   [::verify
+    ::mk-build-name
+    ::mk-build-resource
+    ::create-build
+    ::hook-resp]
    arg))
-
-
 
 (comment
   (u/*apply

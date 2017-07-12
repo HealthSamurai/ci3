@@ -60,7 +60,7 @@
 
 (defn query [cfg rt & [pth]]
   (let [res @(http-client/get
-              (url cfg (str (or (:prefix cfg) "apis") "/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) "/" pth))
+              (url cfg (str (or (:prefix cfg) "apis") "/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) (when pth (str "/" pth))))
               {:headers (merge default-headers {"Content-Type" "application/json"})
                :insecure? true})]
     (-> res
