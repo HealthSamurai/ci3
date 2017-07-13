@@ -12,12 +12,13 @@
   (let [repo-id (get-in arg [:request :route-params :id])
         repo (k8s/find k8s/cfg :repositories repo-id)]
     (if (= "Failure" (:status repo))
-      {::error "Hook not found"}
+      {::u/status :error
+       ::u/message "Hook not found"}
       {::repository repo})))
 
 (defmethod u/*fn
   ::catch-errors
-  [{error ::error}]
+  [{error ::u/message}]
   (when error
     {:response {:status 400
                 :body error}}))
@@ -28,10 +29,8 @@
     {:response {:status 200
                 :body (json/generate-string build)}}))
 
-(defmethod u/*fn
-  ::mk-build
-  [arg]
-  {::build (interf/mk-build arg)})
+(defmethod u/*fn ::mk-build [arg]
+  (interf/mk-build arg))
 
 (defmethod u/*fn
   ::webhook
@@ -40,7 +39,7 @@
    [::load-repo
     ::mk-build
     ::response
-    ::catch-errors]
+    ::catch-errors {::u/intercept :all}]
    arg))
 
 (comment

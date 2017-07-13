@@ -5,17 +5,15 @@
    [unifn.rest :as rest]
    [ci3.server.watch]
    [ci3.repo.core :as repo]
-   [unifn.env]
    [unifn.formats]
-   [unifn.core :as u]))
+   [unifn.core :as u]
+   [unifn.env :as e]))
 
 (defmethod u/*fn ::routes
   [{{routes :routes} :cache}]
   {:response {:body (var-get routes)}})
 
-(defmethod u/*fn
-  ::watches
-  [_]
+(defmethod u/*fn ::watches [_]
   {:response {:status 200
               :body (with-out-str (clojure.pprint/pprint  @watch/state))}})
 
@@ -47,13 +45,13 @@
                         :ns "default"}]}
    :web [:unifn.routing/dispatch
          :unifn.formats/response]
-   :bootstrap [:unifn.env/env]
+   :bootstrap [::e/env]
    :config {:web {:port 8888}}})
 
 
 (defn exec [& args]
   (rest/restart metadata)
-  (u/*apply [:unifn.env/env :k8s/watch] metadata))
+  (u/*apply [::e/env :k8s/watch] metadata))
 
 (comment
   (rest/restart metadata))

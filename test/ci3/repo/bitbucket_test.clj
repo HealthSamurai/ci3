@@ -1,7 +1,6 @@
 (ns ci3.repo.bitbucket-test
   (:require [ci3.repo.bitbucket :as sut]
             [unifn.core :as u]
-            [ci3.env :as env]
             [matcho.core :as matcho]
             [clojure.test :refer :all]
             [clojure.string :as str]))

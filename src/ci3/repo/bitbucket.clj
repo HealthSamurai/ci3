@@ -153,17 +153,17 @@
 (defmethod u/*fn
   ::create-build
   [{build ::build}]
-  {::build (k8s/create k8s/cfg :builds build)})
-(defmethod u/*fn
-  ::hook-resp
-  [{build ::build}]
-  {:response {:status 200 :body build}})
+  {:ci3.repo.core/build (k8s/create k8s/cfg :builds build)})
 (defmethod u/*fn
   ::verify
-  [{{ip :remote-addr :as req} :request}]
+  [{{ip :remote-addr body :body} :request repo :ci3.repo.core/repository}]
   ;; verify ip should be one of
   ;; 104.192.143.0/24 34.198.203.127 34.198.178.64 34.198.32.85
-  )
+  (let [payload (json/parse-string body keyword )]
+    (if-not (= (str/lower-case (:fullName repo))
+               (get-in payload [:repository :fullName]))
+      {::u/status :error
+       ::u/message "Invalid payload"})))
 
 (defmethod interf/mk-build
   :bitbucket
@@ -172,8 +172,7 @@
    [::verify
     ::mk-build-name
     ::mk-build-resource
-    ::create-build
-    ::hook-resp]
+    ::create-build]
    arg))
 
 
