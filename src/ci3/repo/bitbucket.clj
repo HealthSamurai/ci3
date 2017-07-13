@@ -5,6 +5,7 @@
             [org.httpkit.client :as http]
             [unifn.core :as u]
             [unifn.env :as e]
+            [clojure.walk]
             [environ.core :as env]
             [ci3.fx]
             [ci3.k8s :as k8s]
@@ -12,16 +13,23 @@
             [clojure.string :as str]))
 
 (def auth-endpoint "https://bitbucket.org/site/oauth2/access_token")
-(def bb-api "https://api.bitbucket.org/2.0/repositories/")
+(def bb-api        "https://api.bitbucket.org/2.0/repositories/")
+
+(s/def ::hook-url (s/keys :req-un [::env]))
+(s/def ::env      (s/keys :req-un [::hostname]))
+(s/def ::hostname string?)
+(s/def ::key string?)
+(s/def ::secret string?)
+(s/def ::oauthConsumer (s/keys :req-un [::key ::secret]))
+(s/def ::repository (s/keys :req-un [::oauthConsumer]))
+(s/def ::access-token-request (s/keys :req-un [::repository]))
+(s/def ::tokens (s/keys :req-un [::access_token]))
+(s/def ::get-hooks (s/keys :req-un [::tokens]))
 
 (defmethod u/*fn
   ::slug
   [{{url :url} :repository}]
   {:repository {:slug (->> (str/split url #"bitbucket.org/") second)}})
-
-(s/def ::hook-url (s/keys :req-un [::env]))
-(s/def ::env      (s/keys :req-un [::hostname]))
-(s/def ::hostname string?)
 
 (defmethod u/*fn
   ::hook-url
@@ -36,17 +44,6 @@
     {::u/status :stop
      ::u/message "already installed"}))
 
-(s/def ::key string?)
-(s/def ::secret string?)
-(s/def ::oauthConsumer
-  (s/keys :req-un [::key ::secret]))
-(s/def ::repository
-  (s/keys :req-un [::oauthConsumer]))
-(s/def ::access-token-request
-  (s/keys :req-un [::repository]))
-
-(s/def ::tokens (s/keys :req-un [::access_token]))
-(s/def ::get-hooks (s/keys :req-un [::tokens]))
 
 (defmethod u/*fn
   ::access-token-request
@@ -144,8 +141,9 @@
 
 (defmethod u/*fn
   ::mk-build-name
-  [arg]
-  {::build-name (-> (k8s/list k8s/cfg :builds) :items count inc str)})
+  [{repo :ci3.repo.core/repository}]
+  {::build-name (str (get-in repo [:metadata :name]) "-"
+                     (System/currentTimeMillis))})
 (defmethod u/*fn
   ::mk-build-resource
   [arg]
@@ -153,7 +151,8 @@
 (defmethod u/*fn
   ::create-build
   [{build ::build}]
-  {:ci3.repo.core/build (k8s/create k8s/cfg :builds build)})
+  {:ci3.repo.core/build
+   (clojure.walk/keywordize-keys (k8s/create k8s/cfg :builds build))})
 (defmethod u/*fn
   ::verify
   [{{ip :remote-addr body :body} :request repo :ci3.repo.core/repository}]
@@ -174,7 +173,6 @@
     ::mk-build-resource
     ::create-build]
    arg))
-
 
 (comment
   (u/*apply

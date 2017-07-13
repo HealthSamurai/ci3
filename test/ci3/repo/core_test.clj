@@ -28,14 +28,16 @@
     {:request {:route-params {:id rid}}})
    {:response {:status 400
                :body "Invalid payload"}})
-  (match
-   (u/*apply
-    ::sut/webhook
-    {:request {:body "{\"repository\": {\"fullName\": \"healthsamurai-test/test-repo\"}}"
-               :route-params {:id rid}}})
-   {:response {:status 200}})
 
-  (k8s/delete k8s/cfg :repositories "test-repo")
+  (let [build (u/*apply
+               ::sut/webhook
+               {:request {:body "{\"repository\": {\"fullName\": \"healthsamurai-test/test-repo\"}}"
+                          :route-params {:id rid}}})]
+    (match
+     build
+     {:response {:status 200}})
 
-  )
+    (k8s/delete k8s/cfg :builds (get-in build [::sut/build :metadata :name]))
+    )
 
+  (k8s/delete k8s/cfg :repositories "test-repo"))

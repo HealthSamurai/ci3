@@ -2,11 +2,12 @@
   (:require [ci3.repo.bitbucket :as sut]
             [unifn.core :as u]
             [matcho.core :as matcho]
+            [environ.core :as env]
             [clojure.test :refer :all]
             [clojure.string :as str]))
 
 
-(deftest bitbucket-mock-test
+#_(deftest bitbucket-mock-test
   (matcho/match
    (u/*apply :bitbucket/slug
              {:repository  {:url "https://bitbucket.org/healthsamurai/ci3"}})
@@ -20,9 +21,7 @@
 
 )
 
-(deftest bitbucket-test
-
-
+#_(deftest bitbucket-test
 
   (matcho/match
    (u/*apply :bitbucket/access-token-request
@@ -45,8 +44,8 @@
                                    {:repository  {:url "https://bitbucket.org/healthsamurai/ci3"
                                                   :oauthConsumer {:key (env/env :BITBUCKET_KEY)
                                                                   :secret (env/env :BITBUCKET_SECRET)}}})))
-   
-   
+
+
    )
 
 

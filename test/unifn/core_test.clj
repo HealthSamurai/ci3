@@ -101,7 +101,6 @@
   {:fx {:test/http {:uri (:uri arg)
                     :fx/result [:myresult]}}})
 
-(u/*apply :test/effects {:uri "http://google.com"})
 
 (deftest test-effects
   (matcho/match

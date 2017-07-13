@@ -1,4 +1,4 @@
-(ns ci3.watch-test
+(ns ci3.server.watch-test
   (:require [ci3.server.watch :as sut]
             [clojure.test :refer :all]
             [matcho.core :as matcho]))
