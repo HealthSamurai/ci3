@@ -6,8 +6,8 @@
             [clojure.test :refer :all]))
 
 (def rid "test-repo")
-(deftest repo-core
 
+(defn repo-fixture [f]
   (k8s/create k8s/cfg :repositories
               {:apiVersion "ci3.io/v1"
                :kind "Repository"
@@ -15,6 +15,12 @@
                :type "bitbucket"
                :fullName "HealthSamurai-test/test-repo"
                :url "https://bitbucket.org/healthsamurai-test/test-repo"})
+  (f)
+  (k8s/delete k8s/cfg :repositories rid))
+
+(use-fixtures :once repo-fixture)
+
+(deftest fetch-webhook
   (match
    (u/*apply
     ::sut/webhook
@@ -37,7 +43,4 @@
      build
      {:response {:status 200}})
 
-    (k8s/delete k8s/cfg :builds (get-in build [::sut/build :metadata :name]))
-    )
-
-  (k8s/delete k8s/cfg :repositories "test-repo"))
+    (k8s/delete k8s/cfg :builds (get-in build [::sut/build :metadata :name]))))

@@ -44,7 +44,6 @@
     {::u/status :stop
      ::u/message "already installed"}))
 
-
 (defmethod u/*fn
   ::access-token-request
   [{{{k :key s :secret} :oauthConsumer} :repository}]
@@ -148,11 +147,13 @@
   ::mk-build-resource
   [arg]
   {::build (build-resource arg)})
+
 (defmethod u/*fn
   ::create-build
   [{build ::build}]
   {:ci3.repo.core/build
    (clojure.walk/keywordize-keys (k8s/create k8s/cfg :builds build))})
+
 (defmethod u/*fn
   ::verify
   [{{ip :remote-addr body :body} :request repo :ci3.repo.core/repository}]
