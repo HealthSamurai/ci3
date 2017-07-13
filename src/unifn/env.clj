@@ -13,7 +13,11 @@
   {:env (reduce (fn [acc [k v]]
                   (assoc acc (normalize-name k) v))
                 {} (System/getenv))})
-
+(defmethod u/*fn
+  ::raw-env [arg]
+  {:env (reduce (fn [acc [k v]]
+                  (assoc acc (keyword k) v))
+                {} (System/getenv))})
 
 (comment
   (u/*apply ::env {})

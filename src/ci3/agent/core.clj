@@ -102,45 +102,34 @@
 (defn success [build]
   (update-status (assoc build :status "success")))
 
-(defn run-build [build]
-  (let [start (System/nanoTime)]
-    (loop [env {:build build }
-           [st & sts] (:pipeline build)]
-      (if st
-        (let [res (do-step st env)]
-          (if-not (= 0 (:exit res))
-            (error build)
-            (recur res sts)))
-        (do
-          (println "==========================================\nDONE in "
-           (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
-         (success build))))))
 
 (defmethod u/*fn
   ::run-build
   [{e :env build-config ::build-config}]
   (let [start (System/nanoTime)]
-    (loop [env {:build build-config :env e}
-           [st & sts] (:pipeline build-config)]
-      (if st
-        (let [res (do-step st env)]
-          (if-not (= 0 (:exit res))
-            (error build-config)
-            (recur res sts)))
-        (do
-          (println "==========================================\nDONE in "
-                   (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
-          #_(success build))))))
+    {::result (loop [env {:build build-config :env e}
+                     [st & sts] (:pipeline build-config)]
+                (if st
+                  (let [res (do-step st env)]
+                    (println res)
+                    (if-not (= 0 (:exit res))
+                      (error build-config)
+                      (recur res sts)))
+                  (do
+                    (println "==========================================\nDONE in "
+                             (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
+                    #_(success build))))}))
 
 (comment
-  (u/*apply
-   [::e/env
-    ::run-build]
-   {::build-config
-    {:pipeline
-     [{:type "bash" :command "echo 11l"}
-      {:type "bash" :command "env"}]}}
-   ))
+  (->(u/*apply
+    [::e/raw-env
+     ::run-build]
+    {::build-config
+     {:pipeline
+      [
+       {:type "bash" :command "echo $HOME"}
+       ]}}
+    )::result))
 
 (defmethod u/*fn
  ::checkout-project
@@ -198,7 +187,7 @@
 
 (defn run [& [arg]]
   (u/*apply
-   [::e/env
+   [::e/raw-env
     ::get-build
     ::get-repository
     ::checkout-project
