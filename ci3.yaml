@@ -15,7 +15,7 @@ pipeline:
   GIT_COMMIT: 
     command: "git rev-parse --short HEAD"
 - type: bash
-  command: while true
+  command: while :; do echo 'Wait'; sleep 1; don:e
 - type: maven
   command: restore-cache
   key: ci3
