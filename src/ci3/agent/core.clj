@@ -119,8 +119,9 @@
 (defmethod u/*fn
   ::run-build
   [{env :env build-config ::build-config}]
-  (let [start (System/nanoTime)]
-    (loop [env env
+  (let [start (System/nanoTime)
+        build-config (assoc build-config :env env )]
+    (loop [env {:env build-config}
            [st & sts] (:pipeline build-config)]
       (if st
         (let [res (do-step st env)]
@@ -131,6 +132,13 @@
           (println "==========================================\nDONE in "
                    (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
           #_(success build))))))
+
+(comment
+  (u/*apply
+   [::e/env
+    ::run-build]
+   {::build-config {:pipeline [{:type "bash" :command "env"}]}}
+   ))
 
 (defmethod u/*fn
  ::checkout-project
