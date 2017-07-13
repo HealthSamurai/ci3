@@ -166,7 +166,7 @@
     (if-not (= (str/lower-case (:fullName repo))
                (get-in payload [:repository :fullName]))
       {::u/status :error
-       ::u/message "Invalid payload"})))
+       ::u/message (str "Invalid payload" repo payload)})))
 
 (defmethod interf/mk-build
   :bitbucket
