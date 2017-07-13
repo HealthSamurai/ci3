@@ -37,7 +37,7 @@
 
   (let [build (u/*apply
                ::sut/webhook
-               {:request {:body "{\"repository\": {\"fullName\": \"healthsamurai/ci3\"}}"
+               {:request {:body "{\"repository\": {\"full_name\": \"healthsamurai/ci3\"}}"
                           :route-params {:id rid}}})]
     (match
      build

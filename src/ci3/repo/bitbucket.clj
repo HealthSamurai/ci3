@@ -164,9 +164,9 @@
   ;; 104.192.143.0/24 34.198.203.127 34.198.178.64 34.198.32.85
   (let [payload (json/parse-string body keyword )]
     (if-not (= (str/lower-case (:fullName repo))
-               (get-in payload [:repository :fullName]))
+               (get-in payload [:repository :full_name]))
       {::u/status :error
-       ::u/message (str "Invalid payload" repo payload)})))
+       ::u/message (str "Invalid payload")})))
 
 (defmethod interf/mk-build
   :bitbucket
