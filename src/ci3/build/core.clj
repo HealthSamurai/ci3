@@ -42,5 +42,4 @@
                                       :annotations {:system "ci3"}
                                       :lables {:system "ci3"}}
                            :spec (pod-spec build)})]
-      (println pod)
       {::pod pod})))

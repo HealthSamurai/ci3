@@ -129,14 +129,17 @@
     {:kind "Build"
      :apiVersion "ci3.io/v1"
      :metadata {:name  build-name}
-     :payload {:diff diff
-               :repository-id repo-id
-               :repository (select-keys repository
-                                        [:name :organization :full_name
-                                         :url :html_url :git_url :ssh_url])
-               :commit (select-keys commit
-                                    [:id :message :timestamp
-                                     :url :author ])} }))
+     :hashcommit hashcommit
+     :repository {:url (:url repository)
+                  :fullName (:fullName repository)}
+     :diff diff
+     :repository-id repo-id
+     ;;:repository (select-keys repository
+     ;;                         [:name :organization :full_name
+     ;;                          :url :html_url :git_url :ssh_url])
+     :commit (select-keys commit
+                          [:id :message :timestamp
+                           :url :author ]) }))
 
 (defmethod u/*fn
   ::mk-build-name

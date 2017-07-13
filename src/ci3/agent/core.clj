@@ -136,9 +136,19 @@
 
 (defmethod u/*fn
  ::checkout-project
- [{env :env build :build repo :repository}]
- {}
- )
+ [{env :env build ::build repo ::repository}]
+  (println "Clone repo")
+  (sh/sh "rm" "-rf" "/workspace/")
+  (let [{err :err exit :exit :as res} (sh/sh "git" "clone" (:url repo) "/workspace/repo")]
+    (if (= 0 exit)
+      (let [{err :err exit :exit :as res}
+            (sh/sh "cd" "/workspace/repo" "&&" "git" "reset" "--hard" (:hashcommit build))]
+        (if-not (= 0 exit)
+          {::u/status :error
+           ::u/message err}
+          {::checkout (:hashcommit build)}))
+      {::u/status :error
+       ::u/message err})))
 
 (defmethod u/*fn
   ::get-build
@@ -153,21 +163,31 @@
 (defmethod u/*fn
   ::get-repository
   [{build ::build}]
-   (when-let [rid (get-in build [:payload :repository-id])]
+   (when-let [rid (:repository build)]
     (when-let [bld (k8s/find k8s/cfg :repositories (str/trim rid))]
       (when-not (or bld (= "Failure" (get bld :status)))
         (throw (Exception. (str "Could not find repo: " rid " or " bld))))
       (println "Got repo: " (get-in bld [:metadata :name]))
       {::repository (walk/keywordize-keys bld)})))
 
+
+(defmethod u/*fn
+  ::catch-errors
+  [{error ::u/message}]
+  (when error
+    (println error)
+    {:response {:status 400
+                :body error}}))
+
 (defn run [& [arg]]
   (u/*apply
    [::e/env
     ::get-build
     ::get-repository
-    ;;::checkout-project
+    ::checkout-project
     ;;::run-build
-    ]
+
+    ::catch-errors {::u/intercept :all}]
    arg))
 
 (comment

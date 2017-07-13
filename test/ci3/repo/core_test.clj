@@ -13,8 +13,8 @@
                :kind "Repository"
                :metadata {:name rid}
                :type "bitbucket"
-               :fullName "HealthSamurai-test/test-repo"
-               :url "https://bitbucket.org/healthsamurai-test/test-repo"})
+               :fullName "HealthSamurai/ci3"
+               :url "https://bitbucket.org/healthsamurai/ci3"})
   (f)
   (k8s/delete k8s/cfg :repositories rid))
 
@@ -37,7 +37,7 @@
 
   (let [build (u/*apply
                ::sut/webhook
-               {:request {:body "{\"repository\": {\"fullName\": \"healthsamurai-test/test-repo\"}}"
+               {:request {:body "{\"repository\": {\"fullName\": \"healthsamurai/ci3\"}}"
                           :route-params {:id rid}}})]
     (match
      build
