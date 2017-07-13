@@ -11,7 +11,7 @@ environment:
       git rev-parse --short HEAD
 pipeline:
 - type: env
-  DOCKER_REPO: eu.gcr.io/vivid-kite-171620/ci3:latest
+  DOCKER_REPO: eu.gcr.io/vivid-kite-171620/ci3
   GIT_COMMIT: 
     command: "git rev-parse --short HEAD"
 - type: maven
