@@ -139,7 +139,8 @@
   (sh/sh "rm" "-rf" "/workspace/repo")
   (let [{err :err exit :exit :as res} (sh/sh "git" "clone" (:url repo) "/workspace/repo")]
     (if (= 0 exit)
-      (let [{err :err exit :exit :as res}
+      (let [_ (println (sh/sh "ls" "/workspace/repo"))
+            {err :err exit :exit :as res}
             (sh/sh "cd" "/workspace/repo" "&&" "git" "reset" "--hard" (:hashcommit build))]
         (if-not (= 0 exit)
           {::u/status :error
