@@ -19,9 +19,9 @@
   (f)
   (k8s/delete k8s/cfg :builds bid))
 
-(use-fixtures :once build-fixture repo/repo-fixture )
+#_(use-fixtures :once build-fixture repo/repo-fixture )
 
-(deftest agent-checkout
+#_(deftest agent-checkout
   (match
    (sut/run {:env {:build-id bid}})
    {::sut/build      {:metadata {:name bid}}

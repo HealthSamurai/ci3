@@ -1,0 +1,12 @@
+apiVersion: ci3.io/v1
+commit: {}
+diff: https://bitbucket.org/healthsamurai/ci3/branches/compare/3a8514032a798882c35dc628d90db25c63e91be0..93d9b3d5ebae6efe69b7b87bf575fa247719cd37
+hashcommit: 3a8514032a798882c35dc628d90db25c63e91be0
+kind: Build
+namespace: default
+metadata:
+  name: ci3-1499957545927
+repository:
+  fullName: null
+  url: null
+repository-id: ci3

@@ -25,7 +25,7 @@
        :readOnly true}]
      :env [{:name "BUILD_ID" :value (get-in res [:metadata :name])}
            {:name "BOTO_CONFIG" :value "/gsutil/.boto"}
-           {:name "REPOSITORY" :value (get-in res [:repository :metadata :name])}
+           {:name "REPOSITORY" :value (get-in res [:repository])}
            {:name "DOCKER_KEY" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}
            {:name "SERVICE_ACCOUNT" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}]}]})
 
