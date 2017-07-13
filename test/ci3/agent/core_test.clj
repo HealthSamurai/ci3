@@ -27,6 +27,5 @@
    {::sut/build      {:metadata {:name bid}}
     ::sut/repository {:metadata {:name repo/rid}}
     ::sut/checkout   hashcommit
-    }
-
+    ::sut/build-config {:kind "Build" }}
    ))

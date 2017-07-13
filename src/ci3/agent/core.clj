@@ -116,29 +116,27 @@
            (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
          (success build))))))
 
-
-(defn checkout-project-github []
-  (when-let [full_name (System/getenv "REPOSITORY")]
-    (let [token (k8s/secret "secrets" :github_token)
-          repo (str "https://" token "@github.com/" full_name ".git")
-          res (sh/sh "git" "clone" repo "/workspace")]
-      (println res)
-      res)))
-
-(defn checkout-project [build]
-  (when-let [full_name (System/getenv "REPOSITORY")]
-    (let [token (k8s/secret "secrets" :github_token)
-          repo (str "https://" token "@github.com/" full_name ".git")
-          res (sh/sh "git" "clone" repo "/workspace")]
-      (println res)
-      res)))
-
+(defmethod u/*fn
+  ::run-build
+  [{env :env build-config ::build-config}]
+  (let [start (System/nanoTime)]
+    (loop [env env
+           [st & sts] (:pipeline build-config)]
+      (if st
+        (let [res (do-step st env)]
+          (if-not (= 0 (:exit res))
+            (error build-config)
+            (recur res sts)))
+        (do
+          (println "==========================================\nDONE in "
+                   (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
+          #_(success build))))))
 
 (defmethod u/*fn
  ::checkout-project
  [{env :env build ::build repo ::repository}]
   (println "Clone repo")
-  (sh/sh "rm" "-rf" "/workspace/")
+  (sh/sh "rm" "-rf" "/workspace/repo")
   (let [{err :err exit :exit :as res} (sh/sh "git" "clone" (:url repo) "/workspace/repo")]
     (if (= 0 exit)
       (let [{err :err exit :exit :as res}
@@ -175,9 +173,18 @@
   ::catch-errors
   [{error ::u/message}]
   (when error
-    (println error)
+    (println "Error:" error)
     {:response {:status 400
                 :body error}}))
+
+(defmethod u/*fn
+  ::get-build-config
+  [arg]
+  (let [build-config (yaml/parse-string (slurp "/workspace/repo/ci3.yaml") true)]
+    (if build-config
+      {::build-config build-config}
+      {::u/status :error
+       ::u/message (str "Wrong config" build-config)})))
 
 (defn run [& [arg]]
   (u/*apply
@@ -185,8 +192,8 @@
     ::get-build
     ::get-repository
     ::checkout-project
-    ;;::run-build
-
+    ::get-build-config
+    ::run-build
     ::catch-errors {::u/intercept :all}]
    arg))
 
