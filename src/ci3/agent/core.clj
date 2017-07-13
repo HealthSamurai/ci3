@@ -118,10 +118,9 @@
 
 (defmethod u/*fn
   ::run-build
-  [{env :env build-config ::build-config}]
-  (let [start (System/nanoTime)
-        build-config (assoc build-config :env env )]
-    (loop [env {:env build-config}
+  [{e :env build-config ::build-config}]
+  (let [start (System/nanoTime)]
+    (loop [env {:build build-config :env e}
            [st & sts] (:pipeline build-config)]
       (if st
         (let [res (do-step st env)]
@@ -137,7 +136,10 @@
   (u/*apply
    [::e/env
     ::run-build]
-   {::build-config {:pipeline [{:type "bash" :command "env"}]}}
+   {::build-config
+    {:pipeline
+     [{:type "bash" :command "echo 11l"}
+      {:type "bash" :command "env"}]}}
    ))
 
 (defmethod u/*fn
