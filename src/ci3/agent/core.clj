@@ -77,11 +77,9 @@
   (println "STEP:" (:type step) (pr-str step))
   (println "------------------------------")
   (let [start (System/nanoTime)
+        dir (or dir "/workspace/repo/")
         result (sh/with-sh-env (or (:env env) {})
-                 (if dir
-                   (sh/with-sh-dir dir
-                     (execute step env))
-                   (execute step env)))]
+                   (sh/with-sh-dir dir (execute step env)))]
     (println "------------------------------")
     (println "step done in " (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
 
