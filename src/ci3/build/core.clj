@@ -34,6 +34,7 @@
   [{env :env {{{nm :name} :metadata :as build}  :object tp :type } :resource}]
   (when (= tp "ADDED")
     (println "Start building #" nm)
+    (println "Start building 11111")
     (let [cfg {:prefix "api" :apiVersion "v1" :ns "default"}
           pod (k8s/create cfg :pods
                           {:apiVersion "v1"
@@ -42,4 +43,5 @@
                                       :annotations {:system "ci3"}
                                       :lables {:system "ci3"}}
                            :spec (pod-spec build)})]
+      (println pod)
       {::pod pod})))

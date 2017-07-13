@@ -53,7 +53,8 @@
          x)
        x)) res))
 
-(defmethod u/*fn
+(defmethod
+  u/*fn
   ::resolve-secrets
   [res]
   (resolve-secrets res))

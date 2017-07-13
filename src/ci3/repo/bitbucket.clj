@@ -119,10 +119,10 @@
     ::update-repo]
    {:env env :repository repo}))
 
-(defn build-resource [{{payload :body :as req} :request build-name ::build-name}]
+(defn build-resource [{{payload :body :as req} :request
+                       build-name ::build-name
+                       repository  :ci3.repo.core/repository}]
   (let [payload (json/parse-string payload keyword)
-        repo-id  (get-in req [:route-params :id])
-        repository (:repository payload)
         commit (last (:commits payload))
         hashcommit (get-in payload [:push :changes 0 :commits 0 :hash])
         diff (get-in payload [:push :changes 0 :links :html :href])]
@@ -133,10 +133,7 @@
      :repository {:url (:url repository)
                   :fullName (:fullName repository)}
      :diff diff
-     :repository-id repo-id
-     ;;:repository (select-keys repository
-     ;;                         [:name :organization :full_name
-     ;;                          :url :html_url :git_url :ssh_url])
+     :repository-id (get-in repository [:metadata :name])
      :commit (select-keys commit
                           [:id :message :timestamp
                            :url :author ]) }))
