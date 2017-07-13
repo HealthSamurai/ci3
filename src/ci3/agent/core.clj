@@ -167,7 +167,6 @@
       (println "Got repo: " (get-in bld [:metadata :name]))
       {::repository (walk/keywordize-keys bld)})))
 
-
 (defmethod u/*fn
   ::catch-errors
   [{error ::u/message}]
