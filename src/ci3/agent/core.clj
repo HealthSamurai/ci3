@@ -135,7 +135,7 @@
 (defmethod u/*fn
  ::checkout-project
  [{env :env build ::build repo ::repository}]
-  (println "Clone repo")
+  (println "Clone repo" (:url repo))
   (sh/sh "rm" "-rf" "/workspace/repo")
   (let [{err :err exit :exit :as res} (sh/sh "git" "clone" (:url repo) "/workspace/repo")]
     (if (= 0 exit)
