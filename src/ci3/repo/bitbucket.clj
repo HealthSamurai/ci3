@@ -130,10 +130,8 @@
      :apiVersion "ci3.io/v1"
      :metadata {:name  build-name}
      :hashcommit hashcommit
-     :repository {:url (:url repository)
-                  :fullName (:fullName repository)}
+     :repository (get-in repository [:metadata :name])
      :diff diff
-     :repository-id (get-in repository [:metadata :name])
      :commit (select-keys commit
                           [:id :message :timestamp
                            :url :author ]) }))
