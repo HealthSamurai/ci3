@@ -187,11 +187,12 @@
 
 (defn run [& [arg]]
   (u/*apply
-   [::e/raw-env
+   [::e/env
     ::get-build
     ::get-repository
     ::checkout-project
     ::get-build-config
+    ::e/raw-env
     ::run-build
     ::catch-errors {::u/intercept :all}]
    arg))
