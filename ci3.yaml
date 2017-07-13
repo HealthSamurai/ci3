@@ -14,11 +14,11 @@ pipeline:
   DOCKER_REPO: eu.gcr.io/vivid-kite-171620/ci3:latest
   GIT_COMMIT: 
     command: "git rev-parse --short HEAD"
-- type: bash
-  command: env
 - type: maven
   command: restore-cache
   key: ci3
+- type: bash
+  command: env
 - type: lein
   command: test
 - type: lein
