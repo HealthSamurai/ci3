@@ -205,13 +205,5 @@
   (System/exit 0))
 
 
-
 (defn local [& args])
 
-#_(defn $run [& args]
-  (let [repo (checkout-project)] (println repo))
-  (let [id (build-id)
-        build (merge (yaml/parse-string (slurp "ci3.yaml") true) build)]
-    (k8s/patch k8s/cfg :builds id
-               (select-keys  build [:pipeline :environment]))
-    (run-build build)))
