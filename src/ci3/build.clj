@@ -110,7 +110,7 @@
 (defn build [build]
   (let [start (System/nanoTime)]
     (loop [env {:build build :env (get-envs)}
-           [st & sts] (:pipeline build)]
+          [st & sts] (:pipeline build )]
       (if st
         (let [res (do-step st env)]
           (if-not (= 0 (:exit res))

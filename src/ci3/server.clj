@@ -75,8 +75,6 @@
 
 
 (def longstring "healthsamurai-yourwaitsapp-d6b1fa98d56db635825fc2d4a4c1ea72801931e6")
-(count longstring)
-(subs longstring  0 63)
 
 (defn create-build [payload]
   (let [repository (:repository payload)
