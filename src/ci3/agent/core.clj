@@ -109,7 +109,6 @@
                      [st & sts] (:pipeline build-config)]
                 (if st
                   (let [res (do-step st env)]
-                    (println res)
                     (if-not (= 0 (:exit res))
                       (error build-config)
                       (recur res sts)))

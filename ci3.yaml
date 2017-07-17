@@ -17,8 +17,6 @@ pipeline:
 - type: maven
   command: restore-cache
   key: ci3
-- type: bash
-  command: env
 - type: lein
   command: test
 - type: lein
