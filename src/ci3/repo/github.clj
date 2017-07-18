@@ -3,6 +3,8 @@
             [ci3.repo.interface :as interf]
             [clojure.tools.logging :as log]
             [org.httpkit.client :as http]
+            [pandect.algo.sha1 :refer [sha1-hmac]]
+            [clojure.java.shell :as sh]
             [unifn.core :as u]
             [unifn.env :as e]
             [clojure.walk]
@@ -15,24 +17,22 @@
 (defmethod u/*fn
   ::verify
   [arg]
-  (println "Github verify"))
+  (println "TODO: Github verify"))
 
-(defn build-resource [{{payload :body :as req} :request
-                       build-name ::build-name
-                       repository  :ci3.repo.core/repository}]
-  (let [payload (json/parse-string payload keyword)
-        commit (last (:commits payload))
-        hashcommit (get-in payload [:push :changes 0 :commits 0 :hash])
-        diff (get-in payload [:push :changes 0 :links :html :href])]
-    {:kind "Build"
-     :apiVersion "ci3.io/v1"
-     :metadata {:name  build-name}
-     :hashcommit hashcommit
-     :repository (get-in repository [:metadata :name])
-     :diff diff
-     :commit (select-keys commit
-                          [:id :message :timestamp
-                           :url :author ]) }))
+;; TODO
+(defn verify
+  [{ {id :id} :route-params headers :headers body :body :as req}]
+  (let [signature (get headers "x-hub-signature")
+        payload (slurp body)
+        repo (k8s/find k8s/cfg :repositories id)
+        secret (k8s/secret "ci3" (keyword (or (get repo "secret") "defaultSecret")))
+        hash (str "sha1=" (sha1-hmac payload secret)) ]
+    (if (and
+         (not (= (get repo "code") 404))
+         (= signature hash))
+      (json/parse-string payload keyword)
+      nil)))
+
 
 (defmethod u/*fn
   ::mk-build-resource
@@ -68,10 +68,26 @@
 
 
 
+(defn verify
+  [{ {id :id} :route-params headers :headers body :body :as req}]
+  (let [signature (get headers "x-hub-signature")
+        payload (slurp body)
+        repo (k8s/find k8s/cfg :repositories id)
+        secret (k8s/secret "ci3" (keyword (or (get repo "secret") "defaultSecret")))
+        hash (str "sha1=" (sha1-hmac payload secret)) ]
+    (if (and
+         (not (= (get repo "code") 404))
+         (= signature hash))
+      (json/parse-string payload keyword)
+      nil)))
 
-
-
-
+(defn checkout-project []
+  (when-let [full_name (System/getenv "REPOSITORY")]
+    (let [token (k8s/secret "secrets" :github_token)
+          repo (str "https://" token "@github.com/" full_name ".git")
+          res (sh/sh "git" "clone" repo "/workspace")]
+      (println res)
+      res)))
 
 
 (defn create-webhook [access-token repo]

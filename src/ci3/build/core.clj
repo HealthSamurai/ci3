@@ -23,25 +23,23 @@
       {:name "gsutil"
        :mountPath "/gsutil"
        :readOnly true}]
-     :env [{:name "BUILD_ID" :value (get-in res [:metadata :name])}
-           {:name "BOTO_CONFIG" :value "/gsutil/.boto"}
-           {:name "REPOSITORY" :value (get-in res [:repository])}
-           {:name "DOCKER_KEY" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}
-           {:name "SERVICE_ACCOUNT" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}]}]})
+     :env
+     [{:name "BUILD_ID" :value (get-in res [:metadata :name])}
+      {:name "BOTO_CONFIG" :value "/gsutil/.boto"}
+      {:name "REPOSITORY" :value (get-in res [:repository])}
+      {:name "DOCKER_KEY" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}
+      {:name "SERVICE_ACCOUNT" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}]}]})
 
 (defmethod u/*fn
   ::build
-  [{env :env {{{nm :name} :metadata :as build}  :object tp :type } :resource}]
+  [{env :env cfg :k8s {{{nm :name} :metadata :as build}  :object tp :type } :resource}]
   (when (= tp "ADDED")
     (println "Start building #" nm)
-    (println "Start building 11111")
-    (let [cfg {:prefix "api" :apiVersion "v1" :ns "default"}
-          pod (k8s/create cfg :pods
+    (let [pod (k8s/create cfg :pods
                           {:apiVersion "v1"
                            :kind "Pod"
                            :metadata {:name (str "build-" nm)
                                       :annotations {:system "ci3"}
                                       :lables {:system "ci3"}}
                            :spec (pod-spec build)})]
-      (println pod)
       {::pod pod})))

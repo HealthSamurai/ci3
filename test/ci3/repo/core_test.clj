@@ -7,7 +7,6 @@
             [unifn.core :as u]
             [clojure.test :refer :all]))
 
-
 (def bb_rid "ci3public")
 (def gh_rid "ci3githubpublic")
 (def cfg {:apiVersion "ci3.io/v1" :ns "test"})
