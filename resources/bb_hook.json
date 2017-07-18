@@ -1,0 +1,288 @@
+{
+  "push": {
+    "changes": [
+      {
+        "forced": false,
+        "old": {
+          "type": "branch",
+          "name": "master",
+          "links": {
+            "commits": {
+              "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commits/master"
+            },
+            "self": {
+              "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/refs/branches/master"
+            },
+            "html": {
+              "href": "https://bitbucket.org/healthsamurai/ci3/branch/master"
+            }
+          },
+          "target": {
+            "hash": "ea73fff79aff8778ab6faf12c834b91902a6b5a8",
+            "links": {
+              "self": {
+                "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commit/ea73fff79aff8778ab6faf12c834b91902a6b5a8"
+              },
+              "html": {
+                "href": "https://bitbucket.org/healthsamurai/ci3/commits/ea73fff79aff8778ab6faf12c834b91902a6b5a8"
+              }
+            },
+            "author": {
+              "raw": "Aitem <muradbei@gmail.com>",
+              "type": "author",
+              "user": {
+                "username": "Aitem",
+                "type": "user",
+                "display_name": "Marat Surmashev",
+                "uuid": "{9da370f6-084c-4870-9d00-00e49ad5416c}",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/users/Aitem"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/Aitem/"
+                  },
+                  "avatar": {
+                    "href": "https://bitbucket.org/account/Aitem/avatar/32/"
+                  }
+                }
+              }
+            },
+            "parents": [
+              {
+                "type": "commit",
+                "hash": "47cad5f97bacbc21e2ad2bea54deff1b37069712",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commit/47cad5f97bacbc21e2ad2bea54deff1b37069712"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/healthsamurai/ci3/commits/47cad5f97bacbc21e2ad2bea54deff1b37069712"
+                  }
+                }
+              }
+            ],
+            "date": "2017-07-17T13:56:58+00:00",
+            "message": "fix tiller version\n",
+            "type": "commit"
+          }
+        },
+        "links": {
+          "commits": {
+            "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commits?include=61cd3aa486521854e7737c7e9b79c3013de5c48d&exclude=ea73fff79aff8778ab6faf12c834b91902a6b5a8"
+          },
+          "html": {
+            "href": "https://bitbucket.org/healthsamurai/ci3/branches/compare/61cd3aa486521854e7737c7e9b79c3013de5c48d..ea73fff79aff8778ab6faf12c834b91902a6b5a8"
+          },
+          "diff": {
+            "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/diff/61cd3aa486521854e7737c7e9b79c3013de5c48d..ea73fff79aff8778ab6faf12c834b91902a6b5a8"
+          }
+        },
+        "truncated": false,
+        "commits": [
+          {
+            "hash": "61cd3aa486521854e7737c7e9b79c3013de5c48d",
+            "links": {
+              "self": {
+                "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commit/61cd3aa486521854e7737c7e9b79c3013de5c48d"
+              },
+              "comments": {
+                "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commit/61cd3aa486521854e7737c7e9b79c3013de5c48d/comments"
+              },
+              "patch": {
+                "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/patch/61cd3aa486521854e7737c7e9b79c3013de5c48d"
+              },
+              "html": {
+                "href": "https://bitbucket.org/healthsamurai/ci3/commits/61cd3aa486521854e7737c7e9b79c3013de5c48d"
+              },
+              "diff": {
+                "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/diff/61cd3aa486521854e7737c7e9b79c3013de5c48d"
+              },
+              "approve": {
+                "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commit/61cd3aa486521854e7737c7e9b79c3013de5c48d/approve"
+              },
+              "statuses": {
+                "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commit/61cd3aa486521854e7737c7e9b79c3013de5c48d/statuses"
+              }
+            },
+            "author": {
+              "raw": "Aitem <muradbei@gmail.com>",
+              "type": "author",
+              "user": {
+                "username": "Aitem",
+                "type": "user",
+                "display_name": "Marat Surmashev",
+                "uuid": "{9da370f6-084c-4870-9d00-00e49ad5416c}",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/users/Aitem"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/Aitem/"
+                  },
+                  "avatar": {
+                    "href": "https://bitbucket.org/account/Aitem/avatar/32/"
+                  }
+                }
+              }
+            },
+            "parents": [
+              {
+                "type": "commit",
+                "hash": "ea73fff79aff8778ab6faf12c834b91902a6b5a8",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commit/ea73fff79aff8778ab6faf12c834b91902a6b5a8"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/healthsamurai/ci3/commits/ea73fff79aff8778ab6faf12c834b91902a6b5a8"
+                  }
+                }
+              }
+            ],
+            "date": "2017-07-17T13:59:37+00:00",
+            "message": "fix helm release\n",
+            "type": "commit"
+          }
+        ],
+        "created": false,
+        "closed": false,
+        "new": {
+          "type": "branch",
+          "name": "master",
+          "links": {
+            "commits": {
+              "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commits/master"
+            },
+            "self": {
+              "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/refs/branches/master"
+            },
+            "html": {
+              "href": "https://bitbucket.org/healthsamurai/ci3/branch/master"
+            }
+          },
+          "target": {
+            "hash": "61cd3aa486521854e7737c7e9b79c3013de5c48d",
+            "links": {
+              "self": {
+                "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commit/61cd3aa486521854e7737c7e9b79c3013de5c48d"
+              },
+              "html": {
+                "href": "https://bitbucket.org/healthsamurai/ci3/commits/61cd3aa486521854e7737c7e9b79c3013de5c48d"
+              }
+            },
+            "author": {
+              "raw": "Aitem <muradbei@gmail.com>",
+              "type": "author",
+              "user": {
+                "username": "Aitem",
+                "type": "user",
+                "display_name": "Marat Surmashev",
+                "uuid": "{9da370f6-084c-4870-9d00-00e49ad5416c}",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/users/Aitem"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/Aitem/"
+                  },
+                  "avatar": {
+                    "href": "https://bitbucket.org/account/Aitem/avatar/32/"
+                  }
+                }
+              }
+            },
+            "parents": [
+              {
+                "type": "commit",
+                "hash": "ea73fff79aff8778ab6faf12c834b91902a6b5a8",
+                "links": {
+                  "self": {
+                    "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3/commit/ea73fff79aff8778ab6faf12c834b91902a6b5a8"
+                  },
+                  "html": {
+                    "href": "https://bitbucket.org/healthsamurai/ci3/commits/ea73fff79aff8778ab6faf12c834b91902a6b5a8"
+                  }
+                }
+              }
+            ],
+            "date": "2017-07-17T13:59:37+00:00",
+            "message": "fix helm release\n",
+            "type": "commit"
+          }
+        }
+      }
+    ]
+  },
+  "actor": {
+    "username": "Aitem",
+    "type": "user",
+    "display_name": "Marat Surmashev",
+    "uuid": "{9da370f6-084c-4870-9d00-00e49ad5416c}",
+    "links": {
+      "self": {
+        "href": "https://api.bitbucket.org/2.0/users/Aitem"
+      },
+      "html": {
+        "href": "https://bitbucket.org/Aitem/"
+      },
+      "avatar": {
+        "href": "https://bitbucket.org/account/Aitem/avatar/32/"
+      }
+    }
+  },
+  "repository": {
+    "scm": "git",
+    "website": "",
+    "name": "ci3",
+    "links": {
+      "self": {
+        "href": "https://api.bitbucket.org/2.0/repositories/healthsamurai/ci3"
+      },
+      "html": {
+        "href": "https://bitbucket.org/healthsamurai/ci3"
+      },
+      "avatar": {
+        "href": "https://bitbucket.org/healthsamurai/ci3/avatar/32/"
+      }
+    },
+    "project": {
+      "links": {
+        "self": {
+          "href": "https://api.bitbucket.org/2.0/teams/healthsamurai/projects/CI3"
+        },
+        "html": {
+          "href": "https://bitbucket.org/account/user/healthsamurai/projects/CI3"
+        },
+        "avatar": {
+          "href": "https://bitbucket.org/account/user/healthsamurai/projects/CI3/avatar/32"
+        }
+      },
+      "type": "project",
+      "uuid": "{7e0a2194-ac3c-4b01-bfba-7fe5ee24ee51}",
+      "key": "CI3",
+      "name": "ci3"
+    },
+    "full_name": "Aitem/ci3-public",
+    "owner": {
+      "username": "healthsamurai",
+      "type": "team",
+      "display_name": "healthsamurai",
+      "uuid": "{00913e8c-ee5f-45b6-9c03-40c01ddc1edc}",
+      "links": {
+        "self": {
+          "href": "https://api.bitbucket.org/2.0/teams/healthsamurai"
+        },
+        "html": {
+          "href": "https://bitbucket.org/healthsamurai/"
+        },
+        "avatar": {
+          "href": "https://bitbucket.org/account/healthsamurai/avatar/32/"
+        }
+      }
+    },
+    "type": "repository",
+    "is_private": false,
+    "uuid": "{ebf1d921-f2af-4534-9749-2237ad0e43fd}"
+  }
+}

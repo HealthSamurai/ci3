@@ -1,9 +1,78 @@
 (ns ci3.repo.github
-  (:require [ci3.repo.interface :as interf]
-            [ci3.k8s :as k8s]
-            [cheshire.core :as json]
+  (:require [cheshire.core :as json]
+            [ci3.repo.interface :as interf]
+            [clojure.tools.logging :as log]
             [org.httpkit.client :as http]
-            [clojure.tools.logging :as log]))
+            [unifn.core :as u]
+            [unifn.env :as e]
+            [clojure.walk]
+            [environ.core :as env]
+            [ci3.fx]
+            [ci3.k8s :as k8s]
+            [clojure.spec.alpha :as s]
+            [clojure.string :as str]))
+
+(defmethod u/*fn
+  ::verify
+  [arg]
+  (println "Github verify"))
+
+(defn build-resource [{{payload :body :as req} :request
+                       build-name ::build-name
+                       repository  :ci3.repo.core/repository}]
+  (let [payload (json/parse-string payload keyword)
+        commit (last (:commits payload))
+        hashcommit (get-in payload [:push :changes 0 :commits 0 :hash])
+        diff (get-in payload [:push :changes 0 :links :html :href])]
+    {:kind "Build"
+     :apiVersion "ci3.io/v1"
+     :metadata {:name  build-name}
+     :hashcommit hashcommit
+     :repository (get-in repository [:metadata :name])
+     :diff diff
+     :commit (select-keys commit
+                          [:id :message :timestamp
+                           :url :author ]) }))
+
+(defmethod u/*fn
+  ::mk-build-resource
+  [{{payload :body :as req} :request
+    build-name ::build-name
+    repository  :ci3.repo.core/repository}]
+  {:ci3.repo.core/build
+   (let [payload (json/parse-string payload keyword)
+         commit (last (:commits payload))
+         hashcommit (:id commit)
+         diff (get-in payload [:push :changes 0 :links :html :href])]
+     {:kind "Build"
+      :apiVersion "ci3.io/v1"
+      :metadata {:name  build-name}
+      :hashcommit hashcommit
+      :repository (get-in repository [:metadata :name])
+      :diff diff
+      :commit (select-keys commit
+                           [:id :message :timestamp
+                            :url :author ]) })})
+
+(defmethod interf/mk-build
+  :github
+  [arg]
+  (u/*apply
+   [::verify
+    ::mk-build-resource]
+   arg))
+
+
+
+
+
+
+
+
+
+
+
+
 
 (defn create-webhook [access-token repo]
   (let [secret (or (k8s/secret "ci3" (keyword (or (:secret repo) "defaultSecret"))) "defaultSecret") ]

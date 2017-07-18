@@ -117,17 +117,6 @@
                              (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
                     #_(success build))))}))
 
-(comment
-  (->(u/*apply
-    [::e/raw-env
-     ::run-build]
-    {::build-config
-     {:pipeline
-      [
-       {:type "bash" :command "echo $HOME"}
-       ]}}
-    )::result))
-
 (defmethod u/*fn
  ::checkout-project
  [{env :env build ::build repo ::repository}]

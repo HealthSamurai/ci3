@@ -7,7 +7,8 @@
    [ci3.repo.core :as repo]
    [unifn.formats]
    [unifn.core :as u]
-   [unifn.env :as e]))
+   [unifn.env :as e]
+   [ci3.k8s :as k8s]))
 
 (defmethod u/*fn ::routes
   [{{routes :routes} :cache}]
@@ -16,6 +17,11 @@
 (defmethod u/*fn ::watches [_]
   {:response {:status 200
               :body (with-out-str (clojure.pprint/pprint  @watch/state))}})
+
+(defmethod u/*fn
+  ::configure
+  [arg]
+  :k8s k8s/cfg)
 
 (defmethod u/*fn
   ::webhook-verify
@@ -45,7 +51,7 @@
                         :ns "default"}]}
    :web [:unifn.routing/dispatch
          :unifn.formats/response]
-   :bootstrap [::e/env]
+   :bootstrap [::e/env ::configure]
    :config {:web {:port 8888}}})
 
 

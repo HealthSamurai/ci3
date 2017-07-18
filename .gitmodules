@@ -1,0 +1,6 @@
+[submodule "ci3-public"]
+	path = ci3-public
+	url = https://Aitem@bitbucket.org/Aitem/ci3-public.git
+[submodule "ci3-github-public"]
+	path = ci3-github-public
+	url = https://github.com/Aitem/ci3-github-public.git

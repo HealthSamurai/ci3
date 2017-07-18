@@ -28,5 +28,6 @@
 
                  [matcho "0.1.0-RC5"]]
   :uberjar-name "ci3.jar"
+  :resource-paths ["resources"]
   :main ci3.core
   :profiles {:uberjar {:aot :all :omit-source true}})

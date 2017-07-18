@@ -12,9 +12,10 @@
   (log/info "No handler for repo " repo))
 
 (defmulti mk-build
-  (fn [arg]
-    ;; some rule
-    :bitbucket))
+  (fn [{repository :ci3.repo.core/repository :as arg}]
+    (println repository)
+    (or (keyword (:type repository)) :github)))
 
 (comment
+  (ns-unmap *ns* 'mk-build)
   (ns-unmap *ns* 'init))

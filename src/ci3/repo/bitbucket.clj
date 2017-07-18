@@ -119,38 +119,25 @@
     ::update-repo]
    {:env env :repository repo}))
 
-(defn build-resource [{{payload :body :as req} :request
-                       build-name ::build-name
-                       repository  :ci3.repo.core/repository}]
-  (let [payload (json/parse-string payload keyword)
-        commit (last (:commits payload))
-        hashcommit (get-in payload [:push :changes 0 :commits 0 :hash])
-        diff (get-in payload [:push :changes 0 :links :html :href])]
-    {:kind "Build"
-     :apiVersion "ci3.io/v1"
-     :metadata {:name  build-name}
-     :hashcommit hashcommit
-     :repository (get-in repository [:metadata :name])
-     :diff diff
-     :commit (select-keys commit
-                          [:id :message :timestamp
-                           :url :author ]) }))
-
-(defmethod u/*fn
-  ::mk-build-name
-  [{repo :ci3.repo.core/repository}]
-  {::build-name (str (get-in repo [:metadata :name]) "-"
-                     (System/currentTimeMillis))})
 (defmethod u/*fn
   ::mk-build-resource
-  [arg]
-  {::build (build-resource arg)})
-
-(defmethod u/*fn
-  ::create-build
-  [{build ::build}]
+  [{{payload :body :as req} :request
+    build-name ::build-name
+    repository  :ci3.repo.core/repository}]
   {:ci3.repo.core/build
-   (clojure.walk/keywordize-keys (k8s/create k8s/cfg :builds build))})
+   (let [payload (json/parse-string payload keyword)
+         commit (last (:commits payload))
+         hashcommit (get-in payload [:push :changes 0 :commits 0 :hash])
+         diff (get-in payload [:push :changes 0 :links :html :href])]
+     {:kind "Build"
+      :apiVersion "ci3.io/v1"
+      :metadata {:name  build-name}
+      :hashcommit hashcommit
+      :repository (get-in repository [:metadata :name])
+      :diff diff
+      :commit (select-keys commit
+                           [:id :message :timestamp
+                            :url :author ]) })})
 
 (defmethod u/*fn
   ::verify
@@ -159,7 +146,7 @@
   ;; 104.192.143.0/24 34.198.203.127 34.198.178.64 34.198.32.85
   (let [payload (json/parse-string body keyword )]
     (if-not (= (str/lower-case (:fullName repo))
-               (get-in payload [:repository :full_name]))
+               (str/lower-case (or (get-in payload [:repository :full_name]) "")))
       {::u/status :error
        ::u/message (str "Invalid payload")})))
 
@@ -168,9 +155,7 @@
   [arg]
   (u/*apply
    [::verify
-    ::mk-build-name
-    ::mk-build-resource
-    ::create-build]
+    ::mk-build-resource]
    arg))
 
 (comment

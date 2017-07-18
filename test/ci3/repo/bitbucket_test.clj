@@ -7,7 +7,7 @@
             [clojure.string :as str]))
 
 
-#_(deftest bitbucket-mock-test
+(deftest bitbucket-mock-test
   (matcho/match
    (u/*apply :bitbucket/slug
              {:repository  {:url "https://bitbucket.org/healthsamurai/ci3"}})
@@ -21,7 +21,7 @@
 
 )
 
-#_(deftest bitbucket-test
+(deftest bitbucket-test
 
   (matcho/match
    (u/*apply :bitbucket/access-token-request
@@ -47,9 +47,6 @@
 
 
    )
-
-
-
 
 
   )
