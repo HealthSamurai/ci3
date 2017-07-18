@@ -9,7 +9,7 @@
 (def bid "test-build")
 (def hashcommit "2242735bf839c149c48d4d73f3af434bb0bf0806")
 
-(defn build-fixture [f]
+#_(defn build-fixture [f]
   (k8s/create k8s/cfg :builds
               {:apiVersion "ci3.io/v1"
                :kind "Build"
