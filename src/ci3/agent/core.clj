@@ -204,7 +204,7 @@
       ::repository ))
 
 (defn exec  [& args]
-  (run)
+  (run {:k8s k8s/cfg})
   (System/exit 0))
 
 
