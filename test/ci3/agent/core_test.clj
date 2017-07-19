@@ -1,6 +1,10 @@
 (ns ci3.agent.core-test
-  (:require [unifn.core :as u]
-            [clojure.test :refer :all]))
+  (:require
+   [ci3.agent.core :as sut]
+   [matcho.core :refer [match]]
+   [unifn.core :as u]
+   [ci3.k8s :as k8s]
+   [clojure.test :refer :all]))
 
 (def bid "build-112233")
 (def bid-src "build-223344")
@@ -42,7 +46,6 @@
                :root "src"
                :type "bitbucket"
                :fullName "Aitem/ci3-public"
-               
                :url "https://bitbucket.org/Aitem/ci3-public"})
 
   ;; github
@@ -81,7 +84,7 @@
              :env {:build-id bid :BUILD_ID bid}})
    {::sut/build  {:metadata {:name bid}
                   :repository rid}
-    ::ci3.repo.core/repository {:metadata {:name rid}}
+    :ci3.repo.core/repository {:metadata {:name rid}}
     :checkout   hashcommit
     ::sut/build-config {:description "build in root"}})
 
@@ -90,7 +93,7 @@
              :env {:build-id bid-src :BUILD_ID bid-src}})
    {::sut/build  {:metadata {:name bid-src}
                   :repository rid-src}
-    ::ci3.repo.core/repository {:metadata {:name rid-src}}
+    :ci3.repo.core/repository {:metadata {:name rid-src}}
     :checkout   hashcommit
     ::sut/build-config {:description "build in src"}})
 
@@ -99,7 +102,7 @@
              :env {:build-id ghbid :BUILD_ID ghbid}})
    {::sut/build  {:metadata {:name ghbid}
                   :repository ghrid}
-    ::ci3.repo.core/repository {:metadata {:name ghrid}}
+    :ci3.repo.core/repository {:metadata {:name ghrid}}
     :checkout   github-hashcommit
     ::sut/build-config {:description "build in src"}})
 
