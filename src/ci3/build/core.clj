@@ -46,7 +46,9 @@
                              :spec (pod-spec build)})]
         (if (= "Failure" (get pod "status"))
           (do
-            (log/error pod)
+            (log/error "Cfg:" cfg)
+            (log/error "Pod:" pod)
+            (log/error "Pod spec: " (pod-spec build))
             {::u/status :error
              ::u/message pod})
           (do
