@@ -34,13 +34,21 @@
 (defmethod u/*fn
   ::build
   [{env :env cfg :k8s {{{nm :name} :metadata :as build}  :object tp :type } :resource}]
-  (when (= tp "ADDED")
-    (log/info "Create build pod #" nm)
-    (let [pod (k8s/create cfg :pods
-                          {:apiVersion "v1"
-                           :kind "Pod"
-                           :metadata {:name (str "build-" nm)
-                                      :annotations {:system "ci3"}
-                                      :lables {:system "ci3"}}
-                           :spec (pod-spec build)})]
-      {::pod pod})))
+  (let [cfg (or cfg (def cfg {:prefix "api" :apiVersion "v1" :ns "default"}))]
+    (when (= tp "ADDED")
+      (log/info "Create build pod #" nm)
+      (let [pod (k8s/create cfg :pods
+                            {:apiVersion "v1"
+                             :kind "Pod"
+                             :metadata {:name (str "build-" nm)
+                                        :annotations {:system "ci3"}
+                                        :lables {:system "ci3"}}
+                             :spec (pod-spec build)})]
+        (if (= "Failure" (get pod "status"))
+          (do
+            (log/error pod)
+            {::u/status :error
+             ::u/message pod})
+          (do
+            (log/info "Build pod created: " (get-in pod ["metadata" "name"]))
+            {::pod pod}))))))

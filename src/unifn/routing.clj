@@ -16,7 +16,7 @@
   ::dispatch
   [{{routes :routes} :cache {uri :uri meth :request-method} :request :as arg}]
   (if-let [route (route-map/match [meth uri] routes )]
-    (do (log/info "Matched route" (:match route))
+    (do #_(log/info "Matched route" (:match route))
         (u/*apply (:match route) (u/deep-merge arg {:request {:route-params (:params route)}})))
     {:response {:status 404 :body {:message (str meth " " uri " not found in")}}}))
 
