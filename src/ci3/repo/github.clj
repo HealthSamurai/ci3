@@ -37,7 +37,7 @@
 (defmethod u/*fn
   ::mk-build-resource
   [{{payload :body :as req} :request
-    build-name ::build-name
+    build-name :ci3.repo.core/build-name
     repository  :ci3.repo.core/repository}]
   {:ci3.repo.core/build
    (let [payload (json/parse-string payload keyword)
