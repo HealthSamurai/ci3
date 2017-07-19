@@ -80,11 +80,10 @@
   (println "STEP:" (:type step) (pr-str step))
   (println "------------------------------")
   (println root (::workspace env))
-  (log/info root (::workspace env))
   (let [start (System/nanoTime)
         dir (if (re-find #"^/" (or dir ""))
-              (str root "/" dir)
-              dir)
+              dir
+              (str root "/" dir))
         result (sh/with-sh-env (or (:env env) {})
                    (sh/with-sh-dir dir (execute step env)))]
     (println "------------------------------")

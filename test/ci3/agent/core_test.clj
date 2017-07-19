@@ -14,7 +14,7 @@
 (def ghbid "build-github")
 (def ghrid "ci3githubpublic")
 
-(def hashcommit "0b9429c4b4f520457c3b80347d1bca4b3d79c1c6")
+(def hashcommit "d6d601b11a5f99d213b063fea702ecfeae03e888")
 (def github-hashcommit "553e3564848da9d2621c1d28e2f1fda0fa9ce6d8")
 (def cfg {:apiVersion "ci3.io/v1" :ns "test"})
 
