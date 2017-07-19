@@ -34,7 +34,7 @@
 (defmethod u/*fn
   ::build
   [{env :env cfg :k8s {{{nm :name} :metadata :as build}  :object tp :type } :resource}]
-  (let [cfg (or cfg (def cfg {:prefix "api" :apiVersion "v1" :ns "default"}))]
+  (let [cfg {:prefix "api" :apiVersion "v1" :ns "default"}]
     (when (= tp "ADDED")
       (log/info "Create build pod #" nm)
       (let [pod (k8s/create cfg :pods

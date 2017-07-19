@@ -21,7 +21,7 @@
 (defmethod u/*fn
   ::configure
   [arg]
-  {:k8s {:prefix "api" :apiVersion "v1" :ns "default"}})
+  {:k8s k8s/cfg})
 
 (defmethod u/*fn
   ::webhook-verify
