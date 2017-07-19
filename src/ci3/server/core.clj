@@ -21,7 +21,7 @@
 (defmethod u/*fn
   ::configure
   [arg]
-  :k8s k8s/cfg)
+  {:k8s k8s/cfg})
 
 (defmethod u/*fn
   ::webhook-verify

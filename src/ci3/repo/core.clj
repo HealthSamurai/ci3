@@ -51,14 +51,11 @@
   {:ci3.repo.core/build
    (clojure.walk/keywordize-keys (k8s/create cfg :builds build))})
 
-(defmethod u/*fn ::init [arg] {:k8s k8s/cfg})
-
 (defmethod u/*fn
   ::webhook
   [arg]
   (u/*apply
-   [::init
-    ::e/env
+   [::e/env
     ::load-repo
     ::mk-build-name
     ::mk-build

@@ -1,7 +1,8 @@
 (ns ci3.build.core
   (:require [unifn.core :as u]
             [clojure.string :as str]
-            [ci3.k8s :as k8s]))
+            [ci3.k8s :as k8s]
+            [clojure.tools.logging :as log]))
 
 (defn pod-spec [res]
   {:restartPolicy "Never"
@@ -34,7 +35,7 @@
   ::build
   [{env :env cfg :k8s {{{nm :name} :metadata :as build}  :object tp :type } :resource}]
   (when (= tp "ADDED")
-    (println "Start building #" nm)
+    (log/info "Create build pod #" nm)
     (let [pod (k8s/create cfg :pods
                           {:apiVersion "v1"
                            :kind "Pod"
