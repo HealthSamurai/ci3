@@ -5,7 +5,8 @@
             [ci3.repo.github :as github]
             [ci3.k8s :as k8s]
             [unifn.core :as u]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [unifn.env :as e]))
 
 (defmethod u/*fn
   ::load-repo
@@ -50,11 +51,15 @@
   {:ci3.repo.core/build
    (clojure.walk/keywordize-keys (k8s/create cfg :builds build))})
 
+(defmethod u/*fn ::init [arg] {:k8s k8s/cfg})
+
 (defmethod u/*fn
   ::webhook
   [arg]
   (u/*apply
-   [::load-repo
+   [::init
+    ::e/env
+    ::load-repo
     ::mk-build-name
     ::mk-build
     ::create-build
