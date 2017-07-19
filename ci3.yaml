@@ -10,6 +10,10 @@ environment:
     command:
       git rev-parse --short HEAD
 pipeline:
+- type: bash
+  command: pwd
+- type: bash
+  command: ls
 - type: env
   DOCKER_REPO: eu.gcr.io/vivid-kite-171620/ci3
   GIT_COMMIT: 
