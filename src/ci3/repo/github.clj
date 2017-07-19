@@ -62,7 +62,25 @@
     ::mk-build-resource]
    arg))
 
-
+(defmethod interf/checkout-project
+  :github
+  [{env :env workspace :ci3.agent.core/workspace
+    build :ci3.agent.core/build repo :ci3.repo.core/repository}]
+  (log/info "Clone repo" (:url repo) )
+  (sh/sh "rm" "-rf" workspace)
+  (let [token (get-in repo [:oauthConsumer :token])
+        full-name (:fullName repo)
+        url (str "https://" token "@github.com/" full-name ".git")
+        {err :err exit :exit :as res} (sh/sh "git" "clone" url workspace)]
+    (if (= 0 exit)
+      (let [{err :err exit :exit :as res}
+            (sh/sh "git" "reset" "--hard" (:hashcommit build) :dir workspace)]
+        (if-not (= 0 exit)
+          {::u/status :error
+           ::u/message err}
+          {:checkout (:hashcommit build)}))
+      {::u/status :error
+       ::u/message err})))
 
 
 
@@ -80,14 +98,6 @@
          (= signature hash))
       (json/parse-string payload keyword)
       nil)))
-
-(defn checkout-project []
-  (when-let [full_name (System/getenv "REPOSITORY")]
-    (let [token (k8s/secret "secrets" :github_token)
-          repo (str "https://" token "@github.com/" full_name ".git")
-          res (sh/sh "git" "clone" repo "/workspace")]
-      (println res)
-      res)))
 
 
 (defn create-webhook [access-token repo]
