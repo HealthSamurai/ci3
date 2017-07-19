@@ -4,14 +4,16 @@
             [ci3.repo.bitbucket :as bitbucket]
             [ci3.repo.github :as github]
             [ci3.k8s :as k8s]
-            [unifn.core :as u]))
+            [unifn.core :as u]
+            [clojure.tools.logging :as log]))
 
 (defmethod u/*fn
   ::load-repo
   [{cfg :k8s :as arg}]
+  (log/info "CONFIG" cfg)
   (let [repo-id (get-in arg [:request :route-params :id])
         repo (k8s/find cfg :repositories repo-id)]
-    (println repo)
+    (log/info repo)
     (if (or (nil? repo)
             (= "Failure" (:status repo)))
       {::u/status :error
@@ -22,6 +24,7 @@
   ::catch-errors
   [{error ::u/message}]
   (when error
+    (log/error error)
     {:response {:status 400
                 :body error}}))
 (defmethod u/*fn
