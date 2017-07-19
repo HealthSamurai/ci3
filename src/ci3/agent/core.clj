@@ -110,9 +110,9 @@
 
 (defmethod u/*fn
   ::run-build
-  [{e :env build-config ::build-config}]
+  [{e :env build-config ::build-config :as arg}]
   (let [start (System/nanoTime)]
-    {::result (loop [env {:build build-config :env e}
+    {::result (loop [env (merge arg {:build build-config :env e})
                      [st & sts] (:pipeline build-config)]
                 (if st
                   (let [res (do-step st env)]
