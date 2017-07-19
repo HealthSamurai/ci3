@@ -79,6 +79,7 @@
   (println "==============================")
   (println "STEP:" (:type step) (pr-str step))
   (println "------------------------------")
+  (log/info root (::workspace env))
   (let [start (System/nanoTime)
         dir (if (re-find #"^/" (or dir ""))
               (str root "/" dir)
