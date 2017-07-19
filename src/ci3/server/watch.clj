@@ -126,7 +126,7 @@
               (start))
           (doseq [[rt {req :request :as opts}] (:requests @state)]
             (cond (realized? (:error req))
-                  (do (println "ERRORED:" opts)
+                  (do #_(println "ERRORED:" opts)
                       (#'do-watch env client (dissoc opts :request)))
                   (realized? (:done req))
                   (do (println "DONE:" opts)
