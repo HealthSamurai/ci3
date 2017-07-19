@@ -159,13 +159,13 @@
     ::mk-build-resource]
    arg))
 
-(def workspace "/workspace/repo")
 
 (defmethod interf/checkout-project
   :bitbucket
-  [{env :env build :ci3.agent.core/build repo :ci3.repo.core/repository}]
+  [{env :env workspace :ci3.agent.core/workspace
+    build :ci3.agent.core/build repo :ci3.repo.core/repository}]
   (log/info "Clone repo" (:url repo) )
-  (sh/sh "rm" "-rf" "/workspace/repo")
+  (sh/sh "rm" "-rf" workspace)
   (let [{err :err exit :exit :as res} (sh/sh "git" "clone" (:url repo) workspace)]
     (if (= 0 exit)
       (let [{err :err exit :exit :as res}
@@ -190,6 +190,4 @@
    {:repository  (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3"))})
 
   (k8s/find k8s/cfg :repositories "ci3")
-  (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3"))
-
-  )
+  (k8s/resolve-secrets (k8s/find k8s/cfg :repositories "ci3")))

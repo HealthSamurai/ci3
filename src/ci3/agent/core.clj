@@ -12,6 +12,7 @@
             [clojure.contrib.humanize :as humanize]
             [ci3.agent.cache :as cache]
             [ci3.agent.shelk :as shelk]
+            [clojure.string :as str]
             [ci3.build.core :as build]
             [ci3.repo.interface :as interf]
             [clojure.tools.logging :as log]))
@@ -72,13 +73,16 @@
                          (assoc-in acc [:env k] res))
               :else (assoc-in acc [:env k] v)))
           (assoc env :exit 0) (dissoc step :type)))
+(re-find #"^/" "/")
 
-(defn do-step [{dir :dir :as step} env]
+(defn do-step [{dir :dir :as step} {root ::root-dir :as env}]
   (println "==============================")
   (println "STEP:" (:type step) (pr-str step))
   (println "------------------------------")
   (let [start (System/nanoTime)
-        dir (or dir "/workspace/repo/")
+        dir (if (re-find #"^/" (or dir ""))
+              (str root "/" dir)
+              dir)
         result (sh/with-sh-env (or (:env env) {})
                    (sh/with-sh-dir dir (execute step env)))]
     (println "------------------------------")
@@ -160,15 +164,26 @@
 
 (defmethod u/*fn
   ::get-build-config
-  [arg]
+  [{root ::root-dir}]
   (try
-    (let [build-config (yaml/parse-string (slurp "/workspace/repo/ci3.yaml") true)]
+    (let [build-config (yaml/parse-string (slurp (str root "/ci3.yaml")) true)]
       (if build-config
         {::build-config build-config}
         {::u/status :error
          ::u/message (str "Wrong or empty config" build-config)}))
     (catch Exception e {::u/status :error
-                        ::u/message "File ci3.yaml not found"})))
+                        ::u/message (str "File " (str root "/ci3.yaml") " not found")})))
+
+(defmethod u/*fn
+  ::workspace
+  [{repo :ci3.repo.core/repository}]
+  (let [workspace (str "/workspace/" (get-in repo [:metadata :name]))
+        root (or (:root repo) "")
+        root (-> root
+                 (str/replace  #"^/" "")
+                 (str/replace  #"/$" ""))]
+    {::workspace workspace
+     ::root-dir  (str workspace "/" root)}))
 
 (defn run [& [arg]]
   (log/info "Run agent")
@@ -176,6 +191,7 @@
    [::e/env
     ::get-build
     ::get-repository
+    ::workspace
     ::checkout-project
     ::get-build-config
     ::e/raw-env
