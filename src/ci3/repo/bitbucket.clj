@@ -3,6 +3,7 @@
             [ci3.repo.interface :as interf]
             [clojure.tools.logging :as log]
             [org.httpkit.client :as http]
+            [clojure.java.shell :as sh]
             [unifn.core :as u]
             [unifn.env :as e]
             [clojure.walk]
@@ -33,16 +34,16 @@
 
 (defmethod u/*fn
   ::hook-url
-  [{{host :hostname} :env {{nm :name} :metadata} :repository}] (println host)
+  [{{host :hostname} :env {{nm :name} :metadata} :repository}]
   {:hook-url (str host "/webhook/" (name nm))})
 
 (defmethod u/*fn
   ::not-initialized?
   [{{{status :status} :webhook} :repository}]
   (when (= "installed" status)
-    (println "Already installed")
+    (log/info "Already installed")
     {::u/status :stop
-     ::u/message "already installed"}))
+     ::u/message "Already installed"}))
 
 (defmethod u/*fn
   ::access-token-request
@@ -75,7 +76,7 @@
   [{hook-url :hook-url
    {access-token :access_token} :tokens
    {slug :slug {name :name} :metadata} :repository}]
-  (println "Add hook")
+  (log/info "Add hook")
   {:fx {:http {:oauth-token access-token
                :url (str bb-api slug "/hooks")
                :method :post
@@ -157,6 +158,24 @@
    [::verify
     ::mk-build-resource]
    arg))
+
+(def workspace "/workspace/repo")
+
+(defmethod interf/checkout-project
+  :bitbucket
+  [{env :env build :ci3.agent.core/build repo :ci3.repo.core/repository}]
+  (log/info "Clone repo" (:url repo) )
+  (sh/sh "rm" "-rf" "/workspace/repo")
+  (let [{err :err exit :exit :as res} (sh/sh "git" "clone" (:url repo) workspace)]
+    (if (= 0 exit)
+      (let [{err :err exit :exit :as res}
+            (sh/sh "git" "reset" "--hard" (:hashcommit build) :dir workspace)]
+        (if-not (= 0 exit)
+          {::u/status :error
+           ::u/message err}
+          {:checkout (:hashcommit build)}))
+      {::u/status :error
+       ::u/message err})))
 
 (comment
   (u/*apply

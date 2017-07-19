@@ -4,16 +4,17 @@
             [ci3.gcp.gcloud :as gcloud]
             [clj-yaml.core :as yaml]
             [clojure.walk :as walk]
+            [clojure.spec.alpha :as s]
             [unifn.core :as u]
             [unifn.env :as e]
             [cheshire.core :as json]
-            [clojure.pprint :as pprint]
             [clojure.string :as str]
             [clojure.contrib.humanize :as humanize]
             [ci3.agent.cache :as cache]
             [ci3.agent.shelk :as shelk]
-            [unifn.env :as e]
-            [ci3.build.core :as build]))
+            [ci3.build.core :as build]
+            [ci3.repo.interface :as interf]
+            [clojure.tools.logging :as log]))
 
 (defmulti execute
   (fn [st env] (when-let [tp (:type st)] (keyword tp))))
@@ -118,59 +119,59 @@
                     #_(success build))))}))
 
 (defmethod u/*fn
- ::checkout-project
- [{env :env build ::build repo ::repository}]
-  (println "Clone repo" (:url repo))
-  (sh/sh "rm" "-rf" "/workspace/repo")
-  (let [{err :err exit :exit :as res} (sh/sh "git" "clone" (:url repo) "/workspace/repo")]
-    (if (= 0 exit)
-      (let [{err :err exit :exit :as res}
-            (sh/sh "git" "reset" "--hard" (:hashcommit build) :dir "/workspace/repo")]
-        (if-not (= 0 exit)
-          {::u/status :error
-           ::u/message err}
-          {::checkout (:hashcommit build)}))
-      {::u/status :error
-       ::u/message err})))
+  ::checkout-project
+  [arg]
+  (interf/checkout-project arg))
 
+(s/def ::build-id  string?)
+(s/def ::env       (s/keys :req-un [::build-id]))
+(s/def ::get-build (s/keys :req-un [::env]))
 (defmethod u/*fn
   ::get-build
-  [{{bid :build-id} :env}]
-  (when bid
-    (when-let [bld (k8s/find k8s/cfg :builds (str/trim bid))]
-      (when-not (or bld (= "Failure" (get bld :status)))
-        (throw (Exception. (str "Could not find build: " bid " or " bld))))
-      (println "Got build: " (get-in bld [:metadata :name]))
+  [{cfg :k8s {bid :build-id} :env}]
+  (log/info "Get build: " bid)
+  (let [bld (k8s/find cfg :builds (str/trim bid))]
+    (if (= "Failure" (get bld :status))
+      {::u/status :error
+       ::u/message (str "Could not find build: " bid " - " bld)}
       {::build (walk/keywordize-keys bld)})))
 
+
+(s/def ::repository string?)
+(s/def ::build      (s/keys :req-un [::repository]))
+(s/def ::get-repository (s/keys :req [::build]))
 (defmethod u/*fn
   ::get-repository
-  [{build ::build}]
-   (when-let [rid (:repository build)]
-    (when-let [bld (k8s/find k8s/cfg :repositories (str/trim rid))]
-      (when-not (or bld (= "Failure" (get bld :status)))
-        (throw (Exception. (str "Could not find repo: " rid " or " bld))))
-      (println "Got repo: " (get-in bld [:metadata :name]))
-      {::repository (walk/keywordize-keys bld)})))
+  [{cfg :k8s {rid :repository} ::build}]
+  (log/info "Get repo: " rid)
+  (let [repo (k8s/find cfg :repositories (str/trim rid))]
+    (if (= "Failure" (get repo :status))
+      {::u/status :error
+       ::u/message (str "Could not find repository: " rid " - " repo)}
+      {:ci3.repo.core/repository (walk/keywordize-keys repo)})))
 
 (defmethod u/*fn
   ::catch-errors
   [{error ::u/message}]
   (when error
-    (println "Error:" error)
+    (log/error error)
     {:response {:status 400
                 :body error}}))
 
 (defmethod u/*fn
   ::get-build-config
   [arg]
-  (let [build-config (yaml/parse-string (slurp "/workspace/repo/ci3.yaml") true)]
-    (if build-config
-      {::build-config build-config}
-      {::u/status :error
-       ::u/message (str "Wrong config" build-config)})))
+  (try
+    (let [build-config (yaml/parse-string (slurp "/workspace/repo/ci3.yaml") true)]
+      (if build-config
+        {::build-config build-config}
+        {::u/status :error
+         ::u/message (str "Wrong or empty config" build-config)}))
+    (catch Exception e {::u/status :error
+                        ::u/message "File ci3.yaml not found"})))
 
 (defn run [& [arg]]
+  (log/info "Run agent")
   (u/*apply
    [::e/env
     ::get-build

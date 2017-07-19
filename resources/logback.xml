@@ -1,0 +1,23 @@
+<configuration debug="false">
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} [%logger{36}] %-5level: %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- <appender name="FILE" class="ch.qos.logback.core.FileAppender"> -->
+  <!--   <file>app.log</file> -->
+  <!--   <append>true</append> -->
+  <!--   <encoder> -->
+  <!--     <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern> -->
+  <!--   </encoder> -->
+  <!-- </appender> -->
+
+  <logger name="com.zaxxer.hikari" level="INFO" />
+
+  <root level="INFO">
+    <!-- <appender-ref ref="FILE"/> -->
+    <appender-ref ref="STDOUT"/>
+  </root>
+</configuration>
