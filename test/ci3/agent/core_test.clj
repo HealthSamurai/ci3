@@ -109,8 +109,9 @@
     ::sut/build-config {:description "build in root"}})
 
   (match
-   (run {:k8s cfg
-             :env {:build-id bid-src :BUILD_ID bid-src}})
+   (run (arg
+         {:k8s cfg
+          :env {:build-id bid-src :BUILD_ID bid-src}}))
    {::sut/build  {:metadata {:name bid-src}
                   :repository rid-src}
     :ci3.repo.core/repository {:metadata {:name rid-src}}
@@ -118,8 +119,9 @@
     ::sut/build-config {:description "build in src"}})
 
   (match
-   (run {:k8s cfg
-             :env {:build-id ghbid :BUILD_ID ghbid}})
+   (run (arg
+         {:k8s cfg
+          :env {:build-id ghbid :BUILD_ID ghbid}}))
    {::sut/build  {:metadata {:name ghbid}
                   :repository ghrid}
     :ci3.repo.core/repository {:metadata {:name ghrid}}
