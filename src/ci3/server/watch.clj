@@ -97,7 +97,7 @@
         q (if v (assoc-in q [:query :resourceVersion] v) q)
         on-change (mk-on-change env opts #(do-watch env client opts))]
     #_(println "Start Watch " opts " from " v)
-    (println "Start Watch ")
+    #_(println "Start Watch ")
     (->> (http/request-stream client :get (:url q) on-change
                               :headers {"Authorization" (str "Bearer " (:kube-token env))}
                               :insecure? true
