@@ -58,7 +58,7 @@
     (let [[json-str rest-msg] (str/split s #"\n" 2)]
       (try (*parse-json-stream (conj acc (json/parse-string json-str keyword)) rest-msg)
            (catch com.fasterxml.jackson.core.JsonParseException e
-             (println "JSON ERROR WHILE PARSE" s)
+             #_(println "JSON ERROR WHILE PARSE" s)
              [s acc])))
     [s acc]))
 
@@ -77,11 +77,11 @@
       (update-version (:resource opts) (get-in res [:object :metadata :resourceVersion]))
       ;; sometimes version is compacted :(
       (if (and (= "ERROR" (:type res)) (= "Expired" (get-in res [:object :reason])))
-        (do (println "OUTDATE version:" res)
+        (do #_(println "OUTDATE version:" res)
             (reset-version (:resource opts))
             (retry))
-        (do (println opts " for v:" (get-in res [:object :metadata :resourceVersion]))
-            (println "->" (:handler opts))
+        (do #_(println opts " for v:" (get-in res [:object :metadata :resourceVersion]))
+            #_(println "->" (:handler opts))
             (u/*apply (:handler opts) {:env env :resource (k8s/resolve-secrets res)}))))
     [body :continue]))
 
@@ -96,7 +96,8 @@
         q (build-watch-query env opts)
         q (if v (assoc-in q [:query :resourceVersion] v) q)
         on-change (mk-on-change env opts #(do-watch env client opts))]
-    (println "Watch " opts " from " v)
+    #_(println "Start Watch " opts " from " v)
+    (println "Start Watch ")
     (->> (http/request-stream client :get (:url q) on-change
                               :headers {"Authorization" (str "Bearer " (:kube-token env))}
                               :insecure? true
@@ -129,7 +130,7 @@
                   (do #_(println "ERRORED:" opts)
                       (#'do-watch env client (dissoc opts :request)))
                   (realized? (:done req))
-                  (do (println "DONE:" opts)
+                  (do #_(println "DONE:" opts)
                       (#'do-watch env client (dissoc opts :request))))))
         (Thread/sleep 10000)))
     (println "Stopping supervisor")
