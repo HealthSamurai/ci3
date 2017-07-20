@@ -3,7 +3,9 @@
    [ci3.agent.core :as sut]
    [matcho.core :refer [match]]
    [unifn.core :as u]
+   [unifn.env :as e]
    [ci3.k8s :as k8s]
+   [clojure.tools.logging :as log]
    [clojure.test :refer :all]))
 
 (def bid "build-112233")
@@ -78,10 +80,28 @@
 
 (use-fixtures :once agent-fixture)
 
+
+(defn run [& [arg]]
+  (log/info "Run agent")
+  (u/*apply
+   [::sut/get-build
+    ::sut/get-repository
+    ::sut/workspace
+    ::sut/checkout-project
+    ::sut/get-build-config
+    ::sut/run-build
+    ::sut/catch-errors {::u/intercept :all}]
+   arg))
+
+
+(defn arg [a]
+  (merge-with merge (u/*apply [::e/env ::e/raw-env] {}) a))
+
 (deftest agent-get-build
   (match
-   (sut/run {:k8s cfg
-             :env {:build-id bid :BUILD_ID bid}})
+   (run (arg
+         {:k8s cfg
+          :env {:build-id bid :BUILD_ID bid}}))
    {::sut/build  {:metadata {:name bid}
                   :repository rid}
     :ci3.repo.core/repository {:metadata {:name rid}}
@@ -89,7 +109,7 @@
     ::sut/build-config {:description "build in root"}})
 
   (match
-   (sut/run {:k8s cfg
+   (run {:k8s cfg
              :env {:build-id bid-src :BUILD_ID bid-src}})
    {::sut/build  {:metadata {:name bid-src}
                   :repository rid-src}
@@ -98,7 +118,7 @@
     ::sut/build-config {:description "build in src"}})
 
   (match
-   (sut/run {:k8s cfg
+   (run {:k8s cfg
              :env {:build-id ghbid :BUILD_ID ghbid}})
    {::sut/build  {:metadata {:name ghbid}
                   :repository ghrid}
