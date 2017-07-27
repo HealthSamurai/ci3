@@ -9,7 +9,6 @@
             [clojure.java.io :as io]))
 
 (defn build-id [] (System/getenv "BUILD_ID"))
-(defn root "/workspace")
 
 (defn get-build [bid]
   (when bid
