@@ -24,12 +24,10 @@
                                    :volumes
                                    [{:name "docker-sock"
                                      :hostPath {:path "/var/run/docker.sock"}}
-                                    {:name "account"
-                                     :secret {:secretName "boto"
-                                              :items [{:key "account" :path "account.json"}]} }
                                     {:name "gsutil"
                                      :secret {:secretName "boto"
-                                              :items [{:key "boto" :path ".boto"}]}}]
+                                              :items [{:key "boto" :path ".boto"}
+                                                      {:key "account" :path "account.json"}]} }]
                                    :containers
                                    [{:name "agent"
                                      :image "eu.gcr.io/aidbox-next/ci3:latest"
@@ -38,8 +36,6 @@
                                      :volumeMounts
                                      [{:name "docker-sock"
                                        :mountPath "/var/run/docker.sock"}
-                                      {:name "account"
-                                       :mountPath "/tmp"}
                                       {:name "gsutil"
                                        :mountPath "/gsutil"
                                        :readOnly true}]
