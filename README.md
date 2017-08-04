@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/HealthSamurai/ci3.png?label=ready&title=Ready)](https://waffle.io/HealthSamurai/ci3?utm_source=badge)
 # ci3
 
 A minimaliztic ci for k8s
