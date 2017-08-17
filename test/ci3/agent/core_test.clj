@@ -24,12 +24,14 @@
   (k8s/create cfg :builds
               {:apiVersion "ci3.io/v1"
                :kind "Build"
+               :test true
                :metadata {:name bid}
                :hashcommit hashcommit
                :repository rid})
   (k8s/create cfg :repositories
               {:apiVersion "ci3.io/v1"
                :kind "Repository"
+               :test true
                :metadata {:name rid}
                :type "bitbucket"
                :fullName "Aitem/ci3-public"
@@ -38,6 +40,7 @@
   (k8s/create cfg :builds
               {:apiVersion "ci3.io/v1"
                :kind "Build"
+               :test true
                :metadata {:name bid-src}
                :hashcommit hashcommit
                :repository rid-src})
@@ -54,6 +57,7 @@
   (k8s/create cfg :builds
               {:apiVersion "ci3.io/v1"
                :kind "Build"
+               :test true
                :metadata {:name ghbid}
                :hashcommit github-hashcommit
                :repository ghrid})
@@ -103,6 +107,7 @@
          {:k8s cfg
           :env {:build-id bid :BUILD_ID bid}}))
    {::sut/build  {:metadata {:name bid}
+                  :test true
                   :repository rid}
     :ci3.repo.core/repository {:metadata {:name rid}}
     :checkout   hashcommit

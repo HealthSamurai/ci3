@@ -31,11 +31,11 @@
     (String. (.decode (Base64/getDecoder) s))
     nil))
 
-(defn secret [name key]
+(defn secret [nm key]
   (let [cfg {:apiVersion "v1" :ns "default"}]
     (->
      @(http-client/get
-       (str kube-url  "/api/v1/namespaces/default/secrets/" name)
+       (str kube-url  "/api/v1/namespaces/default/secrets/" (name nm))
        {:insecure? true
         :headers (merge default-headers {"Content-Type" "application/json-patch+json"})})
      :body (json/parse-string keyword)

@@ -101,13 +101,15 @@
 
 (def base-url (or (environ/env :base-url) "http://cleo-ci.health-samurai.io/"))
 (defn error [build]
-  (telegram/notify (str "Error build " base-url "builds/" (get-in build [:metadata :name])))
+  (when-not (:test build)
+    (telegram/notify (str "Error build " base-url "builds/" (get-in build [:metadata :name]))))
   (update-status (assoc build :status "error")))
 
 (defn success [build]
-  (telegram/notify (str "Success build " base-url "builds/" (get-in build [:metadata :name])))
+  (println build)
+  (when-not (:test build)
+    (telegram/notify (str "Success build " base-url "builds/" (get-in build [:metadata :name]))))
   (update-status (assoc build :status "success")))
-
 
 (defmethod u/*fn
   ::run-build
