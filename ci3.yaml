@@ -1,10 +1,5 @@
 apiVersion: "ci3.io/v1"
 kind: Build
-metadata:
-  name: build-2
-  label:
-    system: ci
-status: peinding
 environment:
   GIT_COMMIT:
     command:
