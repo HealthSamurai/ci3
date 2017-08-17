@@ -18,13 +18,7 @@
                :metadata {:name bb_rid}
                :type "bitbucket"
                :fullName "Aitem/ci3-public"
-               :url "https://bitbucket.org/Aitem/ci3-public"
-               ;;:oauthConsumer
-               #_{:key
-                {:valueFrom {:secretKeyRef {:name "bitbucket" :key "key"}}}
-                :secret
-                  {:valueFrom {:secretKeyRef {:name "bitbucket" :key "secret"}}}}
-               })
+               :url "https://bitbucket.org/Aitem/ci3-public"})
 
   (k8s/create cfg :repositories
               {:apiVersion "ci3.io/v1"
