@@ -83,9 +83,6 @@
        ::u/message err})))
 
 
-
-
-
 (defn verify
   [{ {id :id} :route-params headers :headers body :body :as req}]
   (let [signature (get headers "x-hub-signature")

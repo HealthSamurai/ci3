@@ -1,5 +1,6 @@
 (ns ci3.agent.core
   (:require [clojure.java.shell :as sh]
+            [ci3.telegram :as telegram]
             [ci3.k8s :as k8s]
             [ci3.gcp.gcloud :as gcloud]
             [clj-yaml.core :as yaml]
@@ -7,6 +8,7 @@
             [clojure.spec.alpha :as s]
             [unifn.core :as u]
             [unifn.env :as e]
+            [environ.core :as environ]
             [cheshire.core :as json]
             [clojure.string :as str]
             [clojure.contrib.humanize :as humanize]
@@ -91,24 +93,25 @@
     result))
 
 (defn update-status [build]
-  (println "TODO")
-  #_(let [gh-status  (gh/set-status build)
+  (let [ ;;gh-status  (gh/set-status build)
         id (get-in build [:metadata :name])]
     (k8s/patch k8s/cfg :builds id
-               {:gh-status gh-status
+               {  ;; :gh-status gh-status
                 :status (:status build) })) )
 
+(def base-url (or (environ/env :base-url) "http://cleo-ci.health-samurai.io/"))
 (defn error [build]
-  (println "ERROR!")
+  (telegram/notify (str "Error build " base-url "builds/" (get-in build [:metadata :name])))
   (update-status (assoc build :status "error")))
 
 (defn success [build]
+  (telegram/notify (str "Success build " base-url "builds/" (get-in build [:metadata :name])))
   (update-status (assoc build :status "success")))
 
 
 (defmethod u/*fn
   ::run-build
-  [{e :env build-config ::build-config :as arg}]
+  [{e :env build-config ::build-config build ::build :as arg}]
   (let [start (System/nanoTime)]
     {::result (loop [env (merge arg {:build build-config :env e})
                      [st & sts] (:pipeline build-config)]
@@ -120,7 +123,7 @@
                   (do
                     (println "==========================================\nDONE in "
                              (humanize/duration (/ (- (System/nanoTime) start) 1000000) {:number-format str}))
-                    #_(success build))))}))
+                    (success build))))}))
 
 (defmethod u/*fn
   ::checkout-project
