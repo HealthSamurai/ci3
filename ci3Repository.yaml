@@ -6,17 +6,8 @@ url: https://bitbucket.org/healthsamurai/ci3
 type: bitbucket
 fullName: HealthSamurai/ci3
 oauthConsumer:
-  key:
+  token:
     valueFrom:
       secretKeyRef:
         name: bitbucket
-        key: key
-  secret:
-    valueFrom:
-      secretKeyRef:
-        name: bitbucket
-        key: secret
-
-
-
-
+        key: token 
