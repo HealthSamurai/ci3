@@ -9,14 +9,17 @@
    [clojure.test :refer :all]))
 
 (def bid "build-112233")
+(def bid-private "build-11223344")
 (def bid-src "build-223344")
 (def rid "ci3public")
 (def rid-src "ci3public-src")
+(def rid-private "ci3private")
 
 (def ghbid "build-github")
 (def ghrid "ci3githubpublic")
 
 (def hashcommit "d6d601b11a5f99d213b063fea702ecfeae03e888")
+(def bb-private-hashcommit "44fed27862a92b2106572e2630491c432807cc73")
 (def github-hashcommit "553e3564848da9d2621c1d28e2f1fda0fa9ce6d8")
 (def cfg {:apiVersion "ci3.io/v1" :ns "test"})
 
@@ -30,12 +33,32 @@
                :repository rid})
   (k8s/create cfg :repositories
               {:apiVersion "ci3.io/v1"
-               :kind "Repository"
-               :test true
-               :metadata {:name rid}
+               :kind "Repository" :test true :metadata {:name rid}
                :type "bitbucket"
                :fullName "Aitem/ci3-public"
                :url "https://bitbucket.org/Aitem/ci3-public"})
+
+
+  ;; BB private
+  (k8s/create cfg :builds
+              {:apiVersion "ci3.io/v1"
+               :kind "Build"
+               :test true
+               :metadata {:name bid-private}
+               :hashcommit bb-private-hashcommit
+               :repository rid-private})
+  (k8s/create cfg :repositories
+              {:apiVersion "ci3.io/v1"
+               :kind "Repository"
+               :test true
+               :metadata {:name rid-private}
+               :type "bitbucket"
+               :fullName "Aitem/private-test"
+               :oauthConsumer
+               {:token
+                {:valueFrom {:secretKeyRef {:name "bitbucket" :key "token"}}}}
+               :url "https://bitbucket.org/Aitem/private-test"})
+
 
   (k8s/create cfg :builds
               {:apiVersion "ci3.io/v1"
@@ -51,6 +74,9 @@
                :root "src"
                :type "bitbucket"
                :fullName "Aitem/ci3-public"
+               :oauthConsumer
+               {:token
+                {:valueFrom {:secretKeyRef {:name "bitbucket" :key "token"}}}}
                :url "https://bitbucket.org/Aitem/ci3-public"})
 
   ;; github
@@ -76,11 +102,12 @@
   (f)
   (k8s/delete cfg :builds bid)
   (k8s/delete cfg :builds bid-src)
+  (k8s/delete cfg :builds bid-private)
   (k8s/delete cfg :builds ghbid)
   (k8s/delete cfg :repositories rid)
+  (k8s/delete cfg :repositories rid-private)
   (k8s/delete cfg :repositories rid-src)
-  (k8s/delete cfg :repositories ghrid)
-  )
+  (k8s/delete cfg :repositories ghrid))
 
 (use-fixtures :once agent-fixture)
 
@@ -133,6 +160,17 @@
     :checkout   github-hashcommit
     ::sut/build-config {:description "build in src"}})
 
+
+  (match
+   (run (arg
+         {:k8s cfg
+          :env {:build-id bid-private :BUILD_ID bid-private}}))
+   {::sut/build  {:metadata {:name bid-private}
+                  :test true
+                  :repository rid-private}
+    :ci3.repo.core/repository {:metadata {:name rid-private}}
+    :checkout   bb-private-hashcommit
+    ::sut/build-config {:description "private repo"}})
 
   )
 

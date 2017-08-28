@@ -166,7 +166,10 @@
     build :ci3.agent.core/build repo :ci3.repo.core/repository}]
   (log/info "Clone repo" (:url repo) )
   (sh/sh "rm" "-rf" workspace)
-  (let [{err :err exit :exit :as res} (sh/sh "git" "clone" (:url repo) workspace)]
+  (let [token (get-in repo [:oauthConsumer :token])
+        full-name (:fullName repo)
+        url (str "https://" token "@bitbucket.org/" full-name ".git")
+        {err :err exit :exit :as res} (sh/sh "git" "clone" url workspace)]
     (if (= 0 exit)
       (let [{err :err exit :exit :as res}
             (sh/sh "git" "reset" "--hard" (:hashcommit build) :dir workspace)]
