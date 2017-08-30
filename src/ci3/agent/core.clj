@@ -99,6 +99,7 @@
 
 (def base-url (or (environ/env :ci3-config-base-url) "http://cleo-ci.health-samurai.io/"))
 (defn error [build]
+  (println build)
   (when-not (:test build)
     (telegram/notify (str "Error build " base-url "builds/" (get-in build [:metadata :name]))))
   (update-status (assoc build :status "failed")))

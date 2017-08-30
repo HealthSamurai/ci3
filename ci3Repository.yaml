@@ -2,12 +2,12 @@ apiVersion: "ci3.io/v1"
 kind: Repository
 metadata:
   name: ci3
-url: https://bitbucket.org/healthsamurai/ci3
-type: bitbucket
+url: https://github.com/HealthSamurai/ci3.git
+type: github
 fullName: HealthSamurai/ci3
 oauthConsumer:
   token:
     valueFrom:
       secretKeyRef:
-        name: bitbucket
+        name: github
         key: token 
