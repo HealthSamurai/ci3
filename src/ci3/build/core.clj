@@ -10,7 +10,7 @@
    [{:name "docker-sock"
      :hostPath {:path "/var/run/docker.sock"}}
     {:name "gsutil"
-     :secret {:secretName "gce"
+     :secret {:secretName "storage"
               :items [{:key "boto" :path ".boto"}
                       {:key "account" :path "account.json"}]}}]
    :containers
