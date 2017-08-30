@@ -93,17 +93,15 @@
     result))
 
 (defn update-status [build]
-  (let [ ;;gh-status  (gh/set-status build)
-        id (get-in build [:metadata :name])]
+  (let [id (get-in build [:metadata :name])]
     (k8s/patch k8s/cfg :builds id
-               {  ;; :gh-status gh-status
-                :status (:status build) })) )
+               {:status (:status build) })) )
 
 (def base-url (or (environ/env :base-url) "http://cleo-ci.health-samurai.io/"))
 (defn error [build]
   (when-not (:test build)
     (telegram/notify (str "Error build " base-url "builds/" (get-in build [:metadata :name]))))
-  (update-status (assoc build :status "error")))
+  (update-status (assoc build :status "failed")))
 
 (defn success [build]
   (println build)
@@ -114,6 +112,7 @@
 (defmethod u/*fn
   ::run-build
   [{e :env build-config ::build-config build ::build :as arg}]
+  (update-status (assoc build :status "process"))
   (let [start (System/nanoTime)]
     {::result (loop [env (merge arg {:build build-config :env e})
                      [st & sts] (:pipeline build-config)]

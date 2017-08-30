@@ -24,10 +24,10 @@
       {:name "gsutil"
        :mountPath "/gsutil"
        :readOnly true}]
-     :envFrom [{:configMapRef
-                {:name "ci3" :prefix "CI3_CONFIG_"}}
-               {:secretRef
-                {:name "ci3" :prefix "CI3_SECRET_"}}]
+     :envFrom [{:configMapRef {:name "ci3"}
+                :prefix "CI3_CONFIG_"}
+               {:secretRef {:name "ci3"}
+                :prefix "CI3_SECRET_"}]
      :env
      [{:name "BUILD_ID" :value (get-in res [:metadata :name])}
       {:name "BOTO_CONFIG" :value "/gsutil/.boto"}
@@ -39,7 +39,7 @@
   ::build
   [{env :env cfg :k8s {{{nm :name} :metadata :as build}  :object tp :type } :resource}]
   (let [cfg {:prefix "api" :apiVersion "v1" :ns "default"}]
-    (when (= tp "ADDED")
+    (when (and (= tp "ADDED") (= "pending" (:status build)))
       (log/info "Create build pod #" nm)
       (let [pod (k8s/create cfg :pods
                             {:apiVersion "v1"

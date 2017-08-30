@@ -21,6 +21,14 @@ spec:
           value: "{{ .Values.cacheBucket }}"
         - name: HOSTNAME
           value: "{{ .Values.hostName }}"
+        envFrom:
+        - configMapRef:
+            name: "ci3"
+          prefix: CI3_CONFIG_
+        - secretRef:
+            name: "ci3"
+          prefix: CI3_SECRET_
+
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         livenessProbe:

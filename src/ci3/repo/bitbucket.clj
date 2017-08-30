@@ -134,6 +134,7 @@
       :apiVersion "ci3.io/v1"
       :metadata {:name  build-name}
       :hashcommit hashcommit
+      :status "pending"
       :repository (get-in repository [:metadata :name])
       :diff diff
       :commit (select-keys commit
