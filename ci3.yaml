@@ -1,18 +1,15 @@
 apiVersion: "ci3.io/v1"
 kind: Build
-environment:
-  GIT_COMMIT:
-    command:
-      git rev-parse --short HEAD
 pipeline:
-- type: bash
-  command: pwd
-- type: bash
-  command: ls
+
 - type: env
-  DOCKER_REPO: eu.gcr.io/vivid-kite-171620/ci3
+  DOCKER_REPO: healthsamurai/ci3
   GIT_COMMIT: 
     command: "git rev-parse --short HEAD"
+
+- type: bash
+  command: docker login --username $CI3_SECRET_DOCKER_USER --password $CI3_SECRET_DOCKER_PASSWORD
+
 - type: maven
   command: restore-cache
   key: ci3
@@ -23,8 +20,6 @@ pipeline:
 - type: maven
   command: save-cache
   key: ci3
-- type: bash
-  command: docker login -u _json_key -p "$DOCKER_KEY" https://eu.gcr.io
 - type: bash
   command: docker build -t $DOCKER_REPO:v_$GIT_COMMIT .
 - type: bash

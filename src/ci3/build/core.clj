@@ -15,7 +15,7 @@
                       {:key "account" :path "account.json"}]}}]
    :containers
    [{:name "agent"
-     :image "eu.gcr.io/vivid-kite-171620/ci3:latest"
+     :image "healthsamurai/ci3:latest"
      :imagePullPolicy "Always"
      :args ["agent"]
      :volumeMounts
@@ -24,6 +24,10 @@
       {:name "gsutil"
        :mountPath "/gsutil"
        :readOnly true}]
+     :envFrom [{:configMapRef
+                {:name "ci3" :prefix "CI3_CONFIG_"}}
+               {:secretRef
+                {:name "ci3" :prefix "CI3_SECRET_"}}]
      :env
      [{:name "BUILD_ID" :value (get-in res [:metadata :name])}
       {:name "BOTO_CONFIG" :value "/gsutil/.boto"}
