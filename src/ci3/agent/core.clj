@@ -97,7 +97,7 @@
     (k8s/patch k8s/cfg :builds id
                {:status (:status build) })) )
 
-(def base-url (or (environ/env :base-url) "http://cleo-ci.health-samurai.io/"))
+(def base-url (or (environ/env :ci3-config-base-url) "http://cleo-ci.health-samurai.io/"))
 (defn error [build]
   (when-not (:test build)
     (telegram/notify (str "Error build " base-url "builds/" (get-in build [:metadata :name]))))
