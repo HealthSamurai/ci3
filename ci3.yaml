@@ -29,4 +29,6 @@ pipeline:
 - type: bash
   command: docker push $DOCKER_REPO:latest
 - type: bash
-  command: helm upgrade --set image.tag=v_$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci3 ci3
+  command: echo "$CI3_CONFIG_CHART_CONFIG" > ~/values.yaml
+- type: bash
+  command: helm upgrade -f ~/values.yaml --set image.tag=v_$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci ci3
