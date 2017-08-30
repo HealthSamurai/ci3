@@ -119,7 +119,7 @@
                 (if st
                   (let [res (do-step st env)]
                     (if-not (= 0 (:exit res))
-                      (error build-config)
+                      (error build)
                       (recur res sts)))
                   (do
                     (println "==========================================\nDONE in "

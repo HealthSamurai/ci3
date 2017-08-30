@@ -9,11 +9,12 @@
             [clojure.test :refer :all]))
 
 (def rid "ci3public")
-(def cfg {:prefix "api" :apiVersion "v1" :ns "default"})
+(def cfg {:prefix "api" :apiVersion "v1" :ns "test"})
 (defn build []
   {:apiVersion "ci3.io/v1"
    :kind "Build"
    :metadata {:name (str rid "-" (System/currentTimeMillis))}
+   :status "pending"
    :hashcommit "some-hash"
    :repository rid})
 
@@ -30,6 +31,7 @@
         "BUILD_ID" (is (= val (get-in b [:metadata :name])))
         "REPOSITORY" (is (= val rid))
         true))
+    (println pod)
     (match
      pod
      {:kind "Pod"
