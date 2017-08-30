@@ -11,4 +11,4 @@ docker build -t $DOCKER_REPO:$GIT_COMMIT .
 docker tag $DOCKER_REPO:$GIT_COMMIT $DOCKER_REPO:latest
 gcloud docker -- push $DOCKER_REPO:$GIT_COMMIT
 gcloud docker -- push $DOCKER_REPO:latest
-helm upgrade --set image.tag=$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci ci3
+## helm upgrade -f secret/values.yaml--set image.tag=$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci ci3
