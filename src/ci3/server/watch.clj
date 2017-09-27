@@ -97,7 +97,7 @@
         q (if v (assoc-in q [:query :resourceVersion] v) q)
         on-change (mk-on-change env opts #(do-watch env client opts))]
     #_(println "Start Watch " opts " from " v)
-    #_(println "Start Watch ")
+    (log/info "Start Watching ")
     (->> (http/request-stream client :get (:url q) on-change
                               :headers {"Authorization" (str "Bearer " (:kube-token env))}
                               :insecure? true
@@ -107,7 +107,7 @@
          (swap! state assoc-in [:requests (:resource opts)]))))
 
 (defn start [{env :env cfg :watch}]
-  (println "Start watching resources")
+  (log/info "Start CI3 server")
   (if-let [c (:client @state)]
     (.close c)
     (swap! state dissoc :client :requests))
@@ -119,11 +119,11 @@
 
 (defn supervisor [env]
   (future
-    (println "Start supervisor")
+    (log/info "Start supervisor")
     (while (not (:stop @state))
       (let [client (:client @state)]
         (if (.isClosed client)
-          (do (println "Client closed, run it")
+          (do (log/info "Client closed, run it")
               (start))
           (doseq [[rt {req :request :as opts}] (:requests @state)]
             (cond (realized? (:error req))
@@ -133,7 +133,7 @@
                   (do #_(println "DONE:" opts)
                       (#'do-watch env client (dissoc opts :request))))))
         (Thread/sleep 10000)))
-    (println "Stopping supervisor")
+    (log/info "Stopping supervisor")
     (swap! state assoc :stop false)))
 
 (defmethod u/*fn :k8s/watch

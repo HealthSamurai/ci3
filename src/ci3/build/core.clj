@@ -2,7 +2,13 @@
   (:require [unifn.core :as u]
             [clojure.string :as str]
             [ci3.k8s :as k8s]
+            [ci3.telegram :as t]
             [clojure.tools.logging :as log]))
+
+(defn update-status [build]
+  (let [id (get-in build [:metadata :name])]
+    (k8s/patch k8s/cfg :builds id
+               {:status (:status build) })) )
 
 (defn pod-spec [res]
   {:restartPolicy "Never"
@@ -40,7 +46,7 @@
   [{env :env cfg :k8s {{{nm :name} :metadata :as build}  :object tp :type } :resource}]
   (let [cfg {:prefix "api" :apiVersion "v1" :ns "default"}]
     (when (and (= tp "ADDED") (= "pending" (:status build)))
-      (log/info "Create build pod #" nm)
+      (log/info "Create build pod" (str "build-" nm))
       (let [pod (k8s/create cfg :pods
                             {:apiVersion "v1"
                              :kind "Pod"
@@ -50,9 +56,11 @@
                              :spec (pod-spec build)})]
         (if (= "Failure" (get pod "status"))
           (do
+            (update-status (assoc build :status "failed"))
             (log/error "Cfg:" cfg)
             (log/error "Pod:" pod)
             (log/error "Pod spec: " (pod-spec build))
+            (t/notify (str "ERROR: Cannot create build pod " nm))
             {::u/status :error
              ::u/message pod})
           (do

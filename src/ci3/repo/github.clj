@@ -17,9 +17,10 @@
 (defmethod u/*fn
   ::verify
   [arg]
-  (println "TODO: Github verify"))
+  (log/warn "TODO: Github verify"))
 
 ;; TODO
+;; need repo secret
 (defn verify
   [{ {id :id} :route-params headers :headers body :body :as req}]
   (let [signature (get headers "x-hub-signature")

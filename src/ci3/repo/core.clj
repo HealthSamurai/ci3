@@ -11,7 +11,7 @@
 (defmethod u/*fn
   ::load-repo
   [{cfg :k8s :as arg}]
-  (log/info "Get repo: " (get-in arg [:request :route-params :id]))
+  (log/info "Get repo:" (get-in arg [:request :route-params :id]))
   (let [repo-id (get-in arg [:request :route-params :id])
         repo (k8s/find cfg :repositories repo-id)]
     (if (or (nil? repo)
