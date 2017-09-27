@@ -51,9 +51,7 @@
       :status "pending"
       :repository (get-in repository [:metadata :name])
       :diff diff
-      :commit (select-keys commit
-                           [:id :message :timestamp
-                            :url :author ]) })})
+      :commit (select-keys commit [:id :message :timestamp :url :author ]) })})
 
 (defmethod interf/mk-build
   :github
