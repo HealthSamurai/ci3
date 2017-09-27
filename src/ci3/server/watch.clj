@@ -142,7 +142,6 @@
   (supervisor env)
   {:started true})
 
-
 (comment
   (:version (:repositories (:requests @state)))
   (swap! state assoc :stop true)

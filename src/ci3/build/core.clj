@@ -45,6 +45,7 @@
   ::build
   [{env :env cfg :k8s {{{nm :name} :metadata :as build}  :object tp :type } :resource}]
   (let [cfg {:prefix "api" :apiVersion "v1" :ns "default"}]
+    (log/warn tp (:status build))
     (when (and (= tp "ADDED") (= "pending" (:status build)))
       (log/info "Create build pod" (str "build-" nm))
       (let [pod (k8s/create cfg :pods
@@ -64,5 +65,6 @@
             {::u/status :error
              ::u/message pod})
           (do
+            (update-status (assoc build :status "running"))
             (log/info "Build pod created: " (get-in pod ["metadata" "name"]))
             {::pod pod}))))))
