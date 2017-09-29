@@ -1,4 +1,4 @@
-FROM docker
+FROM docker:17.06.0
 
 RUN apk add --no-cache curl ca-certificates bash sudo openssl
 
