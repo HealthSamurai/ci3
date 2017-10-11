@@ -50,7 +50,6 @@
   (start))
 
 (comment
-  (notify " `Fail` *ci3* ")
   (start)
   (stop)
   (restart))
