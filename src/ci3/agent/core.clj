@@ -100,7 +100,7 @@
 (def base-url (or (environ/env :ci3-config-base-url) "http://cleo-ci.health-samurai.io/"))
 
 (defn err-msg [err]
-  (when (> (count err) 500) (subs err 0 500) err))
+  (if (> (count err) 2000) (subs err 0 2000) err))
 (defn notify [st build & text]
   (telegram/notify (str st " build " (get-in build [:repository]) " \n"
                         (get-in build [:commit :message]) " \n"
@@ -130,7 +130,7 @@
                 (if st
                   (let [res (do-step st env)]
                     (if-not (= 0 (:exit res))
-                      (error build res)
+                      (error build st)
                       (recur res sts)))
                   (do
                     (println "==========================================\nDONE in "
