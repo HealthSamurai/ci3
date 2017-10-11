@@ -102,20 +102,21 @@
 (defn notify [st build & text]
   (telegram/notify (str st " build " (get-in build [:repository]) "/n"
                         (get-in build [:commit :message]) " \n"
-                        "by " (or (get-in build [:author :raw]) (get-in build [:author :name])) " /n"
+                        "by " (or (get-in build [:author :raw]) (get-in build [:author :name])) " \n"
                         base-url "builds/" (get-in build [:metadata :name])
                         (when text (str " \n ```" (str/join text) "```") ))))
 
 (defn error [build res]
   (println build)
   (when-not (:test build)
-    (notify "Success" build))
+    (notify "Fail" build))
   (update-status (assoc build :status "failed")))
 
 (defn success [build]
   (println build)
+  (notify "Success" build)
   (when-not (:test build)
-    (notify "Fail" build))
+    (notify "Success" build))
   (update-status (assoc build :status "success")))
 
 (defmethod u/*fn
