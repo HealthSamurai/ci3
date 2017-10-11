@@ -5,7 +5,9 @@
   (shelk/bash ["tar" "czvf" to dir ">/dev/null 2>&1"]))
 
 (defn bucket []
-  (or (System/getenv "CACHE_BUCKET") "ci3-cache"))
+  (or (System/getenv "CACHE_BUCKET")
+      (System/getenv "CI3_CONFIG_CACHE_BUCKET")
+      "ci3-cache"))
 
 (defn upload-bucket-object-url [k]
   (str "https://www.googleapis.com/upload/storage/v1/b/"

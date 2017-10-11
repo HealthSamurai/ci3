@@ -100,9 +100,9 @@
 (def base-url (or (environ/env :ci3-config-base-url) "http://cleo-ci.health-samurai.io/"))
 
 (defn notify [st build & text]
-  (telegram/notify (str st " build " (get-in build [:repository]) "\n"
-                        (get-in build [:commit :message]) " \n"
-                        "by " (or (get-in build [:commit :author :raw]) (get-in build [:commit :author :name])) " \n"
+  (telegram/notify (str st " build " (get-in build [:repository]) " \n "
+                        (get-in build [:commit :message]) " \n "
+                        "by " (or (get-in build [:commit :author :raw]) (get-in build [:commit :author :name])) " \n "
                         base-url "builds/" (get-in build [:metadata :name])
                         (when text (str " \n ```" (str/join text) "```") ))))
 
