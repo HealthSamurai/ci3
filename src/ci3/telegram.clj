@@ -33,7 +33,7 @@
       (t/send-text token id "I don't do a whole lot ... yet."))))
 
 (defn notify [msg]
-  (t/send-text token chatid msg))
+  (t/send-text token chatid {:parse_mode "Markdown"} msg))
 
 (defn start []
   (if (str/blank? token)
@@ -50,6 +50,7 @@
   (start))
 
 (comment
+  (notify " `Fail` *ci3* ")
   (start)
   (stop)
   (restart))
