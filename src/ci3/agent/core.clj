@@ -99,12 +99,14 @@
 
 (def base-url (or (environ/env :ci3-config-base-url) "http://cleo-ci.health-samurai.io/"))
 
+(defn err-msg [err]
+  (when (> (count err) 500) (subs err 0 500) err))
 (defn notify [st build & text]
   (telegram/notify (str st " build " (get-in build [:repository]) " \n"
                         (get-in build [:commit :message]) " \n"
                         "By: " (or (get-in build [:commit :author :raw]) (get-in build [:commit :author :name])) " \n"
                         base-url "builds/" (get-in build [:metadata :name])
-                        (when text (str " \n ```" (str/join text) "```") ))))
+                        (when text (str " \n ```" (err-msg (str/join text)) "```") ))))
 
 (defn error [build res]
   (println build)
