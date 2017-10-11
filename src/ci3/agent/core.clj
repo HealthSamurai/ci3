@@ -98,16 +98,24 @@
                {:status (:status build) })) )
 
 (def base-url (or (environ/env :ci3-config-base-url) "http://cleo-ci.health-samurai.io/"))
-(defn error [build]
+
+(defn notify [st build & text]
+  (telegram/notify (str st " build " (get-in build [:repository]) "/n"
+                        (get-in build [:commit :message]) " \n"
+                        "by " (or (get-in build [:author :raw]) (get-in build [:author :name])) " /n"
+                        base-url "builds/" (get-in build [:metadata :name])
+                        (when text (str " \n ```" (str/join text) "```") ))))
+
+(defn error [build res]
   (println build)
   (when-not (:test build)
-    (telegram/notify (str "Error build " base-url "builds/" (get-in build [:metadata :name]))))
+    (notify "Success" build))
   (update-status (assoc build :status "failed")))
 
 (defn success [build]
   (println build)
   (when-not (:test build)
-    (telegram/notify (str "Success build " base-url "builds/" (get-in build [:metadata :name]))))
+    (notify "Fail" build))
   (update-status (assoc build :status "success")))
 
 (defmethod u/*fn
@@ -120,7 +128,7 @@
                 (if st
                   (let [res (do-step st env)]
                     (if-not (= 0 (:exit res))
-                      (error build)
+                      (error build res)
                       (recur res sts)))
                   (do
                     (println "==========================================\nDONE in "
