@@ -9,7 +9,7 @@
 
 (def bb_rid "ci3public")
 (def gh_rid "ci3githubpublic")
-(def bb_prid "ci3githubpublic")
+(def bb_prid "ci3bbpublic")
 (def cfg {:apiVersion "ci3.io/v1" :ns "test"})
 
 (defn repo-fixture [f]
@@ -34,8 +34,8 @@
                :kind "Repository"
                :metadata {:name bb_prid}
                :type "bitbucket"
-               :fullName "Aitem/private-test"
-               :url "https://bitbucket.org/Aitem/private-test"})
+               :fullName "Aitem/ci3-public"
+               :url "https://bitbucket.org/Aitem/ci3-public"})
 
   (f)
   (k8s/delete cfg :repositories bb_rid)

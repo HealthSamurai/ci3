@@ -20,7 +20,7 @@
 
 (def hashcommit "d6d601b11a5f99d213b063fea702ecfeae03e888")
 (def bb-private-hashcommit "44fed27862a92b2106572e2630491c432807cc73")
-(def github-hashcommit "553e3564848da9d2621c1d28e2f1fda0fa9ce6d8")
+(def github-hashcommit "f9fdb8088dae6c41f847b34b4a0f1142312007a0")
 (def cfg {:apiVersion "ci3.io/v1" :ns "test"})
 
 (defn agent-fixture [f]
@@ -84,6 +84,7 @@
               {:apiVersion "ci3.io/v1"
                :kind "Build"
                :test true
+               :branch "master"
                :metadata {:name ghbid}
                :hashcommit github-hashcommit
                :repository ghrid})

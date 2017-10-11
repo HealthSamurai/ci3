@@ -143,7 +143,9 @@
     (if (= "Failure" (get bld :status))
       {::u/status :error
        ::u/message (str "Could not find build: " bid " - " bld)}
-      {::build (walk/keywordize-keys bld)})))
+      (let [build (walk/keywordize-keys bld)]
+        {::build build
+         :env {:CI3_BRANCH (:branch build)}}))))
 
 
 (s/def ::repository string?)

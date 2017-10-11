@@ -120,6 +120,9 @@
     ::update-repo]
    {:env env :repository repo}))
 
+(defn get-branch [payload]
+  (get-in payload  [:push :changes 0 :new :name]))
+
 (defmethod u/*fn
   ::mk-build-resource
   [{{payload :body :as req} :request
@@ -127,19 +130,19 @@
     repository  :ci3.repo.core/repository}]
   {:ci3.repo.core/build
    (let [payload (json/parse-string payload keyword)
-         commit (last (:commits payload))
-         hashcommit (get-in payload [:push :changes 0 :commits 0 :hash])
+         commit (get-in payload [:push :changes 0 :commits 0])
+         hashcommit (:hash commit)
          diff (get-in payload [:push :changes 0 :links :html :href])]
      {:kind "Build"
       :apiVersion "ci3.io/v1"
       :metadata {:name  build-name}
       :hashcommit hashcommit
+      :branch (get-branch payload)
       :status "pending"
       :repository (get-in repository [:metadata :name])
       :diff diff
       :commit (select-keys commit
-                           [:id :message :timestamp
-                            :url :author ]) })})
+                           [:message :date :author ]) })})
 
 (defmethod u/*fn
   ::verify

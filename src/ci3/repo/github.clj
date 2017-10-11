@@ -17,7 +17,8 @@
 (defmethod u/*fn
   ::verify
   [arg]
-  (log/warn "TODO: Github verify"))
+  (log/warn "TODO: Github verify")
+  {})
 
 ;; TODO
 ;; need repo secret
@@ -34,6 +35,8 @@
       (json/parse-string payload keyword)
       nil)))
 
+(defn get-branch [payload]
+  (-> payload :ref (str/split #"/") last))
 
 (defmethod u/*fn
   ::mk-build-resource
@@ -49,6 +52,7 @@
       :apiVersion "ci3.io/v1"
       :metadata {:name  build-name}
       :hashcommit hashcommit
+      :branch (get-branch payload)
       :status "pending"
       :repository (get-in repository [:metadata :name])
       :diff diff

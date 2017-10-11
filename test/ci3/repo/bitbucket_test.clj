@@ -3,9 +3,16 @@
             [unifn.core :as u]
             [matcho.core :as matcho]
             [environ.core :as env]
+            [clojure.java.io :as io]
             [clojure.test :refer :all]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [cheshire.core :as json]))
 
+(deftest parse-payload
+  (testing "Parse BB payload"
+    (is (= "master" (sut/get-branch (json/parse-string (slurp (io/resource "bb_hook.json")) keyword))))
+    )
+  )
 
 #_(deftest bitbucket-mock-test
   (matcho/match

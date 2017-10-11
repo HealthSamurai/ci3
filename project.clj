@@ -23,7 +23,7 @@
                  [environ "1.1.0"]
                  [hiccup "1.0.5"]
                  [garden "1.3.2"]
-                 [matcho "0.1.0-RC5"]]
+                 [matcho "0.1.0-RC6"]]
   :uberjar-name "ci3.jar"
   :resource-paths ["resources"]
   :main ci3.core
