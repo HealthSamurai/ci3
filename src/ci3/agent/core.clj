@@ -108,16 +108,19 @@
                         base-url "builds/" (get-in build [:metadata :name])
                         (when text (str " \n ```\n" (err-msg (json/generate-string text)) "\n```") ))))
 
+(def okEmoji (apply str (Character/toChars 9989)))
+(def noEmoji (apply str (Character/toChars 10060)))
+
 (defn error [build res]
   (println build)
   (when-not (:test build)
-    (notify "`Fail`" build res))
+    (notify (str noEmoji "`Fail`") build res))
   (update-status (assoc build :status "failed")))
 
 (defn success [build]
   (println build)
   (when-not (:test build)
-    (notify "Success" build))
+    (notify (str okEmoji "Success") build))
   (update-status (assoc build :status "success")))
 
 (defmethod u/*fn

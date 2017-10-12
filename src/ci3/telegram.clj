@@ -50,6 +50,7 @@
   (start))
 
 (comment
+  (notify (str (apply str (Character/toChars 9989)) (apply str (Character/toChars 10060))) )
   (start)
   (stop)
   (restart))
