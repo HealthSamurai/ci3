@@ -18,10 +18,8 @@ spec:
         imagePullPolicy: Always
         args: {{ .Values.service.args }}
         env:
-        - name: CACHE_BUCKET
-          value: "{{ .Values.cacheBucket }}"
-        - name: HOSTNAME
-          value: "{{ .Values.hostName }}"
+        - name: AGENT_IMAGE
+          value: "{{ .Values.agentImage }}"
         envFrom:
         - configMapRef:
             name: "ci3"

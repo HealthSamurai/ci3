@@ -31,4 +31,4 @@ pipeline:
 - type: bash
   command: echo "$CI3_CONFIG_CHART_CONFIG" > ~/values.yaml
 - type: bash
-  command: helm upgrade -f ~/values.yaml --set image.tag=v_$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci ci3
+  command: helm upgrade -f ~/values.yaml --set agentImage=$DOCKER_REPO:v_$GIT_COMMIT,image.tag=v_$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci ci3
