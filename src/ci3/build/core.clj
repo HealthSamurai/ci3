@@ -51,8 +51,7 @@
     (when (and (= tp "ADDED") (= "pending" (:status build)))
       (log/info "Create build pod" (str "build-" nm))
       (let [pod (k8s/create cfg :pods
-                            {:apiVersion "v1"
-                             :kind "Pod"
+                            {:kind "Pod"
                              :metadata {:name (str "build-" nm)
                                         :annotations {:system "ci3"}
                                         :lables {:system "ci3"}}
