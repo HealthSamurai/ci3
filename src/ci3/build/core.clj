@@ -21,9 +21,9 @@
                       {:key "account" :path "account.json"}]}}]
    :containers
    [{:name "agent"
-     :image (or (System/getenv "AGENT_IMAGE")
-                (System/getenv "CI3_CONFIG_AGENT_IMAGE")
-                "healthsamurai/ci3:latest")
+     :image (str (or (System/getenv "CI3_CONFIG_AGENT_IMAGE")
+                     (System/getenv "AGENT_IMAGE")
+                     "healthsamurai/ci3:latest"))
      :imagePullPolicy "Always"
      :args ["agent"]
      :volumeMounts
@@ -51,7 +51,8 @@
     (when (and (= tp "ADDED") (= "pending" (:status build)))
       (log/info "Create build pod" (str "build-" nm))
       (let [pod (k8s/create cfg :pods
-                            {:kind "Pod"
+                            {:apiVersion "v1"
+                             :kind "Pod"
                              :metadata {:name (str "build-" nm)
                                         :annotations {:system "ci3"}
                                         :lables {:system "ci3"}}
