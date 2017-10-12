@@ -38,7 +38,6 @@
                 :prefix "CI3_SECRET_"}]
      :env
      [{:name "BUILD_ID" :value (get-in res [:metadata :name])}
-      {:name "REDEPLOY_HASH" :value (System/currentTimeMillis)}
       {:name "BOTO_CONFIG" :value "/gsutil/.boto"}
       {:name "REPOSITORY" :value (get-in res [:repository])}
       {:name "DOCKER_KEY" :valueFrom {:secretKeyRef {:name "docker-registry" :key "key"}}}
