@@ -106,7 +106,7 @@
                         (get-in build [:commit :message]) " \n"
                         "By: " (or (get-in build [:commit :author :raw]) (get-in build [:commit :author :name])) " \n"
                         base-url "builds/" (get-in build [:metadata :name])
-                        (when text (str " \n ```" (err-msg (json/generate-string text)) "```") ))))
+                        (when text (str " \n ```\n" (err-msg (json/generate-string text)) "\n```") ))))
 
 (defn error [build res]
   (println build)
