@@ -21,9 +21,10 @@
                       {:key "account" :path "account.json"}]}}]
    :containers
    [{:name "agent"
-     :image (str (or (System/getenv "CI3_CONFIG_AGENT_IMAGE")
-                     (System/getenv "AGENT_IMAGE")
-                     "healthsamurai/ci3:latest"))
+     ;;:image (str (or (System/getenv "CI3_CONFIG_AGENT_IMAGE")
+     ;;                (System/getenv "AGENT_IMAGE")
+     ;;                "healthsamurai/ci3:latest"))
+     :image "healthsamurai/ci3:latest"
      :imagePullPolicy "Always"
      :args ["agent"]
      :volumeMounts
