@@ -21,10 +21,9 @@
                       {:key "account" :path "account.json"}]}}]
    :containers
    [{:name "agent"
-     ;;:image (str (or (System/getenv "CI3_CONFIG_AGENT_IMAGE")
-     ;;                (System/getenv "AGENT_IMAGE")
-     ;;                "healthsamurai/ci3:latest"))
-     :image "healthsamurai/ci3:latest"
+     :image (str (or (System/getenv "CI3_CONFIG_AGENT_IMAGE")
+                     (System/getenv "AGENT_IMAGE")
+                     "healthsamurai/ci3:latest"))
      :imagePullPolicy "Always"
      :args ["agent"]
      :volumeMounts
@@ -51,19 +50,19 @@
   (let [cfg {:prefix "api" :apiVersion "v1" :ns "default"}]
     (when (and (= tp "ADDED") (= "pending" (:status build)))
       (log/info "Create build pod" (str "build-" nm))
-      (let [pod (k8s/create cfg :pods
-                            {:apiVersion "v1"
-                             :kind "Pod"
-                             :metadata {:name (str "build-" nm)
-                                        :annotations {:system "ci3"}
-                                        :lables {:system "ci3"}}
-                             :spec (pod-spec build)})]
+      (let [spec {:apiVersion "v1"
+                  :kind "Pod"
+                  :metadata {:name (str "build-" nm)
+                             :annotations {:system "ci3"}
+                             :lables {:system "ci3"}}
+                  :spec (pod-spec build)}
+            pod (k8s/create cfg :pods spec)]
         (if (= "Failure" (get pod "status"))
           (do
             (update-status (assoc build :status "failed"))
             (log/error "Cfg:" cfg)
             (log/error "Pod:" pod)
-            (log/error "Pod spec: " (pod-spec build))
+            (log/error "Pod spec: " spec)
             (t/notify (str "ERROR: Cannot create build pod " nm))
             {::u/status :error
              ::u/message pod})

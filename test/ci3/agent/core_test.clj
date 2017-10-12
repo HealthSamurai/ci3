@@ -161,7 +161,6 @@
     :checkout   github-hashcommit
     ::sut/build-config {:description "build in src"}})
 
-
   (match
    (run (arg
          {:k8s cfg
