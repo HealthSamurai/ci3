@@ -81,6 +81,7 @@
             (reset-version (:resource opts))
             (retry))
         (do #_(println opts " for v:" (get-in res [:object :metadata :resourceVersion]))
+            (log/info res)
             #_(println "->" (:handler opts))
             (u/*apply (:handler opts) {:env env :resource (k8s/resolve-secrets res)}))))
     [body :continue]))
@@ -150,7 +151,7 @@
   (supervisor {:kube-url "http://localhost:8001"})
   (start
    {:env {:kube-url "http://localhost:8001"}
-    :watch {:timeout 5000
+    :watch {:timeout 500
             :resources [{:handler :ci3.watch/repository
                          :apiVersion "ci3.io/v1"
                          :resource :repositories
