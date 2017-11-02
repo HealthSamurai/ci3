@@ -98,14 +98,18 @@
                {:status (:status build) })) )
 
 (def base-url (or (environ/env :ci3-config-base-url) "http://cleo-ci.health-samurai.io/"))
+(defn escape [s]
+  (str/replace s #"_" "\\\\_"))
 
 (defn err-msg [err]
   (if (> (count err) 2000) (subs err 0 2000) err))
+
 (defn notify [st build & text]
-  (telegram/notify (str st " build *" (:repository build) ":" (:branch build) "* \n"
-                        (get-in build [:commit :message]) " \n"
-                        "By: " (or (get-in build [:commit :author :raw]) (get-in build [:commit :author :name])) " \n"
-                        base-url "builds/" (get-in build [:metadata :name])
+  (telegram/notify (str (escape
+                         (str st " build *" (:repository build) ":" (:branch build) "* \n"
+                              (get-in build [:commit :message]) " \n"
+                              "By: " (or (get-in build [:commit :author :raw]) (get-in build [:commit :author :name])) " \n"
+                              base-url "builds/" (get-in build [:metadata :name])))
                         (when text (str " \n ```\n" (err-msg (json/generate-string text)) "\n```") ))))
 
 (def okEmoji (apply str (Character/toChars 9989)))

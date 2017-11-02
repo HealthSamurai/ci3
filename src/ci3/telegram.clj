@@ -7,8 +7,10 @@
     [morse.api :as t]
     [clojure.string :as str]))
 
-(def token  (or (env :telegram-token)
+(def token  (or 
+             (env :telegram-token)
                 (k8s/secret :telegram :token)))
+
 (def chatid (or (env :chatid)
                 (k8s/secret :telegram :chatid)))
 
@@ -32,8 +34,8 @@
     (fn [{{id :id} :chat :as message}]
       (t/send-text token id "I don't do a whole lot ... yet."))))
 
-(defn notify [msg & [opts]]
-  (t/send-text token chatid opts msg))
+(defn notify [msg]
+  (t/send-text token chatid {:parse_mode "Markdown"} msg))
 
 (defn start []
   (if (str/blank? token)
@@ -45,11 +47,14 @@
     (p/stop @channel)
     (reset! channel nil)))
 
+
 (defn restart []
   (stop)
   (start))
 
 (comment
+  (notify " ivana <ivana\\_2004@mail.ru>  ")
+  (notify "success ivana- ")
   (notify (str (apply str (Character/toChars 9989)) (apply str (Character/toChars 10060))) )
   (start)
   (stop)
