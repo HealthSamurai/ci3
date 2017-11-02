@@ -1,7 +1,12 @@
-apiVersion: extensions/v1beta1
-kind: ThirdPartyResource
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
 metadata:
-  name: build.ci3.io
-description: "CI/CD resource"
-versions:
-- name: v1
+  name: builds.ci3.io
+spec:
+  scope: Namespaced
+  group: ci3.io
+  version: v1
+  names:
+    kind: Build
+    plural: builds
+    singular: build
