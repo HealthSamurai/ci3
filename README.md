@@ -24,7 +24,13 @@ Install local test runner ci3 brew, download jar etc
 
 ## License
 
-Copyright © 2017 niquola
+## Run and deploy
+
+```
+kubectl create namespace test
+```
+
+Copyright © 2017 niquola aitem
 
 Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
 
