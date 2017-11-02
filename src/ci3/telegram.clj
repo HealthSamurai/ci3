@@ -32,8 +32,8 @@
     (fn [{{id :id} :chat :as message}]
       (t/send-text token id "I don't do a whole lot ... yet."))))
 
-(defn notify [msg]
-  (t/send-text token chatid {:parse_mode "Markdown"} msg))
+(defn notify [msg & [opts]]
+  (t/send-text token chatid opts msg))
 
 (defn start []
   (if (str/blank? token)

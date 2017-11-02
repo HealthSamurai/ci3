@@ -66,7 +66,8 @@
 
 (defn parse-json-stream [rt st]
   (let [[rest-of-msg resources]
-        (*parse-json-stream  [] (str (or (get-request-data rt :message) "") (-> st .toByteArray String.)))]
+        (*parse-json-stream  [] (str (or (get-request-data rt :message) "")
+                                     (-> st .toByteArray String.)))]
 
     (set-request-data rt :message rest-of-msg)
     resources))
@@ -76,12 +77,15 @@
     (doseq [res (parse-json-stream (:resource opts) body)]
       (update-version (:resource opts) (get-in res [:object :metadata :resourceVersion]))
       ;; sometimes version is compacted :(
-      (if (and (= "ERROR" (:type res)) (= "Expired" (get-in res [:object :reason])))
-        (do #_(println "OUTDATE version:" res)
+      (if (and (= "ERROR" (:type res))
+               (or (= "Gone" (get-in res [:object :reason]))
+                   (= "Expired" (get-in res [:object :reason]))))
+        (do #_(println )
+            (log/info "OUTDATE version" )
             (reset-version (:resource opts))
             (retry))
         (do #_(println opts " for v:" (get-in res [:object :metadata :resourceVersion]))
-            (log/info res)
+            #_(log/info res)
             #_(println "->" (:handler opts))
             (u/*apply (:handler opts) {:env env :resource (k8s/resolve-secrets res)}))))
     [body :continue]))
@@ -151,7 +155,7 @@
   (supervisor {:kube-url "http://localhost:8001"})
   (start
    {:env {:kube-url "http://localhost:8001"}
-    :watch {:timeout 500
+    :watch {:timeout 5000
             :resources [{:handler :ci3.watch/repository
                          :apiVersion "ci3.io/v1"
                          :resource :repositories

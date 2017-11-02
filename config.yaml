@@ -1,0 +1,13 @@
+replicaCount: 1
+hostName: https://ci.health-samurai.io
+ingress:
+  enabled: true
+  hosts:
+  - ci.health-samurai.io
+cacheBucket: ci3-cache
+service:
+  args: ["server"]
+  name: nginx
+  type: NodePort
+  externalPort: 80
+  internalPort: 8888
