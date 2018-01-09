@@ -12,6 +12,7 @@
 
 (defn pod-spec [res]
   {:restartPolicy "Never"
+   :serviceAccountName (str (or (System/getenv "CI3_CONFIG_SERVICE_ACCOUNT") "default"))
    :volumes
    [{:name "docker-sock"
      :hostPath {:path "/var/run/docker.sock"}}
