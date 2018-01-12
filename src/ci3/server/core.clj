@@ -12,7 +12,8 @@
    [hiccup.page :as page]
    [garden.core :as css]
    [clojure.walk :as walk]
-   [ci3.k8s :as k8s]))
+   [ci3.k8s :as k8s]
+   [ci3.telegram :as telegram]))
 
 (defn layout [cnt]
   (page/html5
@@ -108,6 +109,7 @@
 
 
 (defn exec [& args]
+  (telegram/start)
   (rest/restart metadata)
   (u/*apply [::e/env :k8s/watch] metadata))
 

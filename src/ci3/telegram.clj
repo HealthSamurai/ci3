@@ -7,17 +7,17 @@
     [morse.api :as t]
     [clojure.string :as str]))
 
-(def token  (or 
-             (env :telegram-token)
-                (k8s/secret :telegram :token)))
+(def token  (or (env :telegram-token)
+                (env :ci3-secret-telegram-token)
+                (k8s/secret :ci3 :TELEGRAM_TOKEN)))
 
 (def chatid (or (env :chatid)
-                (k8s/secret :telegram :chatid)))
+                (env :ci3-secret-telegram-chatid)
+                (k8s/secret :ci3 :TELEGRAM_CHATID)))
 
 (def channel (atom {}))
 
 (h/defhandler handler
-
   (h/command-fn "start"
     (fn [{{id :id :as chat} :chat}]
       (t/send-text token id " Welcome to CI3!")))
@@ -47,14 +47,11 @@
     (p/stop @channel)
     (reset! channel nil)))
 
-
 (defn restart []
   (stop)
   (start))
 
 (comment
-  (notify " ivana <ivana\\_2004@mail.ru>  ")
-  (notify "success ivana- ")
   (notify (str (apply str (Character/toChars 9989)) (apply str (Character/toChars 10060))) )
   (start)
   (stop)
