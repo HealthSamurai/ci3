@@ -4,6 +4,7 @@
 pom.xml
 secret
 secrets.yaml
+.env.secret.tpl
 pom.xml.asc
 *.jar
 *.class
