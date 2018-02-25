@@ -2,9 +2,9 @@ apiVersion: "ci3.io/v1"
 kind: Build
 pipeline:
 
-- type: maven
-  command: restore-cache
-  key: ci3
+# - type: maven
+#   command: restore-cache
+#   key: ci3
 - type: bash
   command: lein deps 
 - type: maven
