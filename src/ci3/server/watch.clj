@@ -91,7 +91,7 @@
 (defn build-watch-query
   [{kube-url :kube-url}
    {res :resource n :ns api :apiVersion}]
-  {:url (str kube-url "/apis/" api "/namespaces/" n "/" (name res))
+  {:url (str kube-url "/apis/" api "/watch/" (name res))
    :query  {:watch true}})
 
 (defn do-watch [env client opts]
