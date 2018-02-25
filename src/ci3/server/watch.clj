@@ -48,7 +48,7 @@
   (get-in @state [:requests rt :version]))
 
 (defn set-request-data [rt k v]
-  (assoc-in @state [:requests rt k] v))
+  (swap! state assoc-in [:requests rt k] v))
 
 (defn get-request-data [rt k]
   (get-in @state [:requests rt k]))
@@ -61,8 +61,6 @@
              #_(println "JSON ERROR WHILE PARSE" s)
              [s acc])))
     [s acc]))
-
-(*parse-json-stream [] "{\"q\":2}\n{\"q\":1}\n")
 
 (defn parse-json-stream [rt st]
   (let [[rest-of-msg resources]
@@ -101,12 +99,10 @@
         q (build-watch-query env opts)
         q (if v (assoc-in q [:query :resourceVersion] v) q)
         on-change (mk-on-change env opts #(do-watch env client opts))]
-    #_(println "Start Watch " opts " from " v)
-    #_(log/info "Start Watching ")
     (->> (http/request-stream client :get (:url q) on-change
                               :headers {"Authorization" (str "Bearer " (:kube-token env))}
                               :insecure? true
-                              :timeout 300000
+                              :timeout 60000
                               :query (:query q))
          (assoc opts :request)
          (swap! state assoc-in [:requests (:resource opts)]))))
