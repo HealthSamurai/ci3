@@ -1,0 +1,13 @@
+apiVersion: "ci3.io/v1"
+kind: Repository
+metadata:
+  name: metrics-aidbox
+url: https://github.com/HealthSamurai/metrics-aidbox
+type: github
+fullName: HealthSamurai/metrics-aidbox
+oauthConsumer:
+  token:
+    valueFrom:
+      secretKeyRef:
+        name: github
+        key: token
