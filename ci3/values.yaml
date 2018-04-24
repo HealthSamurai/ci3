@@ -1,0 +1,24 @@
+replicaCount: 1
+hostName: https://mentrics-ci.health-samurai.io
+agentImage: healthsamurai/ci3:v_397f91f
+image:
+  repository: healthsamurai/ci3
+  tag: v_397f91f
+cacheBucket: ci3-cache
+service:
+  args: ["server"]
+  name: nginx
+  type: NodePort
+  externalPort: 80
+  internalPort: 8888
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+  hosts:
+   - mentrics-ci.health-samurai.io
+  tls:
+    - secretName: health-samurai-tls
+      hosts:
+        - mentrics-ci.health-samurai.io
