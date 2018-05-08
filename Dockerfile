@@ -1,4 +1,4 @@
-FROM docker:17.06.0
+FROM docker:18.05-rc
 
 RUN apk add --no-cache curl ca-certificates bash sudo openssl
 
@@ -103,6 +103,10 @@ RUN apk add --update \
   && pip install gsutil \
   && apk del build-deps \
   && rm -rf /var/cache/apk/*
+
+RUN apk add rlwrap --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
+
+RUN cd /tmp && curl -O https://download.clojure.org/install/linux-install-1.9.0.375.sh && chmod +x linux-install-1.9.0.375.sh && ./linux-install-1.9.0.375.sh
 
 COPY target/ci3.jar /var/ci3.jar
 
