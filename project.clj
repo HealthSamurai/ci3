@@ -22,7 +22,6 @@
                  [clojure-humanize "0.2.2"]
                  [environ "1.1.0"]
                  [hiccup "1.0.5"]
-                 [io.minio/minio "4.0.0"]
                  [garden "1.3.2"]
                  [matcho "0.1.0-RC6"]]
   :uberjar-name "ci3.jar"
