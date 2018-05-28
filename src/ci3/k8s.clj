@@ -60,14 +60,21 @@
   (resolve-secrets res))
 
 (defn query [cfg rt & [pth]]
-  (let [res @(http-client/get
-              (url cfg (str (or (:prefix cfg) "apis") "/" (:apiVersion cfg) "/namespaces/" (:ns cfg) "/" (name rt) (when pth (str "/" pth))))
-              {:headers (merge default-headers {"Content-Type" "application/json"})
-               :insecure? true})]
-    (-> res
-     :body
-     (json/parse-string keyword)
-     (resolve-secrets))))
+  (let [{:keys [body error]}
+        @(http-client/get
+          (url cfg (str (or (:prefix cfg) "apis")
+                        "/" (:apiVersion cfg)
+                        "/namespaces/" (:ns cfg)
+                        "/" (name rt)
+                        (when pth (str "/" pth))))
+          {:headers   (merge default-headers {"Content-Type" "application/json"})
+           :insecure? true})]
+    (if error
+      (throw (Exception. (:cause error)))
+      (-> body
+          (json/parse-string keyword)
+          (#(when (= "Failure" (:status %)) (throw (Exception. (:message %)))))
+          (resolve-secrets)))))
 
 (defn list [cfg rt] (query cfg rt))
 (defn find [cfg rt id] (query cfg rt id))
