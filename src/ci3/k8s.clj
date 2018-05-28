@@ -68,13 +68,16 @@
                         "/" (name rt)
                         (when pth (str "/" pth))))
           {:headers   (merge default-headers {"Content-Type" "application/json"})
-           :insecure? true})]
-    (if error
-      (throw (Exception. (:cause error)))
-      (-> body
-          (json/parse-string keyword)
-          (#(when (= "Failure" (:status %)) (throw (Exception. (:message %)))))
-          (resolve-secrets)))))
+           :insecure? true})
+
+        prepared-body (-> body
+                          (json/parse-string keyword)
+                          resolve-secrets)]
+    (when error
+      (log/error (:cause error)))
+    (when (= "Failure" (:status prepared-body))
+      (log/error (:message prepared-body)))
+    prepared-body))
 
 (defn list [cfg rt] (query cfg rt))
 (defn find [cfg rt id] (query cfg rt id))
