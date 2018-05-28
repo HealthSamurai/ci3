@@ -194,10 +194,11 @@
     (let [build-config (yaml/parse-string (slurp (str root "/ci3.yaml")) true)]
       (if build-config
         {::build-config build-config}
-        {::u/status :error
+        {::u/status  :error
          ::u/message (str "Wrong or empty config" build-config)}))
-    (catch Exception e {::u/status :error
-                        ::u/message (str "File " (str root "/ci3.yaml") " not found")})))
+    (catch Exception e
+      {::u/status  :error
+       ::u/message (str (.getMessage e))})))
 
 (defmethod u/*fn
   ::workspace
