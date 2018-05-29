@@ -123,7 +123,16 @@ Ajust values.yaml with proper values.
 helm upgrade -i ci3 .
 ```
 
-### Setup a hook
+### Create a repository resource
+
+Add kubernetes resource called repository and related secret.
+Example config can be found [here](./repo-configs/repo.yaml).
 
 ### Setup a hook
 
+Open https://github.com/YOUR-PROJECT-HERE/settings/hooks/
+create an application/json hook to https://YOUR-CI-DOMAIN/webhook/YOUR-REPO-NAME
+
+# You are perfect!
+
+Enjoy your riding
