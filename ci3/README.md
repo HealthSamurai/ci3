@@ -94,12 +94,13 @@ config files, empty (`PUT-YOUR-VALUE`) fields should be filled according to
 information inside file.
 
 In `docker-registry-secret.yaml` and `storage-secret.yaml` files provided
-information about obtaining keys for service accounts.
+information about obtaining keys for service accounts. Put this files root
+folder for ci3 chart.
 
 
 ```bash
 
-kubectl apply -f configs
+kubectl apply -f ./configs/
 
 # TODO: maybe move following command to separate yaml template
 

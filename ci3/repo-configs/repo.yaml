@@ -1,7 +1,7 @@
 apiVersion: "ci3.io/v1"
 kind: Repository
 metadata:
-  name: metrics-aidbox
+  name: ci3
 #
 # Change url and fullName according to your project requirements
 #

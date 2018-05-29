@@ -1,7 +1,10 @@
 apiVersion: v1
 data:
+  #
   # This value needed for generating urls inside notification text
-  # example value: https://ci.health-samurai.io
+  # example value: https://ci.health-samurai.io/
+  # Note a trailing /
+  #
   BASE_URL: - PUT-YOUR-VALUE-HERE -
 
   # Needed only in case of ci3 self-deploy
