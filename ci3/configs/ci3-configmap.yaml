@@ -1,6 +1,9 @@
 apiVersion: v1
 data:
-  BASE_URL: https://mentrics-ci.health-samurai.io/
+  # This value needed for generating urls inside notification text
+  # example value: https://ci.health-samurai.io
+  BASE_URL: - PUT-YOUR-VALUE-HERE -
+
   # Needed only in case of ci3 self-deploy
   # CHART_CONFIG: |
   #   replicaCount: 1
