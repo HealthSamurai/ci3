@@ -14,3 +14,8 @@ oauthConsumer:
       secretKeyRef:
         name: github
         key: token
+
+# 1. Change github.yaml according your needs
+# 2. kubectl apply -f repo.yaml github.yaml
+# 3. Copy ci3.yaml to your project and modify it
+# 4. Setup a webhook if you didn't do it yet
