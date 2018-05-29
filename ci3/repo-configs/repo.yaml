@@ -2,9 +2,12 @@ apiVersion: "ci3.io/v1"
 kind: Repository
 metadata:
   name: metrics-aidbox
-url: https://github.com/HealthSamurai/metrics-aidbox
+#
+# Change url and fullName according to your project requirements
+#
+url: https://github.com/HealthSamurai/ci3
 type: github
-fullName: HealthSamurai/metrics-aidbox
+fullName: HealthSamurai/ci3
 oauthConsumer:
   token:
     valueFrom:
