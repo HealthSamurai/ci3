@@ -15,4 +15,4 @@ docker push $DOCKER_REPO:latest
 # gcloud docker -- push $DOCKER_REPO:$GIT_COMMIT
 # gcloud docker -- push $DOCKER_REPO:latest
 
-# helm upgrade -f ./values.yaml --set agentImage=$DOCKER_REPO:$GIT_COMMIT,image.tag=$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci ci3
+helm upgrade -f ./ci3/values.yaml --set agentImage=$DOCKER_REPO:$GIT_COMMIT,image.tag=$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci3 ci3
