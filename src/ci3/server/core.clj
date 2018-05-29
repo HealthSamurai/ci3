@@ -32,7 +32,7 @@
 
 (defmethod u/*fn ::index
   [arg]
-  {:response {:body (layout [:b "CI3"])}})
+  {:response {:body (layout [:a {:href "/builds"} "builds"])}})
 
 (defmethod u/*fn ::watches [_]
   {:response {:status 200
