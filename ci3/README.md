@@ -89,7 +89,7 @@ echo -n "YOUR-VALUE-HERE" | base64 -w 0
 
 #### Getting all the secrets
 
-There is a folder called `configs`, which contains templates of secret and
+There is a folder called [configs](./configs), which contains templates of secret and
 config files, empty (`PUT-YOUR-VALUE`) fields should be filled according to
 information inside file.
 
@@ -132,6 +132,16 @@ Example config can be found [here](./repo-configs/repo.yaml).
 
 Open https://github.com/YOUR-PROJECT-HERE/settings/hooks/
 create an application/json hook to https://YOUR-CI-DOMAIN/webhook/YOUR-REPO-NAME
+
+## Troubleshooting
+
+In case something goes wrong:
+```bash
+kubectl get ANY-TYPE ANY-OBJECT -o yaml
+
+kubectl get pods
+kubectl logs -f YOUR-POD-NAME
+```
 
 # You are perfect!
 
