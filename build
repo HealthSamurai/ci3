@@ -9,7 +9,10 @@ lein uberjar
 
 docker build -t $DOCKER_REPO:$GIT_COMMIT .
 docker tag $DOCKER_REPO:$GIT_COMMIT $DOCKER_REPO:latest
-gcloud docker -- push $DOCKER_REPO:$GIT_COMMIT
-gcloud docker -- push $DOCKER_REPO:latest
+docker push $DOCKER_REPO:$GIT_COMMIT
+docker push $DOCKER_REPO:latest
 
-helm upgrade -f ./values.yaml --set agentImage=$DOCKER_REPO:$GIT_COMMIT,image.tag=$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci ci3
+# gcloud docker -- push $DOCKER_REPO:$GIT_COMMIT
+# gcloud docker -- push $DOCKER_REPO:latest
+
+# helm upgrade -f ./values.yaml --set agentImage=$DOCKER_REPO:$GIT_COMMIT,image.tag=$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci ci3
