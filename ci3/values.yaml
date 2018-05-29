@@ -19,6 +19,6 @@ ingress:
   hosts:
    - mentrics-ci.health-samurai.io
   tls:
-    - secretName: health-samurai-tls
+    - secretName: my-tls
       hosts:
         - mentrics-ci.health-samurai.io
