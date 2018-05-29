@@ -1,9 +1,12 @@
 replicaCount: 1
-hostName: https://mentrics-ci.health-samurai.io
-agentImage: healthsamurai/ci3:v_397f91f
+#
+# Set proper hostName
+#
+hostName: https://ci.health-samurai.io
+agentImage: healthsamurai/ci3:latest
 image:
   repository: healthsamurai/ci3
-  tag: v_397f91f
+  tag: latest
 cacheBucket: ci3-cache
 service:
   args: ["server"]
@@ -16,9 +19,12 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
+  #
+  # Set proper hosts
+  #
   hosts:
-   - mentrics-ci.health-samurai.io
+   - ci.health-samurai.io
   tls:
     - secretName: my-tls
       hosts:
-        - mentrics-ci.health-samurai.io
+        - ci.health-samurai.io
