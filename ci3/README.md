@@ -23,23 +23,14 @@ way is to add clusterrolebinding for `system:serviceaccount:kube-system:default`
 
 If you have few users accessing same cluster do helm installation in different
 way:
-- [link1](https://github.com/kubernetes/helm/blob/master/docs/securing_installation.md),
+- [link1](https://github.com/kubernetes/helm/blob/master/docs/securing_installation.md)
 - [link2](https://github.com/kubernetes/helm/blob/master/docs/rbac.md)
 
-Login to google container registry with gcloud account to have ability to
-push/pull images to/from GCR using local docker (helpful for debugging purpose):
 
-```bash
-gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://eu.gcr.io
-```
-
-## Create ci3-bucket
+### Create ci3-bucket
 
 If cache functionallity is needed create a google storage bucket called
 `ci3-bucket`
-
-## Configure and deploy ci3
-
 
 ### Setup loadbalancer
 
@@ -57,6 +48,8 @@ helm ls
 After that for configuring your DNS you can find balancer ip via GCE interface:
 
 ![2018-05-29-095655_852x531_scrot](https://user-images.githubusercontent.com/1218615/40642766-b8a620bc-6326-11e8-8914-456138ea77c3.png)
+
+## Configure and deploy ci3
 
 ### Setup access for ci3 server
 
@@ -138,14 +131,23 @@ Example config can be found [here](./repo-configs/repo.yaml).
 Open https://github.com/YOUR-PROJECT-HERE/settings/hooks/
 create an application/json hook to https://YOUR-CI-DOMAIN/webhook/YOUR-REPO-NAME
 
-## Troubleshooting
+## Troubleshooting and helpful commands
 
-In case something goes wrong:
+In case something goes wrong you can inspect values of objects and inspect debug
+information of pods:
+
 ```bash
 kubectl get ANY-TYPE ANY-OBJECT -o yaml
 
 kubectl get pods
 kubectl logs -f YOUR-POD-NAME
+```
+
+Login to google container registry with gcloud account to have ability to
+push/pull images to/from GCR using local docker (helpful for debugging purpose):
+
+```bash
+gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://eu.gcr.io
 ```
 
 # PROFIT
