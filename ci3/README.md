@@ -4,7 +4,8 @@
 
 - Create a kubernetes cluster using GCE (Google Cloud Engine)
 - Install gcloud cli tool
-- Get credentials for your kubectl
+- Setup credentials for kubectl
+- Make sure that kubectl in the right context
 
 ```bash
   gcloud init
@@ -20,18 +21,22 @@ way is to add clusterrolebinding for `system:serviceaccount:kube-system:default`
   helm init
 ```
 
-If you have few users accessing same cluster do helm installation in different way:
+If you have few users accessing same cluster do helm installation in different
+way:
 - [link1](https://github.com/kubernetes/helm/blob/master/docs/securing_installation.md),
 - [link2](https://github.com/kubernetes/helm/blob/master/docs/rbac.md)
 
-Login to google container registry:
+Login to google container registry with gcloud account to have ability to
+push/pull images to/from GCR using local docker (helpful for debugging purpose):
+
 ```bash
 gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://eu.gcr.io
 ```
 
 ## Create ci3-bucket
 
-If cache functionallity is needed create a google storage bucket called `ci3-bucket`
+If cache functionallity is needed create a google storage bucket called
+`ci3-bucket`
 
 ## Configure and deploy ci3
 
@@ -143,6 +148,7 @@ kubectl get pods
 kubectl logs -f YOUR-POD-NAME
 ```
 
+# PROFIT
 # You are perfect!
 
-Enjoy your riding
+Enjoy your riding :)
