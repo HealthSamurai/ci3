@@ -1,0 +1,50 @@
+apiVersion: "ci3.io/v1"
+kind: Build
+pipeline:
+
+# - type: maven
+#   command: restore-cache
+#   key: ci3
+
+# - type: bash
+#   command: echo -e "machine github.com\n  login $CI3_SECRET_GITHUB_TOKEN" >> ~/.netrc
+# - type: bash
+#   command: git submodule init && git submodule update
+
+- type: bash
+  command: lein deps
+- type: maven
+  command: save-cache
+  key: ci3
+
+
+# - type: env
+#   DOCKER_REPO: healthsamurai/ci3
+#   GIT_COMMIT:
+#     command: "git rev-parse --short HEAD"
+
+# - type: bash
+#   command: docker login --username $CI3_SECRET_DOCKER_USER --password $CI3_SECRET_DOCKER_PASSWORD
+
+# - type: maven
+#   command: restore-cache
+#   key: ci3
+# - type: lein
+#   command: test
+# - type: lein
+#   command: uberjar
+# - type: maven
+#   command: save-cache
+#   key: ci3
+# - type: bash
+#   command: docker build -t $DOCKER_REPO:v_$GIT_COMMIT .
+# - type: bash
+#   command: docker tag $DOCKER_REPO:v_$GIT_COMMIT $DOCKER_REPO:latest
+# - type: bash
+#   command: docker push $DOCKER_REPO:v_$GIT_COMMIT
+# - type: bash
+#   command: docker push $DOCKER_REPO:latest
+# - type: bash
+#   command: echo "$CI3_CONFIG_CHART_CONFIG" > ~/values.yaml
+# - type: bash
+#   command: helm upgrade -f ~/values.yaml --set agentImage=$DOCKER_REPO:v_$GIT_COMMIT,image.tag=v_$GIT_COMMIT,image.repository=$DOCKER_REPO -i ci ci3

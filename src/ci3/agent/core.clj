@@ -45,16 +45,17 @@
   (let [tmp-file (str "/tmp/" k  ".tar.gz")]
     (cache/archive-dir "/root/.m2" tmp-file)
     (shelk/bash ["ls -lah" tmp-file])
-    (cache/upload-to-bucket tmp-file k)
+    (cache/upload-to-bucket (gcloud/get-access-token) tmp-file k)
     (assoc env :exit 0)))
 
 (defmethod maven-execute
   :restore-cache
   [{k :key} env]
   (let [tmp-file (str "/tmp/" k  ".tar.gz")]
-    (cache/download-from-bucket tmp-file k)
+    (cache/download-from-bucket (gcloud/get-access-token) tmp-file k)
     (shelk/bash ["tar" "xzvf" tmp-file ">/dev/null 2>&1"] :dir "/")
     (assoc env :exit 0)))
+
 
 (defmethod execute
   :maven
@@ -193,10 +194,11 @@
     (let [build-config (yaml/parse-string (slurp (str root "/ci3.yaml")) true)]
       (if build-config
         {::build-config build-config}
-        {::u/status :error
+        {::u/status  :error
          ::u/message (str "Wrong or empty config" build-config)}))
-    (catch Exception e {::u/status :error
-                        ::u/message (str "File " (str root "/ci3.yaml") " not found")})))
+    (catch Exception e
+      {::u/status  :error
+       ::u/message (str (.getMessage e))})))
 
 (defmethod u/*fn
   ::workspace

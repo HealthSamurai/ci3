@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  #
+  # Values are base64 encoded files (crt and key respectively)
+  #
+  # cat tls.crt | base64 -w 0
+  # cat tls.key | base64 -w 0
+  #
+  tls.crt: - PUT-YOUR-VALUE-HERE -
+  tls.key: - PUT-YOUR-VALUE-HERE -
+kind: Secret
+metadata:
+  name: my-tls
+  namespace: default
+type: kubernetes.io/tls

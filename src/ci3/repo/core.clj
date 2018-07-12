@@ -14,12 +14,8 @@
   (log/info "Get repo:" (get-in arg [:request :route-params :id]))
   (log/info "Config" cfg)
   (let [repo-id (get-in arg [:request :route-params :id])
-        repo (k8s/find cfg :repositories repo-id)]
-    (if (or (nil? repo)
-            (= "Failure" (:status repo)))
-      {::u/status :error
-       ::u/message "Hook not found"}
-      {::repository repo})))
+        repo    (k8s/find cfg :repositories repo-id)]
+    {::repository repo}))
 
 (defmethod u/*fn
   ::catch-errors
@@ -28,6 +24,7 @@
     (log/error error)
     {:response {:status 400
                 :body error}}))
+
 (defmethod u/*fn
   ::response
   [{build ::build}]

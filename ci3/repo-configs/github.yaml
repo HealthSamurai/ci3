@@ -1,0 +1,16 @@
+apiVersion: v1
+data:
+  #
+  # This token will be used to project checkout
+  #
+  # 1. Get token from https://github.com/settings/tokens with read-only access
+  # 2. echo -n "TOKEN" | base64 -w 0
+  # 3. put encoded secret to github.yaml
+  #
+  token: - PUT-YOUR-VALUE-HERE -
+kind: Secret
+metadata:
+  annotations:
+  name: github
+  namespace: default
+type: Opaque
