@@ -36,7 +36,15 @@
       nil)))
 
 (defn get-branch [payload]
-  (-> payload :ref (str/split #"/") last))
+  (let [p (-> payload :ref (str/split #"/") )]
+    (if (= "heads" (get p 1))
+      (last p)
+      (last (str/split (or (:base_ref payload) "UNKNOWN-BRANCH") #"/" )))))
+
+(defn get-tag [payload]
+  (let [p (-> payload :ref (str/split #"/") )]
+    (if (= "tags" (get p 1))
+      (last p))))
 
 (defmethod u/*fn
   ::mk-build-resource
@@ -46,13 +54,14 @@
   {:ci3.repo.core/build
    (let [payload (json/parse-string payload keyword)
          commit (last (:commits payload))
-         hashcommit (:id commit)
+         hashcommit (or (:id commit) (get-in payload [:head_commit :id]) (:after payload))
          diff (get-in payload [:push :changes 0 :links :html :href])]
      {:kind "Build"
       :apiVersion "ci3.io/v1"
       :metadata {:name  build-name}
       :hashcommit hashcommit
       :branch (get-branch payload)
+      :tag (get-tag payload)
       :status "pending"
       :repository (get-in repository [:metadata :name])
       :diff diff

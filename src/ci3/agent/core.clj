@@ -163,7 +163,9 @@
        ::u/message (str "Could not find build: " bid " - " bld)}
       (let [build (walk/keywordize-keys bld)]
         {::build build
-         :env {:CI3_BRANCH (:branch build)}}))))
+         :env {:CI3_BRANCH (:branch build)
+               :CI3_COMMIT (:hashcommit build)
+               :CI3_TAG    (:tag build)}}))))
 
 
 (s/def ::repository string?)
