@@ -2,7 +2,7 @@
 
 A minimalistic ci for k8s
 
-## Motivataion
+## Motivation
 
 k8s provides us with nice platform to run isolated payloads.
 ci3 is hacker's ci which could provide CI/CD inside k8s cluster, as well as
@@ -14,12 +14,11 @@ ability to run and debug tests localy using agent mode
 1. Create [Repository](./ci3/repo-configs/repo.yaml) or Organization resource
 1. Add [ci3.yaml](./ci3/repo-configs/ci3.yaml) manifest into project
 
-
 ## Getting started
 
 Install local test runner ci3 brew, download jar etc
 
-## Secretes
+## Secrets
 
 
 ## License
