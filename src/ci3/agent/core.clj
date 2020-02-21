@@ -189,15 +189,31 @@
     {:response {:status 400
                 :body error}}))
 
+;; path should have "/" prefix
+(defn try-read [root pth]
+  (log/info "reading ci3.yaml from" (str root pth)) 
+  (let [build-config (yaml/parse-string (slurp (str root pth)) true)]
+    (if build-config
+      {::build-config build-config}
+      {::u/status  :error
+       ::u/message (str "Wrong or empty config" build-config)})))
+
 (defmethod u/*fn
   ::get-build-config
-  [{root ::root-dir}]
+  [{root ::root-dir
+    repo :ci3.repo.core/repository
+    build ::build}]
   (try
-    (let [build-config (yaml/parse-string (slurp (str root "/ci3.yaml")) true)]
-      (if build-config
-        {::build-config build-config}
-        {::u/status  :error
-         ::u/message (str "Wrong or empty config" build-config)}))
+    (cond
+      (contains? repo :buildConfig)
+      (let [pth (or (get-in repo [:buildConfig (keyword (:branch build))])
+                    (get-in repo [:buildConfig :default]))]
+        (if (nil? pth)
+          {::u/status  :error
+           ::u/message "build config path not provided in repo.buildConfig"}
+          (try-read root pth)))
+
+      :else (try-read root "/ci3.yaml"))
     (catch Exception e
       {::u/status  :error
        ::u/message (str (.getMessage e))})))
